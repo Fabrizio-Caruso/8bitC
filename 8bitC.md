@@ -3,14 +3,13 @@
 
 ---
 
-<h1 id="programmare-in-c-per-gli-8-bit">Programmare in C per gli 8-bit</h1>
-<p>Questo articolo descrive alcuni teniche l’uso del linguaggio ANSI C per programmare da PC per sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare di come programmare per le seguenti architetture:</p>
+<h1 id="c-per-gli-8-bit">C per gli 8-bit</h1>
+<p>Questo articolo descrive alcune tecniche e consigli per sfruttare al massimo il linguaggio ANSI C su sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti architetture (e architetture derivate e retrocompatibili):</p>
 <ul>
 <li>Intel 8080</li>
 <li>Zilog Z80</li>
 <li>MOS 6502</li>
-<li>Motorola 6809<br>
-e loro derivati e retrocompatibili 8-bit.</li>
+<li>Motorola 6809</li>
 </ul>
 <p>Faremo particolare riferimento ai <em>cross compilatori</em> <em>multi-target</em> della seguente tabella:</p>
 
@@ -55,13 +54,13 @@ e loro derivati e retrocompatibili 8-bit.</li>
 <li>lo sperimentale ZSDCC (versione ottimizzata per Z80 di SDCC sopracitato) che però può produrre codice più efficiente e compatto di SCCZ80 a costo di compilazione più lenta e rischio di introdurre bug.</li>
 </ul>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
-Per ANSI C qui intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <em>float</em> e i <em>long long</em> sono esclusi ma i puntatori a funzioni e puntatori a <em>struct</em> sono presenti.<br>
+Per ANSI C qui intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <em>float</em> e i <em>long long</em> sono opzionali ma i puntatori a funzioni e puntatori a <em>struct</em> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
 <p><strong>Cross-compilatori multi-target</strong><br>
-Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una architettura (sono <em>mono-architettura</em>) e per tale architettura supportano diversi target (cioè sono <em>multi-target</em> supportando diversi computer, console, handheld, calcolatrici, sistemi embedded, etc.).<br>
+Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) e per tale architettura supportano diversi target (cioè sono <em>multi-target</em> supportando diversi computer, console, handheld, calcolatrici, sistemi embedded, etc.).<br>
 ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
 <h2 id="motivazione">Motivazione</h2>
-<p>Per quale motivo e quali scopi dovremmo usare il C per programmare dei sistemi 8-bit?<br>
+<p>Per quale motivo dovremmo usare il C per programmare dei sistemi 8-bit?<br>
 Tradizionalmente queste macchine vengono programmate in Assembly o in BASIC interpretato o in un mix dei due.<br>
 Data la limitatezza delle risorse è spesso necessario ricorrere all’Assembly. Il BASIC è invece comodo per la sua semplicità e perché spesso un interprete è già presente sulla macchina.</p>
 <p>Volendo limitare il confronto a questi soli tre linguaggi il seguente schema ci dà una idea delle ragione per l’uso del C.</p>
@@ -110,12 +109,12 @@ Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly t
 <h2 id="scrivere-codice-portabile">Scrivere codice portabile</h2>
 <p>Scrivere codice facilmente portabile o addirittura diretammente ricompilabile per diverse piattaforme è possibile in C attraverso varie strategie:</p>
 <ul>
-<li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API)</li>
-<li>Usare implementazioni delle <em>interfacce</em> diverse per ogni target (facendo uso di <em>meta-programmazione</em>: con direttive al precompilatore o fornendo file diversi al momento del linking)</li>
+<li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware)</li>
+<li>Usare implementazioni delle <em>interfacce</em> diverse per ogni target (facendo uso di <em>meta-programmazione</em>: con <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking)</li>
 </ul>
 <p>Questo divenda banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target.</p>
-<p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal devkit Z88DK per creare un gioco su diversi sistemi ma tutti basati sull’architettura Z80.</p>
-<p>Se invece non si hanno a dispo delle API per tutti i target del proprio progetto, allora bisognerà costruirsele.<br>
+<p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su diversi sistemi ma tutti basati sull’architettura Z80.</p>
+<p>Se invece non si hanno a dispozione delle API per tutti i target del proprio progetto, allora bisognerà costruirsele.<br>
 Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em>. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
@@ -137,10 +136,10 @@ Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permet
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
 <p><strong>Esempio di progetto in C per scrivere codice multi-target e multi-architettura:</strong><br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
-<h2 id="come-ottimizzare-il-codice-per-gli-8-bit">Come ottimizzare il codice per gli 8-bit</h2>
+<h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come gli <em>struct</em>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
-<p>Il C prevede tipi numerici interi (char, short, int, long, long long e loro equivalenti in versione <em>unsigned</em>).<br>
+<p>Il C prevede tipi numerici interi (<em>char</em>, <em>short</em>, <em>int</em>, <em>long</em>, <em>long long</em> e loro equivalenti in versione <em>unsigned</em>).<br>
 Alcuni compilatori prevedono anche tipi <em>float</em> che qui non tratteremo. Bisogna però ricordarsi che i <em>float</em> delle architetture 8-bit sono tutti <em>software</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
 <p>Innanzitutto dobbiamo tenere conto che le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <em>signed</em> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <em>signed</em>.</p>
@@ -228,12 +227,12 @@ In pratica i due scenari in cui è conveniente sono:</p>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
 <p>Il mio consiglio è quello di compilare e vedere se il binario è più breve.</p>
 <h3 id="dove-mettere-i-dati">Dove mettere i dati</h3>
-<p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario e non codice. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.</p>
+<p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.<br>
+Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
 <p>Spesso (ma non sempre) le architetture basate su MOS 6502 prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
 <p>Molte architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata. Quindi non potremo mettere la grafica direttamente in questa memoria.</p>
-<h4 id="istruiamo-il-linker-di-cc65">Istruiamo il linker di CC65</h4>
-<p>Il caso più comune è forse quello degli sprites e dei caratteri ridefiniti.<br>
-Ogni compilatore mette a disposizioni strumenti diversi.<br>
+<h4 id="istruiamo-il-linker-di-cc65">[6502] Istruiamo il linker di CC65</h4>
+<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
 In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
 Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
 Una dettagliata descrizione è presente su:<br>
