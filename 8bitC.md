@@ -194,7 +194,7 @@ Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, opp
 <pre><code>unsigned char foo, bar;
 ...
 foo &lt;&lt; 2; // moltiplicazione per 2^2=4
-bar &gt;&gt; 1; // divisione per 2^1=4
+bar &gt;&gt; 1; // divisione per 2^1=2
 </code></pre>
 <h4 id="riscrivere-certe-operazioni">Riscrivere certe operazioni</h4>
 <p>Molte operazioni come il modulo possono essere riscritte in maniera più efficiente per gli 8 bit usando operatori bit a bit. Non sempre il compilatore ottimizza nel modo migliore. Quando il compilatore non ce la fa, dobbiamo dargli una mano noi:</p>
@@ -240,7 +240,7 @@ Una dettagliata descrizione è presente su:<br>
 Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
 <p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
-<h4 id="z88dk-ci-aiuta-molto-nella-grafica">Z88DK ci aiuta molto nella grafica</h4>
+<h4 id="z80-z88dk-ci-aiuta-molto-nella-grafica">[Z80] Z88DK ci aiuta molto nella grafica</h4>
 <p>Il dev-kit Z88DK possiede strumenti potentissimi per la grafica multi-piattaforma e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti indipendentemente dalla presenza del chip Texas VDP. Se usiamo queste API sarà il compilatore a decidere dove mettere questi dati e eventualmente a copiarli in memoria video.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
 <p>Il compilatore C produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
@@ -254,7 +254,7 @@ In particolare consiglio:</p>
 <li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
 </ul>
 <p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
-<p>In C standard potremmo solo definire le variabili puntatore come locazioni in queste aree di memoria.<br>
+<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.<br>
 Non esiste però un modo standard per dire al compilatore di mettere tutte le variabili in una specifica area di memoria.<br>
 I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia di byte preziosi.<br>
 Vari esempi sono presenti in:<br>
@@ -282,7 +282,7 @@ defc _player = _bombs + $14
 ...
 </code></pre>
 <p>CMOC mette a dispozione l’opzione <em>--data=&lt;indirizzo&gt;</em> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
-<p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore con valori nelle zone di memoria libera.</p>
+<p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
 <h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.</p>
 <p>In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
@@ -299,11 +299,11 @@ Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
 Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <em>POKE(0x9005,0xFF);</em> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispoendio di memoria per i caratteri standard.</p>
 <h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
 <p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni.Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto in uno di questi framework).</p>
-<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare classi, polimorfismo ed ereditarietà in maniera molto efficiente.<br>
+<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
 Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
 <ul>
-<li>usare puntatori a funzioni per ottenere methodo polimorfici (cioè il cui comportamento è definito a run-time). Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare puntatori a <em>struct</em> e composizione per implementare sotto-classi: dato uno <em>struct</em> A, si implementa una sua sotto-classe con uno <em>struct</em> B definito come uno <em>struct</em> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <em>struct</em>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
+<li>usare <em>puntatori a funzioni</em> per ottenere methodi polimorfici (cioè il cui comportamento è definito a run-time). Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
+<li>usare puntatori a <em>struct</em> e <em>composizione</em> per implementare sotto-classi: dato uno <em>struct</em> A, si implementa una sua sotto-classe con uno <em>struct</em> B definito come uno <em>struct</em> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <em>struct</em>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
 </ul>
 <p>Esempio preso da<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a><br>
