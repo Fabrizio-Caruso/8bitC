@@ -11,7 +11,9 @@
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
 </ul>
-<p>Faremo particolare riferimento ai <em>cross compilatori</em> <em>multi-target</em> della seguente tabella:</p>
+<h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
+<p>Per produrre i nostri binari 8-bit useremo dei <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi come computer, console, handheld, calcolatrici, sistemi embedded, etc.).  Non useremo dei compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
+<p>Faremo particolare riferimento ai seguenti <em>cross compilatori</em> <em>multi-target</em>:</p>
 
 <table>
 <thead>
@@ -50,15 +52,14 @@
 </ul>
 <p>Si noti come il dev-kit Z88DK disponga di due compilatori:</p>
 <ul>
-<li>il più affidabile SCCZ80 e veloce nelle compilazione</li>
+<li>l’affidabile SCCZ80 che è anche molto veloce nelle compilazione,</li>
 <li>lo sperimentale ZSDCC (versione ottimizzata per Z80 di SDCC sopracitato) che però può produrre codice più efficiente e compatto di SCCZ80 a costo di compilazione più lenta e rischio di introdurre bug.</li>
 </ul>
-<p><strong>Sottoinsieme di ANSI C</strong><br>
-Per ANSI C qui intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <em>float</em> e i <em>long long</em> sono opzionali ma i puntatori a funzioni e puntatori a <em>struct</em> sono presenti.<br>
-Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
-<p><strong>Cross-compilatori multi-target</strong><br>
-Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) e per tale architettura supportano diversi target (cioè sono <em>multi-target</em> supportando diversi computer, console, handheld, calcolatrici, sistemi embedded, etc.).<br>
+<p>Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) pur essendo <em>multi-target</em>.<br>
 ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p><strong>Sottoinsieme di ANSI C</strong><br>
+In questo articolo per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <em>float</em> e i <em>long long</em> sono opzionali ma i puntatori a funzioni e puntatori a <em>struct</em> sono presenti.<br>
+Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
 <h2 id="motivazione">Motivazione</h2>
 <p>Per quale motivo dovremmo usare il C per programmare dei sistemi 8-bit?<br>
 Tradizionalmente queste macchine vengono programmate in Assembly o in BASIC interpretato o in un mix dei due.<br>
@@ -102,17 +103,53 @@ In particolare l’ANSI C ci pemette di:</p>
 <li>scrivere codice “universale”, cioè valido per diversi target <strong>senza</strong> alcuna modifica</li>
 </ul>
 <h3 id="buone-performance">Buone performance</h3>
-<p>Qualcuno si spinge a dichiarare che il C siauna sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene.<br>
+<p>Qualcuno si spinge a dichiarare che il C sia una sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene.<br>
 Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly tra i linguaggi che permettono anche la programmazione ad alto livello.</p>
 <h3 id="controindicazioni-sentimentali">Controindicazioni “sentimentali”</h3>
-<p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come come sulle macchine che usavano il sistema operativo CP/M).</p>
+<p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come come sulle macchine che usavano il sistema operativo CP/M).<br>
+Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare programmare l’hardware di quasi tutti i sistemi 8-bit.</p>
 <h2 id="scrivere-codice-portabile">Scrivere codice portabile</h2>
 <p>Scrivere codice facilmente portabile o addirittura diretammente ricompilabile per diverse piattaforme è possibile in C attraverso varie strategie:</p>
 <ul>
-<li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware)</li>
-<li>Usare implementazioni delle <em>interfacce</em> diverse per ogni target (facendo uso di <em>meta-programmazione</em>: con <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking)</li>
+<li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
+<li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
 </ul>
-<p>Questo divenda banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target.</p>
+<p>Questo diventa banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target e la libreria multi-target del del dev-kit farà la “magia” per noi.</p>
+<p>Solo CC65 e Z88DK propongono interfacce multi-target per input e output ad accezione delle librerie standard C:</p>
+
+<table>
+<thead>
+<tr>
+<th>Dev-Kit</th>
+<th>conio</th>
+<th>tgi</th>
+<th>vt52</th>
+<th>vt100</th>
+<th>sprites</th>
+<th>UDG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CC65</td>
+<td>[x]</td>
+<td>[x]</td>
+<td>[  ]</td>
+<td>[ ]</td>
+<td>[ ]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>Z88DK</td>
+<td>[x]</td>
+<td>[ ]</td>
+<td>[x]</td>
+<td>[x]</td>
+<td>[x]</td>
+<td>[x]</td>
+</tr>
+</tbody>
+</table><p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice valido per ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice valido per <em>CC65</em> e <em>Z88DK</em>. Se usassimo altre <em>API</em> saremmo costretti a doverle implementare per i dev-kit che non le forniscono direttamente.</p>
 <p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su diversi sistemi ma tutti basati sull’architettura Z80.</p>
 <p>Se invece non si hanno a dispozione delle API per tutti i target del proprio progetto, allora bisognerà costruirsele.<br>
 Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
