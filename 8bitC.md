@@ -342,7 +342,17 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <tr>
 <td>Galaksija</td>
 <td>variable a-z</td>
-<td>$2A00-$2A68</td>
+<td>$2A00-2A68</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>printer buffer &amp; misc</td>
+<td>$7930-79AB</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>BASIC line input buffer</td>
+<td>$79E8-7A28</td>
 </tr>
 </tbody>
 </table><p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
