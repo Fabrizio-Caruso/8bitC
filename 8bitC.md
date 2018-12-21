@@ -283,7 +283,8 @@ Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg
 <p>Il compilatore C produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
 <p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
 Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
-In particolare consiglio:</p>
+Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In particolare consiglio:</p>
 <ul>
 <li>buffer della cassetta, della tastiera, della stampante, del disco</li>
 <li>memoria usata dal BASIC</li>
@@ -291,8 +292,61 @@ In particolare consiglio:</p>
 <li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
 </ul>
 <p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
-<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.<br>
-Non esiste però un modo standard per dire al compilatore di mettere tutte le variabili in una specifica area di memoria.<br>
+<p><em>Esempi utili</em><br>
+In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
+
+<table>
+<thead>
+<tr>
+<th>computer</th>
+<th>descrizione</th>
+<th>area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commodore Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Commodore 16</td>
+<td>tape buffer</td>
+<td>$0333-03F2</td>
+</tr>
+<tr>
+<td>Commodore 16</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Sinclair Spectrum 16K/48K</td>
+<td>printer buffer</td>
+<td>$5B00-5BFF</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>system input buffer</td>
+<td>$0200-0250</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>tape buffer</td>
+<td>$033A-03F9</td>
+</tr>
+<tr>
+<td>Galaksija</td>
+<td>variable a-z</td>
+<td>$2A00-$2A68</td>
+</tr>
+</tbody>
+</table><p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
+<p>Non esiste però un modo standard per dire al compilatore di mettere tutte le variabili in una specifica area di memoria.<br>
 I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia di byte preziosi.<br>
 Vari esempi sono presenti in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
