@@ -203,29 +203,24 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 <tr>
 <th></th>
 <th>dimensione in bit</th>
-<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><em>unsigned char</em></td>
 <td>8</td>
-<td></td>
 </tr>
 <tr>
 <td><em>unsigned short</em></td>
 <td>16</td>
-<td></td>
 </tr>
 <tr>
 <td><em>unsigned int</em></td>
 <td>16</td>
-<td></td>
 </tr>
 <tr>
 <td><em>unsigned long</em></td>
 <td>32</td>
-<td></td>
 </tr>
 </tbody>
 </table><p>Il tipo che dovremo usare il più possibile è quindi <em>unsigned char</em> (o qualora sia disponibile <em>uint8_t</em>).<br>
