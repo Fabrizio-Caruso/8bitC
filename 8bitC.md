@@ -3,16 +3,23 @@
 
 ---
 
-<h1 id="c-per-gli-8-bit">C per gli 8-bit</h1>
-<p>Questo articolo descrive alcune tecniche e consigli per sfruttare al massimo il linguaggio ANSI C su sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti architetture (e architetture derivate e retrocompatibili):</p>
+<h1 id="c-ottimizzato-per-gli-8-bit">C ottimizzato per gli 8-bit</h1>
+<p>Questo articolo descrive alcune tecniche e consigli per ottimizzare codice in ANSI C per <strong>tutti</strong> sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti architetture (e architetture derivate e retrocompatibili):</p>
 <ul>
 <li>Intel 8080</li>
 <li>Zilog Z80</li>
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
 </ul>
+<p>Questo articolo descrive tecniche di programmazione generiche valide per <strong>tutte</strong> le architetture e tutti i sistemi 8-bit <em>vintage</em>. Buona parte di queste tecniche rimangono validi su altre architetture 8-bit come quelle dei microcontrollori come l’Intel 8051.</p>
+<p>Lo scopo di questo articolo è duplice:</p>
+<ol>
+<li>descrivere tecniche per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
+<li>descrivere teniche per scrivere codice <strong>portatile</strong> cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit</li>
+</ol>
+<p>Questo articolo non approfondirà aspetti né specifici di una architettura, né aspetti specifici di un tool di sviluppo specifico.</p>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
-<p>Per produrre i nostri binari 8-bit useremo dei <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi come computer, console, handheld, calcolatrici, sistemi embedded, etc.).  Non useremo dei compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
+<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi come computer, console, handheld, calcolatrici, sistemi embedded, etc.).  Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
 <p>Faremo particolare riferimento ai seguenti <em>cross compilatori</em> <em>multi-target</em>:</p>
 
 <table>
@@ -149,10 +156,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>[x]</td>
 </tr>
 </tbody>
-</table><p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice valido per ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice valido per <em>CC65</em> e <em>Z88DK</em>. Se usassimo altre <em>API</em> saremmo costretti a doverle implementare per i dev-kit che non le forniscono direttamente.</p>
+</table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (ma su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su diversi sistemi ma tutti basati sull’architettura Z80.</p>
-<p>Se invece non si hanno a dispozione delle API per tutti i target del proprio progetto, allora bisognerà costruirsele.<br>
-Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
+<p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice valido per ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice valido per <em>CC65</em> e <em>Z88DK</em>.</p>
+<p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em>. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
 <li>#define -&gt; per definire una macro</li>
@@ -277,8 +284,6 @@ Una dettagliata descrizione è presente su:<br>
 Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
 <p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
-<h4 id="z80-z88dk-ci-aiuta-molto-nella-grafica">[Z80] Z88DK ci aiuta molto nella grafica</h4>
-<p>Il dev-kit Z88DK possiede strumenti potentissimi per la grafica multi-piattaforma e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti indipendentemente dalla presenza del chip Texas VDP. Se usiamo queste API sarà il compilatore a decidere dove mettere questi dati e eventualmente a copiarli in memoria video.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
 <p>Il compilatore C produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
 <p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
