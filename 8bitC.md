@@ -284,6 +284,7 @@ Una dettagliata descrizione è presente su:<br>
 Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
 <p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
+<h3 id="ottimizzazione-solo-su-singolo-file">Ottimizzazione solo su singolo file</h3>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
 <p>Il compilatore C produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
 <p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
@@ -310,16 +311,6 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </thead>
 <tbody>
 <tr>
-<td>Commodore Vic 20</td>
-<td>tape buffer</td>
-<td>$033C-03FB</td>
-</tr>
-<tr>
-<td>Commodore Vic 20</td>
-<td>BASIC input buffer</td>
-<td>$0200-0258</td>
-</tr>
-<tr>
 <td>Commodore 16</td>
 <td>tape buffer</td>
 <td>$0333-03F2</td>
@@ -328,11 +319,6 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>Commodore 16</td>
 <td>BASIC input buffer</td>
 <td>$0200-0258</td>
-</tr>
-<tr>
-<td>Sinclair Spectrum 16K/48K</td>
-<td>printer buffer</td>
-<td>$5B00-5BFF</td>
 </tr>
 <tr>
 <td>Commodore Pet</td>
@@ -345,9 +331,39 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$033A-03F9</td>
 </tr>
 <tr>
+<td>Commodore Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
 <td>Galaksija</td>
 <td>variable a-z</td>
 <td>$2A00-2A68</td>
+</tr>
+<tr>
+<td>Sinclair Spectrum 16K/48K</td>
+<td>printer buffer</td>
+<td>$5B00-5BFF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>alternate charset</td>
+<td>$B800-B7FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>grabable memory per modo hires</td>
+<td>$9800-B3FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>Page 4</td>
+<td>$400-4FF</td>
 </tr>
 <tr>
 <td>VZ200</td>
@@ -432,6 +448,12 @@ Definiamo <em>Item</em> è un sotto-classe di <em>Character</em> con metodo poli
 	};
 	typedef struct ItemStruct Item;
 </code></pre>
+<p>e poi potremo passare un puntatore a <em>Item</em> come se fosse un puntatore a <em>Character</em> (facendo un semplice <em>cast</em>):</p>
+<pre><code>	void foo(Character * aCharacter);
+...
+
+	foo((Character *) myItem);
+</code></pre>
 <p>Perché ci guadagnamo in termine di memoria?<br>
 Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
 <h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
@@ -510,6 +532,18 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 </table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
 <p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
 <p>Possiamo fare ancora di meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
+<h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
+<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
+<h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
+<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <em>getchar()</em> e <em>putchar(c)</em> e implementare tutto il resto.</p>
+<h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
+<p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
+<p>Per esempio:</p>
+<pre><code>#pragma printf = "%c %u"
+</code></pre>
+<p>includerà solo i convertitori per <em>%c</em> e <em>%u</em> escludendo tutto il codice per gli altri.</p>
+<p>Alcuni esempi sono in<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="sistemi-che-non-sono-supportati">Sistemi che non sono supportati</h2>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target ma dovremo fare più lavoro: saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
 <p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit ma per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
@@ -531,7 +565,7 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td>+test  +embedded  +cpm</td>
+<td><em>+test</em>, <em>+embedded</em> (nuova libreria),  <em>+cpm</em> (per vari sistemi CP/M)</td>
 </tr>
 <tr>
 <td>MOS 6502</td>
@@ -544,5 +578,14 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <td>–nodefaultlibs</td>
 </tr>
 </tbody>
-</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice: bisogna usare la sequenza di commanti chiamati da ACK e che sono visibili quando si compila con opzione <em>-v -v</em> (<em>ack +mcpm -v -v …</em>) come <em>cemcom.ansi</em> per produrre codice <em>byte code</em> da C.</p>
+</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
+Qui di seguito listo i comandi utili:</p>
+<ol>
+<li><em>ccp.ansi</em>:  precompilatore del C</li>
+<li><em>em_cemcom.ansi</em>: compila C preprocessato in bytecode</li>
+<li><em>em_opt</em>: ottimizza il bytecode</li>
+<li><em>cpm/ncg</em>: generaAssembly da bytecode</li>
+<li><em>cpm/as</em>: genera codice Intel 80 da Assembly</li>
+<li><em>em_led</em>: linker</li>
+</ol>
 
