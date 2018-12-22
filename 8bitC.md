@@ -427,7 +427,7 @@ defc _player = _bombs + $14
 </ul>
 <p>Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.<br>
 Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
-Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <em>POKE(0x9005,0xFF);</em> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispoendio di memoria per i caratteri standard.</p>
+Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <code>POKE(0x9005,0xFF);</code> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispoendio di memoria per i caratteri standard.</p>
 <h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
 <p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni.Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto in uno di questi framework).</p>
 <p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
@@ -553,8 +553,14 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <p>includerà solo i convertitori per <em>%c</em> e <em>%u</em> escludendo tutto il codice per gli altri.</p>
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
-<h2 id="sistemi-che-non-sono-supportati">Sistemi che non sono supportati</h2>
-<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target ma dovremo fare più lavoro: saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
+<h2 id="sistemi-non-supportati">Sistemi non supportati</h2>
+<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
+<p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
+<ul>
+<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta l’Olivetti Prodest PC128</li>
+<li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>)</li>
+<li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>)</li>
+</ul>
 <p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit ma per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
 
 <table>
@@ -591,9 +597,9 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 Qui di seguito listo i comandi utili:</p>
 <ol>
 <li><em>ccp.ansi</em>:  precompilatore del C</li>
-<li><em>em_cemcom.ansi</em>: compila C preprocessato in bytecode</li>
+<li><em>em_cemcom.ansi</em>: compila C preprocessato producendo bytecode</li>
 <li><em>em_opt</em>: ottimizza il bytecode</li>
-<li><em>cpm/ncg</em>: generaAssembly da bytecode</li>
+<li><em>cpm/ncg</em>: genera Assembly da bytecode</li>
 <li><em>cpm/as</em>: genera codice Intel 80 da Assembly</li>
 <li><em>em_led</em>: linker</li>
 </ol>
