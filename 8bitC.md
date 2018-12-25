@@ -23,6 +23,7 @@
 <ul>
 <li>Un <em>sistema</em> è un qualunque tipo di macchina dotata di processore come computer, console, handheld, calcolatrici, sistemi embedded, etc.</li>
 <li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e come la generazione di un binario in formato specifico.</li>
+<li>Un <em>architettura</em> è un tipo di processore. Un <em>target</em> appartiene quindi ad una sola archiettura data dal suo processore (con rare eccezioni come il Commodore 128 che ha sia un processore derivato dal 6502 e uno Zilog Z80).</li>
 </ul>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
 <p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi).</p>
@@ -142,6 +143,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <th>vt100</th>
 <th>sprites</th>
 <th>UDG</th>
+<th>bitmap</th>
 </tr>
 </thead>
 <tbody>
@@ -153,6 +155,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>[ ]</td>
 <td>[ ]</td>
 <td>[]</td>
+<td>[]</td>
 </tr>
 <tr>
 <td>Z88DK</td>
@@ -162,6 +165,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>[x]</td>
 <td>[x]</td>
 <td>[x]</td>
+<td>[]</td>
 </tr>
 </tbody>
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (ma su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
@@ -194,9 +198,9 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>il codice della libreria <em>crossLib</em> (directory <em>src/cross_lib</em>) implementa i dettagli di ogni hardware possibile</li>
 </ul>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
-<p>Bisogna scegliere con cura le operazioni come si fa in C per qualunque architettura indipendentemente dal fatto che sia 8-bit o meno.</p>
+<p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
 <h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
-<p>Bisogna evitare operatori di post-incremento/decremento (<em>i++</em>, <em>i–</em>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<em>++i</em>, <em>–i</em>).</p>
+<p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).</p>
 <h3 id="costanti-vs-variabili">Costanti vs Variabili</h3>
 <p>Una qualunque architettura potrà ottimizzare meglio del codici in cui delle variabili sono sostituite con delle costanti.</p>
 <h4 id="usiamo-costanti">Usiamo costanti</h4>
@@ -214,15 +218,15 @@ i = i + OFFS + 3;
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come gli <em>struct</em>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
-<p>Il C prevede tipi numerici interi (<em>char</em>, <em>short</em>, <em>int</em>, <em>long</em>, <em>long long</em> e loro equivalenti in versione <em>unsigned</em>).<br>
-Alcuni compilatori prevedono anche tipi <em>float</em> che qui non tratteremo. Bisogna però ricordarsi che i <em>float</em> delle architetture 8-bit sono tutti <em>software</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
+<p>Il C prevede tipi numerici interi (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
+Alcuni compilatori prevedono anche tipi <code>float</code> che qui non tratteremo. Bisogna però ricordarsi che i <code>float</code> delle architetture 8-bit sono tutti <em>software</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
-<p>Innanzitutto dobbiamo tenere conto che le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <em>signed</em> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <em>signed</em>.</p>
+<p>Innanzitutto dobbiamo tenere conto che le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <code>signed</code> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
 <h4 id="size-matterns">“Size matterns!”</h4>
 <p>Inutile soffermarsi che un’archiettura 8-bit prevede quasi solo operazioni a 8-bit e quindi è meglio limitarsi a tipi di taglia 8-bit. Se il nostro use-case ci obbligo possiamo usare tipi a 16-bit ma oltre, rischiamo di avere codice inefficiente.</p>
 <h4 id="taglie-diverse-su-architetture-diverse">Taglie diverse su architetture diverse</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
-Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <em>uint8_t</em> per l’intero <em>unsigend</em> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
+Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <em>unsigend</em> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
 
 <table>
 <thead>
@@ -249,10 +253,10 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 <td>32</td>
 </tr>
 </tbody>
-</table><p>Il tipo che dovremo usare il più possibile è quindi <em>unsigned char</em> (o qualora sia disponibile <em>uint8_t</em>).<br>
-Quando costretti potremo usare <em>unsigned short</em> (o <em>uint16_t</em>). Consiglio di evitare qualunque altro tipo numerico.</p>
+</table><p>Il tipo che dovremo usare il più possibile è quindi <code>unsigned char</code> (o qualora sia disponibile <code>uint8_t</code>).<br>
+Potremo usare <code>unsigned short</code> (o <code>uint16_t</code>), evitando quando possibile operazioni aritmetiche a 16 bit. Consiglio di evitare qualunque altro tipo numerico.</p>
 <h3 id="scelta-delle-operazioni">Scelta delle operazioni</h3>
-<p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <em>signed</em> o tipi a 16 o peggio 32 bit).</p>
+<p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <code>signed</code> o tipi a 16 o peggio 32 bit).</p>
 <h4 id="non-produciamo-signed">Non produciamo <em>signed</em></h4>
 <p>In particolare, se possibile, spesso si può riscrivere il codice in maniera da evitare sottrazioni e quando questo non è possibile, si può almeno fare in modo che il risultato della sottrazione sia sempre non-negativo.</p>
 <h4 id="evitiamo-i-prodotti-espliciti">Evitiamo i prodotti espliciti</h4>
