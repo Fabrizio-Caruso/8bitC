@@ -30,7 +30,7 @@
 <ul>
 <li>Un <em>sistema</em> è un qualunque tipo di macchina dotata di processore come computer, console, handheld, calcolatrici, sistemi embedded, etc.</li>
 <li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e come la generazione di un binario in formato specifico.</li>
-<li>Un <em>architettura</em> è un tipo di processore. Un <em>target</em> appartiene quindi ad una sola archiettura data dal suo processore (con rare eccezioni come il Commodore 128 che ha sia un processore derivato dal 6502 e uno Zilog Z80).</li>
+<li>Un <em>architettura</em> è un tipo di processore (Intel 8080, 6502, Zilog Z80, Motorola 6809, etc.) . Un <em>target</em> appartiene quindi ad una sola archiettura data dal suo processore (con rare eccezioni come il Commodore 128 che ha sia un processore derivato dal 6502 e uno Zilog Z80).</li>
 </ul>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
 <p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi).</p>
@@ -78,8 +78,7 @@
 <li>l’affidabile SCCZ80 che è anche molto veloce nelle compilazione,</li>
 <li>lo sperimentale ZSDCC (versione ottimizzata per Z80 di SDCC sopracitato) che però può produrre codice più efficiente e compatto di SCCZ80 a costo di compilazione più lenta e rischio di introdurre bug.</li>
 </ul>
-<p>Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) pur essendo <em>multi-target</em>.<br>
-ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p>Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) pur essendo <em>multi-target</em>. ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
 <p>Questo articolo <strong>non</strong> è né una introduzione né un manuale d’uso di questi compilatori e <strong>non</strong> tratterà:</p>
 <ul>
 <li>l’istallazione dei compilatori;</li>
@@ -213,7 +212,9 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
 <h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
-<p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).</p>
+<p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).<br>
+Il motivo è che l’operatore di post-incremento richiede almeno una operazione in più dovendo conservare il valore originario.<br>
+Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo <code>for</code>.</p>
 <h3 id="costanti-vs-variabili">Costanti vs Variabili</h3>
 <p>Una qualunque architettura potrà ottimizzare meglio del codici in cui delle variabili sono sostituite con delle costanti.</p>
 <h4 id="usiamo-costanti">Usiamo costanti</h4>
