@@ -490,7 +490,7 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
 <p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
 <h3 id="ottimizzazione-aggressiva">Ottimizzazione “aggressiva”</h3>
-<p>Le seguenti opzioni applicano il massimo delle ottimizzazioni</p>
+<p>Le seguenti opzioni applicano il massimo delle ottimizzazioni per produrre codice veloce e soprattutto compatto:</p>
 
 <table>
 <thead>
@@ -504,34 +504,61 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <tr>
 <td>Intel 8080</td>
 <td>ACK</td>
-<td><em>-O6</em></td>
+<td><code>-O6</code></td>
 </tr>
 <tr>
 <td>Zilog Z80</td>
 <td>SCCZ80 (Z88DK)</td>
-<td><em>-O3</em></td>
+<td><code>-O3</code></td>
 </tr>
 <tr>
 <td>Zilog Z80</td>
 <td>ZSDCC (Z88DK)</td>
-<td><em>-SO3</em> <em>–max-alloc-node20000</em></td>
+<td><code>-SO3</code> <code>--max-alloc-node20000</code></td>
 </tr>
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td><em>-O</em> <em>-Cl</em></td>
+<td><code>-O</code> <code>-Cl</code></td>
 </tr>
 <tr>
 <td>Motorola 6809</td>
 <td>CMOC</td>
-<td><em>-O2</em></td>
+<td><code>-O2</code></td>
+</tr>
+</tbody>
+</table><h4 id="velocità-vs-memoria">Velocità vs Memoria</h4>
+<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In alcuni casi l’obiettivo principale può invece essere la velocità anche a discapito della memoria. In generale il codice ottimizzato sarà compatto e veloce ma non sempre.<br>
+Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
+
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zilog Z80</td>
+<td>ZSDCC (Z88DK)</td>
+<td><code>--opt-code-size</code></td>
+<td>Ottimizza memoria</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-Oi</code></td>
+<td>Ottimizza velocità</td>
 </tr>
 </tbody>
 </table><p><strong>Problemi noti</strong></p>
 <ul>
-<li>CC65: <em>-Cl</em> impedisce la ricorsione</li>
-<li>CMOC: <em>-O2</em> ha dei bug</li>
-<li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <em>-SO3</em> in assenza di <em>–max-alloc-node20000</em>.</li>
+<li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
+<li>CMOC: <code>-O2</code> ha dei bug</li>
+<li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
 </ul>
 <h3 id="ottimizzazione-più-sicura">Ottimizzazione più sicura</h3>
 
@@ -547,17 +574,17 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <tr>
 <td>Zilog Z80</td>
 <td>SCCZ80 (Z88DK)</td>
-<td><em>-O3</em></td>
+<td><code>-O3</code></td>
 </tr>
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td><em>-O</em></td>
+<td><code>-O</code></td>
 </tr>
 <tr>
 <td>Motorola 6809</td>
 <td>CMOC</td>
-<td><em>-O1</em></td>
+<td><code>-O1</code></td>
 </tr>
 </tbody>
 </table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
@@ -566,7 +593,7 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
 <p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
 <h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
-<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <em>getchar()</em> e <em>putchar(c)</em> e implementare tutto il resto.</p>
+<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> e implementare tutto il resto.</p>
 <h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
 <p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
 <p>Per esempio:</p>
