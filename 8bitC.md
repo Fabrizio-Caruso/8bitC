@@ -548,9 +548,15 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <td>Ottimizza memoria</td>
 </tr>
 <tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>--opt-code-speed</code></td>
+<td>Ottimizza velocità</td>
+</tr>
+<tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td><code>-Oi</code></td>
+<td><code>-Oi</code>, <code>-Os</code></td>
 <td>Ottimizza velocità</td>
 </tr>
 </tbody>
