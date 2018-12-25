@@ -427,13 +427,11 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </tbody>
 </table><p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
 <p>Per esempio se avessi un aree di memoria libera a partire da <code>0xC000</code> e volessimo memorizzarvi un array <code>foo</code> di <code>unsigned char</code> e uno <code>short</code> <code>bar</code>, potremmo sempre fare qualcosa del genere:</p>
-<pre><code>#define FOO_SIZE 10
-
-unsigned char *foo = 0xC000;
-
-short *bar = 0xC000+FOO_SIZE;
-...
-foo[7] = *bar;
+<pre><code>	#define FOO_SIZE 10
+	unsigned char *foo = 0xC000;
+	short *bar = 0xC000+FOO_SIZE;
+	...
+	foo[7] = *bar;
 </code></pre>
 <p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em>.</p>
 <p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
