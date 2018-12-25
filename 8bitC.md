@@ -74,7 +74,7 @@
 <p>Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) pur essendo <em>multi-target</em>.<br>
 ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
-In questo articolo per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <em>float</em> e i <em>long long</em> sono opzionali ma i puntatori a funzioni e puntatori a <em>struct</em> sono presenti.<br>
+In questo articolo per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
 <h2 id="motivazione">Motivazione</h2>
 <p>Per quale motivo dovremmo usare il C per programmare dei sistemi 8-bit?<br>
@@ -174,10 +174,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em>. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
-<li>#define -&gt; per definire una macro</li>
-<li>#if … defined(…) … #else … #elseif -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
+<li><code>#define</code> -&gt; per definire una macro</li>
+<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
 </ul>
-<p>Inoltre tutti i compilatori prevedono una opzione (in genere “-D”) per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
+<p>Inoltre tutti i compilatori prevedono una opzione (in genere <code>-D</code>) per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
 <p>Nel codice avremo qualcosa come:</p>
 <pre><code>...
 	#elif defined(__PV1000__)
@@ -188,7 +188,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 		#define XSize 22
 ...
 </code></pre>
-<p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <em>XSize</em> specifica del <em>Vic 20</em>.</p>
+<p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
 <p>Come esempio principale fareme riferimento al progetto <em>Cross-Chase</em>:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
@@ -216,7 +216,7 @@ i = i + OFFS + 3;
 </code></pre>
 <p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
-<p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come gli <em>struct</em>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
+<p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
 <p>Il C prevede tipi numerici interi (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
 Alcuni compilatori prevedono anche tipi <code>float</code> che qui non tratteremo. Bisogna però ricordarsi che i <code>float</code> delle architetture 8-bit sono tutti <em>software</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
@@ -226,7 +226,7 @@ Alcuni compilatori prevedono anche tipi <code>float</code> che qui non tratterem
 <p>Inutile soffermarsi che un’archiettura 8-bit prevede quasi solo operazioni a 8-bit e quindi è meglio limitarsi a tipi di taglia 8-bit. Se il nostro use-case ci obbligo possiamo usare tipi a 16-bit ma oltre, rischiamo di avere codice inefficiente.</p>
 <h4 id="taglie-diverse-su-architetture-diverse">Taglie diverse su architetture diverse</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
-Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <em>unsigend</em> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
+Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
 
 <table>
 <thead>
@@ -237,19 +237,19 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 </thead>
 <tbody>
 <tr>
-<td><em>unsigned char</em></td>
+<td><code>unsigned char</code></td>
 <td>8</td>
 </tr>
 <tr>
-<td><em>unsigned short</em></td>
+<td><code>unsigned short</code></td>
 <td>16</td>
 </tr>
 <tr>
-<td><em>unsigned int</em></td>
+<td><code>unsigned int</code></td>
 <td>16</td>
 </tr>
 <tr>
-<td><em>unsigned long</em></td>
+<td><code>unsigned long</code></td>
 <td>32</td>
 </tr>
 </tbody>
@@ -283,16 +283,16 @@ Le altre architetture 8-bit che stiamo considerando soffrono meno di questo prob
 <h4 id="un-antipattern-può-aiutarci">Un <em>antipattern</em> può aiutarci</h4>
 <p>Un modo per ridurre il problema è limitare l’uso delle variabili locali e dei parametri passati alle funzioni. Questo è chiaramente un <em>antipattern</em> e se lo applicassimo a tutto il nostro codice otterremo il classico <em>spaghetti code</em>. Dobbiamo quindi scegliere sapientemente quali variabili sono assolutamente locali e quali possono essere usate come globali. Avremo codice meno generico di quello che avremmo voluto ma sarà più efficiente. <strong>NON</strong> sto suggerendo di rendere tutte le variabili globali e di non passare mai parametri alle funzioni.</p>
 <h4 id="usare-funzioni-non-re-entrant">[6502] Usare funzioni non re-entrant</h4>
-<p>Il compilatore CC65 per l’architettura MOS 6502 mette a disposizione l’opzione <em>-Cl</em> che rende tutte le variabili locali come <em>static</em>, quindi globali. Questo ha l’effetto di evitare l’uso dello stack per il loro scope. Ha però l’effetto di rendere tutte le nostre funzioni non re-entrant. In pratica questo ci impedisce di usare funzioni recursive. Questa non è un grave perdita perché la ricorsione sarebbe comunque una operazione troppo costosa per una architettura 8-bit.</p>
+<p>Il compilatore CC65 per l’architettura MOS 6502 mette a disposizione l’opzione <code>-Cl</code> che rende tutte le variabili locali come <code>static</code>, quindi globali. Questo ha l’effetto di evitare l’uso dello stack per il loro scope. Ha però l’effetto di rendere tutte le nostre funzioni non re-entrant. In pratica questo ci impedisce di usare funzioni recursive. Questa non è un grave perdita perché la ricorsione sarebbe comunque una operazione troppo costosa per una architettura 8-bit.</p>
 <h4 id="usare-la-pagina-zero">[6502] Usare la pagina zero</h4>
-<p>Il C standard prevede la keyword <em>register</em> per suggerire al compilatore di mettere una variabile in un registro.<br>
+<p>Il C standard prevede la keyword <code>register</code> per suggerire al compilatore di mettere una variabile in un registro.<br>
 In genere i compilatori moderni ignorano questa keyword perché lasciano questa scelta ai loro ottimizzatori. Questo è vero per i compilatori in questione ad eccezione di quello presenti in CC65 che la usa come suggerimento al compilatore per mettere una variabile in <em>pagina zero</em>. Il MOS 6502 accede in maniera più efficiente a tale pagina di memoria. Si può guadagnare memoria e velocità.<br>
 Per quanto riguarda l’architettura MOS 6502, il sistema operativo di queste macchine usa una parte della pagina zero. Resta comunque una manciata di byte a disposizione del programmatore.<br>
-CC65 per default lascia 6 byte della pagina zero a disposizione delle variabili dichiarate con keyword <em>register</em>.<br>
-Potrebbe sembrare quindi ovvio dichiarare molte variabili come <em>register</em> ma <strong>NON</strong> è così semplice perché tutto ha un costo. Per mettere una variabile sulla <em>pagina zero</em> sono necessarie diverse operazioni. Quindi se ne avrà un vantaggio quando le variabili sono molto usate.<br>
+CC65 per default lascia 6 byte della pagina zero a disposizione delle variabili dichiarate con keyword <code>register</code>.<br>
+Potrebbe sembrare quindi ovvio dichiarare molte variabili come <code>register</code> ma <strong>NON</strong> è così semplice perché tutto ha un costo. Per mettere una variabile sulla <em>pagina zero</em> sono necessarie diverse operazioni. Quindi se ne avrà un vantaggio quando le variabili sono molto usate.<br>
 In pratica i due scenari in cui è conveniente sono:</p>
 <ol>
-<li>parametri di tipo puntatore a <em>struct</em> usati almeno 3 volte all’interno di una funzione</li>
+<li>parametri di tipo puntatore a <code>struct</code> usati almeno 3 volte all’interno di una funzione</li>
 <li>variabile in un loop che si ripete almeno un centinaio di volte</li>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
@@ -413,7 +413,7 @@ I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di f
 Vari esempi sono presenti in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
 <p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
-<p>Di seguito diamo un esempio di mappatura delle variabili <em>ghosts</em>, <em>bombs</em>, <em>player</em>.</p>
+<p>Di seguito diamo un esempio di mappatura delle variabili <code>ghosts</code>, <code>bombs</code>, <code>player</code>.</p>
 <p>Sintassi CC65</p>
 <pre><code>.export _ghosts;
 _ghosts = $33c
@@ -434,7 +434,7 @@ defc _bombs = _ghosts + $28
 defc _player = _bombs + $14
 ...
 </code></pre>
-<p>CMOC mette a dispozione l’opzione <em>--data=&lt;indirizzo&gt;</em> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
+<p>CMOC mette a dispozione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
 <h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.</p>
@@ -456,11 +456,11 @@ Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <c
 Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
 <ul>
 <li>usare <em>puntatori a funzioni</em> per ottenere methodi polimorfici (cioè il cui comportamento è definito a run-time). Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare puntatori a <em>struct</em> e <em>composizione</em> per implementare sotto-classi: dato uno <em>struct</em> A, si implementa una sua sotto-classe con uno <em>struct</em> B definito come uno <em>struct</em> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <em>struct</em>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
+<li>usare puntatori a <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
 </ul>
 <p>Esempio preso da<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a><br>
-Definiamo <em>Item</em> è un sotto-classe di <em>Character</em> con metodo polimorfico <em>_effect</em>:</p>
+Definiamo <code>Item</code> è un sotto-classe di <code>Character</code> con metodo polimorfico <code>_effect</code>:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
@@ -479,7 +479,7 @@ Definiamo <em>Item</em> è un sotto-classe di <em>Character</em> con metodo poli
 	};
 	typedef struct ItemStruct Item;
 </code></pre>
-<p>e poi potremo passare un puntatore a <em>Item</em> come se fosse un puntatore a <em>Character</em> (facendo un semplice <em>cast</em>):</p>
+<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
 <pre><code>	Item *myItem;
 	void foo(Character * aCharacter);
 	...
@@ -605,7 +605,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>Per esempio:</p>
 <pre><code>#pragma printf = "%c %u"
 </code></pre>
-<p>includerà solo i convertitori per <em>%c</em> e <em>%u</em> escludendo tutto il codice per gli altri.</p>
+<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="sistemi-non-supportati">Sistemi non supportati</h2>
@@ -635,17 +635,17 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><em>+test</em>, <em>+embedded</em> (nuova libreria),  <em>+cpm</em> (per vari sistemi CP/M)</td>
+<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
 </tr>
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td>+none</td>
+<td><code>+none</code></td>
 </tr>
 <tr>
 <td>Motorola 6809</td>
 <td>CMOC</td>
-<td>–nodefaultlibs</td>
+<td><code>--nodefaultlibs</code></td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
