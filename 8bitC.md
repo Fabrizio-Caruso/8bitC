@@ -453,10 +453,10 @@ Definiamo <em>Item</em> è un sotto-classe di <em>Character</em> con metodo poli
 	typedef struct ItemStruct Item;
 </code></pre>
 <p>e poi potremo passare un puntatore a <em>Item</em> come se fosse un puntatore a <em>Character</em> (facendo un semplice <em>cast</em>):</p>
-<pre><code>	void foo(Character * aCharacter);
-...
-
-	foo((Character *) myItem);
+<pre><code>	Item *myItem;
+	void foo(Character * aCharacter);
+	...
+	foo((Character *)myItem);
 </code></pre>
 <p>Perché ci guadagnamo in termine di memoria?<br>
 Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
