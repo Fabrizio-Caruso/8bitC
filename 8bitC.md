@@ -183,8 +183,12 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (ma su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su diversi sistemi ma tutti basati sull’architettura Z80.</p>
 <p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice valido per ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice valido per <em>CC65</em> e <em>Z88DK</em>.</p>
-<p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong> il codice che non dipende dall’hardware dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</p>
-<p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em>. In particolare il C prevede un potente precompilatore con comandi come:</p>
+<p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
+<ul>
+<li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
+<li>dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</li>
+</ul>
+<p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
 <li><code>#define</code> -&gt; per definire una macro</li>
 <li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
@@ -233,7 +237,7 @@ i = i + OFFS + 3;
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
 <p>Il C prevede tipi numerici interi (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
-Alcuni compilatori prevedono anche tipi <code>float</code> che qui non tratteremo. Bisogna però ricordarsi che i <code>float</code> delle architetture 8-bit sono tutti <em>software</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
+Alcuni compilatori prevedono anche tipi <code>float</code> che qui non tratteremo. Bisogna però ricordarsi che i <code>float</code> delle architetture 8-bit sono tutti <em>software float</em> ed hanno quindi un costo computazionale notevole. Sono quindi da usare solo se strettamente necessari.</p>
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
 <p>Innanzitutto dobbiamo tenere conto che le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <code>signed</code> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
 <h4 id="size-matterns">“Size matterns!”</h4>
@@ -310,7 +314,7 @@ In pratica i due scenari in cui è conveniente sono:</p>
 <li>variabile in un loop che si ripete almeno un centinaio di volte</li>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
-<p>Il mio consiglio è quello di compilare e vedere se il binario è più breve.</p>
+<p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
 <h3 id="dove-mettere-i-dati">Dove mettere i dati</h3>
 <p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.<br>
 Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
@@ -331,13 +335,13 @@ Questa buona pratica può però avere degli effetti deleteri per gli ottimizzato
 Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
 Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
-<p>Il compilatore C produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
+<p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
 <p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
 Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
 Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
-<p>In particolare consiglio:</p>
+<p>In particolare consiglio di cercare:</p>
 <ul>
-<li>buffer della cassetta, della tastiera, della stampante, del disco</li>
+<li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
 <li>memoria usata dal BASIC</li>
 <li>aree di memoria dedicate a modi grafici (che non si intendono usare)</li>
 <li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
@@ -422,8 +426,18 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </tr>
 </tbody>
 </table><p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
-<p>Non esiste però un modo standard per dire al compilatore di mettere tutte le variabili in una specifica area di memoria.<br>
-I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia di byte preziosi.<br>
+<p>Per esempio se avessi un aree di memoria libera a partire da <code>0xC000</code> e volessimo memorizzarvi un array <code>foo</code> di <code>unsigned char</code> e uno <code>short</code> <code>bar</code>, potremmo sempre fare qualcosa del genere:</p>
+<pre><code>#define FOO_SIZE 10
+
+unsigned char *foo = 0xC000;
+
+short *bar = 0xC000+FOO_SIZE;
+...
+foo[7] = *bar;
+</code></pre>
+<p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em>.</p>
+<p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
+I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia o migliaia di byte preziosi.<br>
 Vari esempi sono presenti in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
 <p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
@@ -470,7 +484,7 @@ Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <c
 Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
 <ul>
 <li>usare <em>puntatori a funzioni</em> per ottenere methodi polimorfici (cioè il cui comportamento è definito a run-time). Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare puntatori a <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
+<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
 </ul>
 <p>Esempio preso da<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a><br>
