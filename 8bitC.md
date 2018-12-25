@@ -11,13 +11,20 @@
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
 </ul>
-<p>Questo articolo descrive tecniche di programmazione generiche valide per <strong>tutte</strong> le architetture e tutti i sistemi 8-bit <em>vintage</em>. Buona parte di queste tecniche rimangono validi su altre architetture 8-bit come quelle dei microcontrollori come l’Intel 8051.</p>
+<p>Questo articolo descrive tecniche di programmazione generiche valide per <strong>tutte</strong> queste architetture e tutti i sistemi 8-bit <em>vintage</em> basati su di esse. Buona parte di queste tecniche sono validi su altre architetture 8-bit come quelle dei microcontrollori come l’Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
-<li>descrivere tecniche per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
+<li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
 <li>descrivere teniche per scrivere codice <strong>portatile</strong> cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit</li>
 </ol>
-<p>Questo articolo non approfondirà aspetti né specifici di una architettura, né aspetti specifici di un tool di sviluppo specifico.</p>
+<h2 id="premesse">Premesse</h2>
+<p>Questo articolo <strong>non</strong> un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
+<ul>
+<li>buona conoscenza del linguaggio <em>C</em>;</li>
+<li>buona conoscenza della programmazione strutturata e a oggetti;</li>
+<li>conoscenza dell’uso di compilatori e linker.</li>
+</ul>
+<p>Questo articolo <strong>non</strong> si occuperà in profondità su ambiti specifici della programmazione come grafica, suono, input/output, etc.</p>
 <h2 id="terminologia">Terminologia</h2>
 <p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo:</p>
 <ul>
@@ -73,6 +80,12 @@
 </ul>
 <p>Quasi tutti i compilatori che stiamo prendendo in considerazione generano codice per una sola architettura (sono <em>mono-architettura</em>) pur essendo <em>multi-target</em>.<br>
 ACK è una eccezione essendo anche <em>multi-architettura</em> (con supporto per Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p>Questo articolo <strong>non</strong> è né una introduzione né un manuale d’uso di questi compilatori e <strong>non</strong> tratterà:</p>
+<ul>
+<li>l’istallazione dei compilatori;</li>
+<li>elementi specifici per l’uso di base di un compilatore</li>
+</ul>
+<p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.</p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
 In questo articolo per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
@@ -460,7 +473,7 @@ Una trattazione dettagliata non è possibile in questo articolo e qui ci limitia
 </ul>
 <p>Esempio preso da<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a><br>
-Definiamo <code>Item</code> è un sotto-classe di <code>Character</code> con metodo polimorfico <code>_effect</code>:</p>
+Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
