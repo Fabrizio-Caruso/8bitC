@@ -4,7 +4,7 @@
 ---
 
 <h1 id="c-ottimizzato-per-gli-8-bit">C ottimizzato per gli 8-bit</h1>
-<p>Questo articolo descrive alcune tecniche e consigli per ottimizzare codice in ANSI C per <strong>tutti</strong> sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti architetture (e architetture derivate e retrocompatibili):</p>
+<p>Questo articolo descrive alcune tecniche e consigli per ottimizzare codice in ANSI C per <strong>tutti</strong> sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
 <ul>
 <li>Intel 8080</li>
 <li>Zilog Z80</li>
@@ -18,8 +18,16 @@
 <li>descrivere teniche per scrivere codice <strong>portatile</strong> cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit</li>
 </ol>
 <p>Questo articolo non approfondirà aspetti né specifici di una architettura, né aspetti specifici di un tool di sviluppo specifico.</p>
+<h2 id="terminologia">Terminologia</h2>
+<p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo:</p>
+<ul>
+<li>Un <em>sistema</em> è un qualunque tipo di macchina dotata di processore come computer, console, handheld, calcolatrici, sistemi embedded, etc.</li>
+<li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e come la generazione di un binario in formato specifico.</li>
+</ul>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
-<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi come computer, console, handheld, calcolatrici, sistemi embedded, etc.).  Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
+<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi).</p>
+<h3 id="cross-compilatori-vs-compilatori-nativi">Cross-compilatori vs compilatori nativi</h3>
+<p>Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
 <p>Faremo particolare riferimento ai seguenti <em>cross compilatori</em> <em>multi-target</em>:</p>
 
 <table>
@@ -185,6 +193,24 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>il codice del gioco (directory <em>src/chase</em>) è indipendente dall’hardware</li>
 <li>il codice della libreria <em>crossLib</em> (directory <em>src/cross_lib</em>) implementa i dettagli di ogni hardware possibile</li>
 </ul>
+<h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
+<p>Bisogna scegliere con cura le operazioni come si fa in C per qualunque architettura indipendentemente dal fatto che sia 8-bit o meno.</p>
+<h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
+<p>Bisogna evitare operatori di post-incremento/decremento (<em>i++</em>, <em>i–</em>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<em>++i</em>, <em>–i</em>).</p>
+<h3 id="costanti-vs-variabili">Costanti vs Variabili</h3>
+<p>Una qualunque architettura potrà ottimizzare meglio del codici in cui delle variabili sono sostituite con delle costanti.</p>
+<h4 id="usiamo-costanti">Usiamo costanti</h4>
+<p>Quindi se una data variabile ha un valore noto al momento della compilazione, è importante che sia rimpiazzata con una costante.<br>
+Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipendre da una opzione di compilazione, allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
+<h4 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h4>
+<p>Inoltre, per compilatori <em>single pass</em> (come CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
+<p>Per esempio (<a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistra a destra non capendo che <code>OFFS+3</code> è una costante.</p>
+<pre><code>#define OFFS   4
+int  i;
+i = i + OFFS + 3;
+</code></pre>
+<p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come gli <em>struct</em>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
@@ -227,9 +253,6 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 Quando costretti potremo usare <em>unsigned short</em> (o <em>uint16_t</em>). Consiglio di evitare qualunque altro tipo numerico.</p>
 <h3 id="scelta-delle-operazioni">Scelta delle operazioni</h3>
 <p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <em>signed</em> o tipi a 16 o peggio 32 bit).</p>
-<h4 id="applichiamo-le-buone-regole-generali">Applichiamo le buone regole generali</h4>
-<p>Bisogna scegliere con cura le operazioni come si fa in C per qualunque architettura.<br>
-Per esempio bisogna evitare operatori di post-incremento/decremento (<em>i++</em>, <em>i–</em>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<em>++i</em>, <em>–i</em>).</p>
 <h4 id="non-produciamo-signed">Non produciamo <em>signed</em></h4>
 <p>In particolare, se possibile, spesso si può riscrivere il codice in maniera da evitare sottrazioni e quando questo non è possibile, si può almeno fare in modo che il risultato della sottrazione sia sempre non-negativo.</p>
 <h4 id="evitiamo-i-prodotti-espliciti">Evitiamo i prodotti espliciti</h4>
@@ -552,11 +575,11 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
 <p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
 <ul>
-<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta l’Olivetti Prodest PC128</li>
-<li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>)</li>
-<li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>)</li>
+<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
+<li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
+<li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
 </ul>
-<p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit ma per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
+<p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit in maniera da compilare per una data architettura senza alcuna dipendenza da un target specifico. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
 
 <table>
 <thead>
@@ -591,11 +614,11 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
 Qui di seguito listo i comandi utili:</p>
 <ol>
-<li><em>ccp.ansi</em>:  precompilatore del C</li>
-<li><em>em_cemcom.ansi</em>: compila C preprocessato producendo bytecode</li>
-<li><em>em_opt</em>: ottimizza il bytecode</li>
-<li><em>cpm/ncg</em>: genera Assembly da bytecode</li>
-<li><em>cpm/as</em>: genera codice Intel 80 da Assembly</li>
-<li><em>em_led</em>: linker</li>
+<li><code>ccp.ansi</code>:  precompilatore del C</li>
+<li><code>em_cemcom.ansi</code>: compila C preprocessato producendo bytecode</li>
+<li><code>em_opt</code>: ottimizza il bytecode</li>
+<li><code>cpm/ncg</code>: genera Assembly da bytecode</li>
+<li><code>cpm/as</code>: genera codice Intel 80 da Assembly</li>
+<li><code>em_led</code>: linker</li>
 </ol>
 
