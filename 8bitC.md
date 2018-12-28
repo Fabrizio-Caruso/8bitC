@@ -71,7 +71,9 @@
 </table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui come per esempio</p>
 <ul>
 <li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) per svariate architetture di microprocessori come lo Z80 e di microcontrollori come l’Intel 8051;</li>
-<li>versioni speciali di GCC per architetture 8-bit (GCC6809, GCC6502).</li>
+<li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) GCC adaptation to the 6809 architecture;</li>
+<li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) GCC adaptation to the 6502 architecture;</li>
+<li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) per Intel 8080/8085</li>
 </ul>
 <p>Si noti come il dev-kit Z88DK disponga di due compilatori:</p>
 <ul>
@@ -632,6 +634,18 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <pre><code>#pragma printf = "%c %u"
 </code></pre>
 <p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
+<pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
+</code></pre>
+<p>non genera codice per l’inizializzazione dell’area di memoria BSS.</p>
+<pre><code>#pragma output CRT_ON_EXIT = 0x10001
+</code></pre>
+<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)</p>
+<pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap della memoria dinamica (nessuna malloc possibile)</p>
+<pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="sistemi-non-supportati">Sistemi non supportati</h2>
