@@ -15,7 +15,7 @@
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
 <li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
-<li>descrivere teniche per scrivere codice <strong>portatile</strong> cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit</li>
+<li>descrivere tecniche generiche per scrivere codice <strong>portatile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente che un sistema sia supportato esplicitamente da un compilatore o meno</li>
 </ol>
 <h2 id="premesse">Premesse</h2>
 <p>Questo articolo <strong>non</strong> un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
@@ -215,6 +215,56 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>il codice del gioco (directory <em>src/chase</em>) è indipendente dall’hardware</li>
 <li>il codice della libreria <em>crossLib</em> (directory <em>src/cross_lib</em>) implementa i dettagli di ogni hardware possibile</li>
 </ul>
+<h3 id="sistemi-non-supportati">Sistemi non supportati</h3>
+<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
+<p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
+<ul>
+<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
+<li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
+<li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
+</ul>
+<p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit in maniera da compilare per una data architettura senza alcuna dipendenza da un target specifico. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
+
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Dev-Kit</th>
+<th>Opzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td>(*)</td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>+none</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>--nodefaultlibs</code></td>
+</tr>
+</tbody>
+</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
+Qui di seguito listo i comandi utili:</p>
+<ol>
+<li><code>ccp.ansi</code>:  precompilatore del C</li>
+<li><code>em_cemcom.ansi</code>: compila C preprocessato producendo bytecode</li>
+<li><code>em_opt</code>: ottimizza il bytecode</li>
+<li><code>cpm/ncg</code>: genera Assembly da bytecode</li>
+<li><code>cpm/as</code>: genera codice Intel 80 da Assembly</li>
+<li><code>em_led</code>: linker</li>
+</ol>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
 <h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
@@ -648,54 +698,4 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
-<h2 id="sistemi-non-supportati">Sistemi non supportati</h2>
-<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target.</p>
-<p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
-<ul>
-<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
-<li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
-<li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
-</ul>
-<p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit in maniera da compilare per una data architettura senza alcuna dipendenza da un target specifico. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
-
-<table>
-<thead>
-<tr>
-<th>Architettura</th>
-<th>Dev-Kit</th>
-<th>Opzione</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Intel 8080</td>
-<td>ACK</td>
-<td>(*)</td>
-</tr>
-<tr>
-<td>Zilog 80</td>
-<td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
-</tr>
-<tr>
-<td>MOS 6502</td>
-<td>CC65</td>
-<td><code>+none</code></td>
-</tr>
-<tr>
-<td>Motorola 6809</td>
-<td>CMOC</td>
-<td><code>--nodefaultlibs</code></td>
-</tr>
-</tbody>
-</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
-Qui di seguito listo i comandi utili:</p>
-<ol>
-<li><code>ccp.ansi</code>:  precompilatore del C</li>
-<li><code>em_cemcom.ansi</code>: compila C preprocessato producendo bytecode</li>
-<li><code>em_opt</code>: ottimizza il bytecode</li>
-<li><code>cpm/ncg</code>: genera Assembly da bytecode</li>
-<li><code>cpm/as</code>: genera codice Intel 80 da Assembly</li>
-<li><code>em_led</code>: linker</li>
-</ol>
 
