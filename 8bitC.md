@@ -265,7 +265,7 @@ Qui di seguito listo i comandi utili:</p>
 </ol>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
-<h3 id="re-utiliziamo-le-stesse-funzioni">Re-utiliziamo le stesse funzioni</h3>
+<h3 id="riutiliziamo-le-stesse-funzioni">Riutiliziamo le stesse funzioni</h3>
 <p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.<br>
 Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
 Per esempio in un gioco, il codice che controlla il movimento di personaggi diversi o dei diversi oggetti da raccogliere potrebbe essere comune anche se il movimento dei personaggi e gli effetti degli oggetti sono diversi. Un modo avanzato di ottenere questo <em>polimorfismo</em> è possibile tramite la <em>programmazione ad oggetti</em> che descriviamo nella sezione specifica di questo articolo.</p>
@@ -292,8 +292,8 @@ i = i + OFFS + 3;
 <h3 id="i-tipi-migliori">I “tipi migliori”</h3>
 <p>Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:</p>
 <ul>
-<li>tutte le operazioni aritmetiche sono solo a 8-bit</li>
-<li>la maggior parte delle operazioni sono ad 8-bit, alcune sono a 16-bit e nessuna operazione è a 32 o 64 bit</li>
+<li>tutte le operazioni aritmetiche sono solo a 8 bit</li>
+<li>la maggior parte delle operazioni sono ad 8 bit, alcune sono a 16-bit e nessuna operazione è a 32 o 64 bit</li>
 </ul>
 <h4 id="tipi-interi-vs-tipi-a-virgola-mobile">Tipi interi vs tipi a virgola mobile</h4>
 <p>Il C prevede tipi numerici interi (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
@@ -301,7 +301,7 @@ Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
 <p>Innanzitutto dobbiamo tenere conto che le architetture 8 bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <code>signed</code> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
 <h4 id="size-matterns">“Size matterns!”</h4>
-<p>Una immediata consequenza della premessa sui tipi di operazione delle architetture hardware a 8-bit ci impone di preferire tipi a 8 bit per qualunque operazione aritmetica e al massimo tipo a 16 bit per qualunque altra operazione. Usare tipi di taglia maggiore avrà un costo e andranno usati solo se strettamente necessari.</p>
+<p>Una immediata consequenza della premessa sui tipi di operazione delle architetture hardware a 8 bit ci impone di preferire tipi a 8 bit per qualunque operazione aritmetica e al massimo tipo a 16 bit per qualunque altra operazione. Usare tipi di taglia maggiore avrà un costo e andranno usati solo se strettamente necessari.</p>
 <h4 id="taglie-diverse-su-architetture-diverse">Taglie diverse su architetture diverse</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
 Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
@@ -309,7 +309,7 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 <table>
 <thead>
 <tr>
-<th></th>
+<th>tipo</th>
 <th>dimensione in bit</th>
 </tr>
 </thead>
