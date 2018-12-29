@@ -11,7 +11,7 @@
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
 </ul>
-<p>Questo articolo descrive tecniche di programmazione generiche valide per <strong>tutte</strong> queste architetture e tutti i sistemi 8-bit <em>vintage</em> basati su di esse. Buona parte di queste tecniche sono validi su altre architetture 8-bit come quelle dei microcontrollori come l’Intel 8051.</p>
+<p>Questo articolo descrive alcune tecniche di programmazione generiche valide per <strong>tutte</strong> queste architetture e tutti i sistemi 8-bit <em>vintage</em> basati su di esse. Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
 <li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
@@ -159,7 +159,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tbody>
 <tr>
 <td>Z88DK</td>
-<td>standard C lib, conio, tgi, vt52, vt100, sprite software, UDG, bitmap</td>
+<td>standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap</td>
 </tr>
 <tr>
 <td>CC65</td>
@@ -266,9 +266,15 @@ Qui di seguito listo i comandi utili:</p>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
 <h3 id="riutiliziamo-le-stesse-funzioni">Riutiliziamo le stesse funzioni</h3>
-<p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.<br>
-Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
-Per esempio in un gioco, il codice che controlla il movimento di personaggi diversi o dei diversi oggetti da raccogliere potrebbe essere comune anche se il movimento dei personaggi e gli effetti degli oggetti sono diversi. Un modo avanzato di ottenere questo <em>polimorfismo</em> è possibile tramite la <em>programmazione ad oggetti</em> che descriviamo nella sezione specifica di questo articolo.</p>
+<p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.</p>
+<h4 id="programmazione-strutturata">Programmazione strutturata</h4>
+<p>Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-<br>
+funzioni</em> che le nostre funzioni chiameranno.<br>
+Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
+<h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
+<p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni.<br>
+Per esempio dato uno <code>struct</code> con due campi su cui di volta vogliamo agire allo stesso modo, possiamo evitare di scrivere due funzioni separate e fare una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato.<br>
+Questo è anche possibile tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
 <h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
 <p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).<br>
 Il motivo è che l’operatore di post-incremento richiede almeno una operazione in più dovendo conservare il valore originario.<br>
@@ -702,8 +708,8 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.</p>
 <p>In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
 <p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo.</p>
-<h3 id="vic20-caso-molto-speciale-commodore-vic-20">[Vic20] Caso molto speciale: Commodore Vic 20</h3>
-<p>Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
+<p>Esempio (Commodore Vic 20)<br>
+Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
 <ul>
 <li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
 <li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
