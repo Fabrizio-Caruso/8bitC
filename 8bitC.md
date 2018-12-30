@@ -285,11 +285,11 @@ typedef struct CharacterStruct Character;
 <p>possiamo evitare di scrivere due funzioni separate creando una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato:</p>
 <pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 {
-	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; (unsigned char) *((unsigned char *)(&amp;player)+offset)
+	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
 	{
 		++(*((unsigned char *) hunterPtr+offset));
 	}
-	else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; (unsigned char) *((unsigned char *)(&amp;player)+offset))
+	else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; ... )
 	{
 		--(*((unsigned char *) hunterPtr+offset));
 	}
@@ -511,7 +511,7 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <tr>
 <td>Oric</td>
 <td>Page 4</td>
-<td>$400-4FF</td>
+<td>$0400-04FF</td>
 </tr>
 <tr>
 <td>VZ200</td>
@@ -528,12 +528,12 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
 <li><code>player</code> di tipo <code>Character</code>,</li>
-<li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=0x28 byte)</li>
-<li><code>bombs</code> di tipo array di 4 <code>Character</code> (20=0x14 byte)</li>
+<li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
+<li><code>bombs</code> di tipo array di 4 <code>Character</code> (20=$14 byte)</li>
 </ul>
 <pre><code>	Character *ghosts = 0xC000;
-	Character *bombs = 0xC000+0x28;
-	Character *player = 0xC000+0x28+0x14;
+	Character *bombs = 0xC000+$28;
+	Character *player = 0xC000+$28+$14;
 </code></pre>
 <p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em> e comunque crea delle variabili puntatore (ognuna delle quali dovrebbe occupare 2 byte) che il compilatore potrebbe comunque allocare in memoria.</p>
 <p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
