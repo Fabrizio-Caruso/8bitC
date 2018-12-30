@@ -271,9 +271,38 @@ Qui di seguito listo i comandi utili:</p>
 <p>Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-<br>
 funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
+<h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
+<p>In alcuni casi è possibile generalizzare il codice passando un parametro per fare evitare di scrivere due funzioni diverse molto simili.<br>
+Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere incrementare il valore di uno o dell’altro:</p>
+<pre><code>struct CharacterStruct
+{
+unsigned char _x;
+unsigned char _y;
+...
+};
+typedef struct CharacterStruct Character;
+</code></pre>
+<p>possiamo evitare di scrivere due funzioni separate creando una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato:</p>
+<pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
+{
+	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; (unsigned char) *((unsigned char *)(&amp;player)+offset)
+	{
+		++(*((unsigned char *) hunterPtr+offset));
+	}
+	else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; (unsigned char) *((unsigned char *)(&amp;player)+offset))
+	{
+		--(*((unsigned char *) hunterPtr+offset));
+	}
+	else
+	{
+		return 0;
+	}
+	return 1;
+}
+</code></pre>
+<p>Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
 <h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
 <p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni.<br>
-Per esempio dato uno <code>struct</code> con due campi su cui di volta vogliamo agire allo stesso modo, possiamo evitare di scrivere due funzioni separate e fare una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato.<br>
 Questo è anche possibile tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
 <h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
 <p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).<br>
