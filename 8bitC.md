@@ -4,24 +4,24 @@
 ---
 
 <h1 id="c-ottimizzato-per-gli-8-bit">C ottimizzato per gli 8-bit</h1>
-<p>Questo articolo descrive alcune tecniche e consigli per ottimizzare codice in ANSI C per <strong>tutti</strong> sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
+<p>Questo articolo descrive alcune tecniche per ottimizzare codice in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
 <ul>
 <li>Intel 8080</li>
 <li>Zilog Z80</li>
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
 </ul>
-<p>Questo articolo descrive alcune tecniche di programmazione generiche valide per <strong>tutte</strong> queste architetture e tutti i sistemi 8-bit <em>vintage</em> basati su di esse. Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
+<p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
 <li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
-<li>descrivere tecniche generiche per scrivere codice <strong>portatile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente che un sistema sia supportato esplicitamente da un compilatore o meno</li>
+<li>descrivere tecniche generiche per scrivere codice <strong>portatile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente dal fatto che un sistema sia supportato esplicitamente da un compilatore o meno</li>
 </ol>
 <h2 id="premesse">Premesse</h2>
-<p>Questo articolo <strong>non</strong> un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
+<p>Questo articolo <strong>non</strong> è un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
 <ul>
-<li>buona conoscenza del linguaggio <em>C</em>;</li>
-<li>buona conoscenza della programmazione strutturata e a oggetti;</li>
+<li>conoscenza del linguaggio <em>C</em>;</li>
+<li>conoscenza della programmazione strutturata e a oggetti;</li>
 <li>conoscenza dell’uso di compilatori e linker.</li>
 </ul>
 <p>Questo articolo <strong>non</strong> si occuperà in profondità su ambiti specifici della programmazione come grafica, suono, input/output, etc.</p>
@@ -29,11 +29,11 @@
 <p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo:</p>
 <ul>
 <li>Un <em>sistema</em> è un qualunque tipo di macchina dotata di processore come computer, console, handheld, calcolatrici, sistemi embedded, etc.</li>
-<li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e come la generazione di un binario in formato specifico.</li>
+<li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e la generazione di un binario in formato specifico.</li>
 <li>Un <em>architettura</em> è un tipo di processore (Intel 8080, 6502, Zilog Z80, Motorola 6809, etc.) . Un <em>target</em> appartiene quindi ad una sola archiettura data dal suo processore (con rare eccezioni come il Commodore 128 che ha sia un processore derivato dal 6502 e uno Zilog Z80).</li>
 </ul>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
-<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi sistemi).</p>
+<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi <em>target</em>).</p>
 <h3 id="cross-compilatori-vs-compilatori-nativi">Cross-compilatori vs compilatori nativi</h3>
 <p>Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accellerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
 <p>Faremo particolare riferimento ai seguenti <em>cross compilatori</em> <em>multi-target</em>:</p>
@@ -68,11 +68,11 @@
 <td><a href="https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html">https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html</a></td>
 </tr>
 </tbody>
-</table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui come per esempio</p>
+</table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui ma per i quali buona parte delle stesse tecniche generiche rimangono valide:</p>
 <ul>
 <li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) per svariate architetture di microprocessori come lo Z80 e di microcontrollori come l’Intel 8051;</li>
-<li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) GCC adaptation to the 6809 architecture;</li>
-<li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) GCC adaptation to the 6502 architecture;</li>
+<li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) per 6809 (adattamento di GCC);</li>
+<li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) per 6502 (adattamento di GCC);</li>
 <li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) per Intel 8080/8085 ;</li>
 <li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) per Sega Master System, Sega Game Gear e Sega SG-1000.</li>
 </ul>
@@ -175,7 +175,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </tr>
 </tbody>
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
-<p><strong>Esempio</strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
+<p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
 <p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
 <p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
@@ -273,7 +273,7 @@ funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
 <p>In alcuni casi è possibile generalizzare il codice passando un parametro per fare evitare di scrivere due funzioni diverse molto simili.<br>
-Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere incrementare il valore di uno o dell’altro:</p>
+Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere incrementare il valore di uno o dell’altro :</p>
 <pre><code>struct CharacterStruct
 {
 unsigned char _x;
@@ -282,7 +282,7 @@ unsigned char _y;
 };
 typedef struct CharacterStruct Character;
 </code></pre>
-<p>possiamo evitare di scrivere due funzioni separate creando una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato:</p>
+<p>Possiamo evitare di scrivere due funzioni separate creando una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato:</p>
 <pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 {
 	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
@@ -293,14 +293,11 @@ typedef struct CharacterStruct Character;
 	{
 		--(*((unsigned char *) hunterPtr+offset));
 	}
-	else
-	{
-		return 0;
-	}
-	return 1;
+...
 }
 </code></pre>
-<p>Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
+<p>Nel caso sopra stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>.</p>
+<p><strong>Avvertenze</strong>: Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
 <h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
 <p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni.<br>
 Questo è anche possibile tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
@@ -315,7 +312,7 @@ Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo 
 Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipendre da una opzione di compilazione, allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
 <h4 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h4>
 <p>Inoltre, per compilatori <em>single pass</em> (come CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
-<p>Per esempio (<a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+<p>Per esempio (preso da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistra a destra non capendo che <code>OFFS+3</code> è una costante.</p>
 <pre><code>#define OFFS   4
 int  i;
@@ -734,9 +731,14 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
-<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.</p>
-<p>In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
-<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo.</p>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
+In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
+<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
+<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
+<h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
+<p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
+<p>Esempio (Chip VDP presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+I sistemi basati su questo chip prevedono una modalità video testuale in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore.</p>
 <p>Esempio (Commodore Vic 20)<br>
 Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
 <ul>
