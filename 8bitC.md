@@ -549,16 +549,13 @@ Vari esempi sono presenti in:<br>
 <p>Sintassi CC65 (esempio Vic 20)</p>
 <pre><code>.export _ghosts;
 _ghosts = $33c
-
 .export _bombs;
 _bombs = _ghosts + $28 
-
 .export _player;
 _player = _bombs + $14
 </code></pre>
 <p>Sintassi Z88DK (esempio Galaksija)</p>
 <pre><code>PUBLIC _ghosts, _bombs, _player
-
 defc _ghosts = 0x2A00
 defc _bombs = _ghosts + $28 
 defc _player = _bombs + $14
