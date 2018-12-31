@@ -555,16 +555,13 @@ _bombs = _ghosts + $28
 
 .export _player;
 _player = _bombs + $14
-...
 </code></pre>
 <p>Sintassi Z88DK (esempio Galaksija)</p>
-<pre><code>PUBLIC _ghosts, _bombs, _player, 
-...
+<pre><code>PUBLIC _ghosts, _bombs, _player
 
 defc _ghosts = 0x2A00
 defc _bombs = _ghosts + $28 
 defc _player = _bombs + $14
-...
 </code></pre>
 <p>CMOC mette a dispozione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
