@@ -268,12 +268,11 @@ Qui di seguito listo i comandi utili:</p>
 <h3 id="riutiliziamo-le-stesse-funzioni">Riutiliziamo le stesse funzioni</h3>
 <p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.</p>
 <h4 id="programmazione-strutturata">Programmazione strutturata</h4>
-<p>Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-<br>
-funzioni</em> che le nostre funzioni chiameranno.<br>
+<p>Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
 <p>In alcuni casi è possibile generalizzare il codice passando un parametro per fare evitare di scrivere due funzioni diverse molto simili.<br>
-Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere incrementare il valore di uno o dell’altro :</p>
+Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
 <pre><code>struct CharacterStruct
 {
 unsigned char _x;
@@ -282,7 +281,7 @@ unsigned char _y;
 };
 typedef struct CharacterStruct Character;
 </code></pre>
-<p>Possiamo evitare di scrivere due funzioni separate creando una unica funzione a cui si passa un <em>offset</em> per fare in modo che acceda al campo desiderato:</p>
+<p>Possiamo evitare di scrivere due diverse funzioni (per agire su <code>_x</code> e su <code>_y</code> creando una unica funzione a cui si passa un <em>offset</em> che faccia da selettore:</p>
 <pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 {
 	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
@@ -301,7 +300,7 @@ typedef struct CharacterStruct Character;
 <h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
 <p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni.<br>
 Questo è anche possibile tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
-<h3 id="pre-incrementodecremente-vs-post-incrementodecremento">Pre-incremento/decremente vs Post-incremento/decremento</h3>
+<h3 id="pre-incrementodecremento-vs-post-incrementodecremento">Pre-incremento/decremento vs Post-incremento/decremento</h3>
 <p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).<br>
 Il motivo è che l’operatore di post-incremento richiede almeno una operazione in più dovendo conservare il valore originario.<br>
 Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo <code>for</code>.</p>
