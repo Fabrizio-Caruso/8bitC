@@ -271,7 +271,7 @@ Qui di seguito listo i comandi utili:</p>
 <p>Spesso guardando bene le funzioni che abbiamo scritto scropriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
-<p>In alcuni casi è possibile generalizzare il codice passando un parametro per fare evitare di scrivere due funzioni diverse molto simili.<br>
+<p>In alcuni casi è possibile generalizzare il codice passando un parametro per evitare di scrivere due funzioni diverse molto simili.<br>
 Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
 <pre><code>struct CharacterStruct
 {
@@ -281,7 +281,7 @@ unsigned char _y;
 };
 typedef struct CharacterStruct Character;
 </code></pre>
-<p>Possiamo evitare di scrivere due diverse funzioni (per agire su <code>_x</code> e su <code>_y</code> creando una unica funzione a cui si passa un <em>offset</em> che faccia da selettore:</p>
+<p>Possiamo evitare di scrivere due diverse funzioni per agire su <code>_x</code> e su <code>_y</code> creando una unica funzione a cui si passa un <em>offset</em> che faccia da selettore:</p>
 <pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 {
 	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
@@ -298,8 +298,8 @@ typedef struct CharacterStruct Character;
 <p>Nel caso sopra stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>.</p>
 <p><strong>Avvertenze</strong>: Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
 <h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
-<p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni.<br>
-Questo è anche possibile tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
+<p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni per esempio sfruttando gli <code>offset</code> dei campi negli <code>struct</code>, <em>puntatori a funzioni</em>, etc.<br>
+Questo è possibile in generale tramite la <em>programmazione ad oggetti</em> di cui descriviamo una implementazione leggera per gli 8-bit in una sezione successiva.</p>
 <h3 id="pre-incrementodecremento-vs-post-incrementodecremento">Pre-incremento/decremento vs Post-incremento/decremento</h3>
 <p>Bisogna evitare operatori di post-incremento/decremento (<code>i++</code>, <code>i--</code>) quando non servono (cioè quando non serve il valore pre-incremento) e sostituirli con (<code>++i</code>, <code>--i</code>).<br>
 Il motivo è che l’operatore di post-incremento richiede almeno una operazione in più dovendo conservare il valore originario.<br>
@@ -310,8 +310,8 @@ Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo 
 <p>Quindi se una data variabile ha un valore noto al momento della compilazione, è importante che sia rimpiazzata con una costante.<br>
 Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipendre da una opzione di compilazione, allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
 <h4 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h4>
-<p>Inoltre, per compilatori <em>single pass</em> (come CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
-<p>Per esempio (preso da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+<p>Inoltre, per compilatori <em>single pass</em> (come la maggioranza dei cross-compilatori 8-bit come per esempio CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
+<p><strong><em>Esempio</em></strong> (preso da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistra a destra non capendo che <code>OFFS+3</code> è una costante.</p>
 <pre><code>#define OFFS   4
 int  i;
@@ -320,50 +320,59 @@ i = i + OFFS + 3;
 <p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruitti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
-<h3 id="i-tipi-migliori">I “tipi migliori”</h3>
+<h3 id="i-tipi-migliori-per-gli-8-bit">I “tipi migliori” per gli 8-bit</h3>
 <p>Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:</p>
 <ul>
 <li>tutte le operazioni aritmetiche sono solo a 8 bit</li>
-<li>la maggior parte delle operazioni sono ad 8 bit, alcune sono a 16-bit e nessuna operazione è a 32 o 64 bit</li>
+<li>la maggior parte delle operazioni sono ad 8 bit, alcune sono a 16-bit e nessuna operazione è a 32 bit</li>
+<li>le operazioni <code>signed</code> (cioè con segno) sono più lente di quelle <code>unsigned</code></li>
+<li>l’hardware non supporta operazioni in <em>virgola mobile</em></li>
 </ul>
 <h4 id="tipi-interi-vs-tipi-a-virgola-mobile">Tipi interi vs tipi a virgola mobile</h4>
-<p>Il C prevede tipi numerici interi (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
-Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <em>virgola mobile</em>) che qui non tratteremo. Bisogna ricordarsi che i <code>float</code> delle architetture 8-bit sono tutti <em>software float</em> ed hanno quindi un costo computazionale notevole. Sarebbero quindi da usare solo se strettamente necessari.</p>
+<p>Il C prevede tipi numerici interi con segno (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
+Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <em>virgola mobile</em>) che qui non tratteremo. Bisogna considerare che i <code>float</code> delle architetture 8-bit sono tutti <em>software float</em> ed hanno quindi un costo computazionale notevole. Sarebbero quindi da usare solo se strettamente necessari.</p>
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
-<p>Innanzitutto dobbiamo tenere conto che le architetture 8 bit che stiamo considerandno <strong>NON</strong> gestiscono bene tipi <code>signed</code> quindi dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
+<p>Siccome le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono ottimalmente tipi <code>signed</code>, dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
 <h4 id="size-matterns">“Size matterns!”</h4>
-<p>Una immediata consequenza della premessa sui tipi di operazione delle architetture hardware a 8 bit ci impone di preferire tipi a 8 bit per qualunque operazione aritmetica e al massimo tipo a 16 bit per qualunque altra operazione. Usare tipi di taglia maggiore avrà un costo e andranno usati solo se strettamente necessari.</p>
-<h4 id="taglie-diverse-su-architetture-diverse">Taglie diverse su architetture diverse</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
-Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit). Non tutti i compilatori 8-bit dispongono di questi tipi ma per la stragrande maggioranza dei compilatori 8-bit abbiano la seguente situazione:</p>
+Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit) ma non tutti i compilatori 8-bit dispongono di questi tipi.</p>
+<p>Fortunatamente per la stragrande maggioranza dei compilatori 8-bit abbiamo la seguente situazione:</p>
 
 <table>
 <thead>
 <tr>
 <th>tipo</th>
-<th>dimensione in bit</th>
+<th>numero bit</th>
+<th>equivalente</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>unsigned char</code></td>
 <td>8</td>
+<td><code>uint8_t</code></td>
 </tr>
 <tr>
 <td><code>unsigned short</code></td>
 <td>16</td>
+<td><code>uint16_t</code></td>
 </tr>
 <tr>
 <td><code>unsigned int</code></td>
 <td>16</td>
+<td><code>uint16_t</code></td>
 </tr>
 <tr>
 <td><code>unsigned long</code></td>
 <td>32</td>
+<td><code>uint32_t</code></td>
 </tr>
 </tbody>
-</table><p>Il tipo che dovremo usare il più possibile è quindi <code>unsigned char</code> (o qualora sia disponibile <code>uint8_t</code>).<br>
-Potremo usare <code>unsigned short</code> (o <code>uint16_t</code>), evitando quando possibile operazioni aritmetiche a 16 bit. Consiglio di evitare qualunque altro tipo numerico.</p>
+</table><p>Quindi dovremo:</p>
+<ul>
+<li>usare il più possibile <code>unsigned char</code> (o <code>uint8_t</code>) per le operazioni aritmetiche;</li>
+<li>usare <code>unsigned char</code> (o <code>uint8_t</code>) e <code>unsigned short</code> (o <code>uint16_t</code>) per tutte le altre operazioni, evitando se possibile qualunque operazione a 32 bit.</li>
+</ul>
 <h3 id="scelta-delle-operazioni">Scelta delle operazioni</h3>
 <p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <code>signed</code> o tipi a 16 o peggio 32 bit).</p>
 <h4 id="non-produciamo-signed">Non produciamo <em>signed</em></h4>
