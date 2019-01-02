@@ -513,6 +513,16 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$5B00-5BFF</td>
 </tr>
 <tr>
+<td>Mattel Aquarius</td>
+<td>random number space</td>
+<td>$381F-3844</td>
+</tr>
+<tr>
+<td>Mattel Aquarius</td>
+<td>input buffer</td>
+<td>$3860-38A8</td>
+</tr>
+<tr>
 <td>Oric</td>
 <td>alternate charset</td>
 <td>$B800-B7FF</td>
@@ -528,6 +538,11 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$0400-04FF</td>
 </tr>
 <tr>
+<td>TRS-80 Model I/III/IV</td>
+<td>RAM for ROM routines (*)</td>
+<td>$4000-41FF</td>
+</tr>
+<tr>
 <td>VZ200</td>
 <td>printer buffer &amp; misc</td>
 <td>$7930-79AB</td>
@@ -538,7 +553,8 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
+</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
 <p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
 <li><code>player</code> di tipo <code>Character</code>,</li>
