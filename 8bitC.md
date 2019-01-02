@@ -665,7 +665,8 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 </tr>
 </tbody>
 </table><h4 id="velocità-vs-memoria">Velocità vs Memoria</h4>
-<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In alcuni casi l’obiettivo principale può invece essere la velocità anche a discapito della memoria. In generale il codice ottimizzato sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
+<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In generale il codice ottimizzato per la velocità sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
+In alcuni altri casi l’obiettivo principale può essere la velocità anche a discapito della memoria.<br>
 Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
 
 <table>
@@ -704,6 +705,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
 </ul>
 <h3 id="ottimizzazione-più-sicura">Ottimizzazione più sicura</h3>
+<p>Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
 
 <table>
 <thead>
