@@ -6,11 +6,12 @@
 <h1 id="c-ottimizzato-per-gli-8-bit">C ottimizzato per gli 8-bit</h1>
 <p>Questo articolo descrive alcune tecniche per ottimizzare codice in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
 <ul>
-<li>Intel 8080</li>
-<li>Zilog Z80</li>
+<li>Intel 8080 (*)</li>
 <li>MOS 6502</li>
 <li>Motorola 6809</li>
+<li>Zilog Z80 (*)</li>
 </ul>
+<p>(*) Lo Zilog Z80 è una estensione dell’Intel 8080, quindi un binario Intel 8080 sarà utilizzabile su un sistema con Z80 ma il viceversa non è vero.</p>
 <p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
@@ -24,7 +25,12 @@
 <li>conoscenza della programmazione strutturata e a oggetti;</li>
 <li>conoscenza dell’uso di compilatori e linker.</li>
 </ul>
-<p>Questo articolo <strong>non</strong> si occuperà in profondità su ambiti specifici della programmazione come grafica, suono, input/output, etc.</p>
+<p>Inoltre questo articolo <strong>non</strong> si occuperà in profondità</p>
+<ul>
+<li><strong>né</strong> di ambiti specifici della programmazione come grafica, suono, input/output,</li>
+<li><strong>né</strong> dell’interazione tra C e Assembly</li>
+</ul>
+<p>essendo questi argomenti avanzati assai importanti che andrebbero affrontati in dettaglio in altri articoli.</p>
 <h2 id="terminologia">Terminologia</h2>
 <p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo:</p>
 <ul>
@@ -53,11 +59,6 @@
 <td><a href="https://github.com/davidgiven/ack">https://github.com/davidgiven/ack</a></td>
 </tr>
 <tr>
-<td>Zilog 80</td>
-<td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><a href="https://github.com/z88dk/z88dk">https://github.com/z88dk/z88dk</a></td>
-</tr>
-<tr>
 <td>MOS 6502</td>
 <td>CC65</td>
 <td><a href="https://github.com/cc65/cc65">https://github.com/cc65/cc65</a></td>
@@ -66,6 +67,11 @@
 <td>Motorola 6809</td>
 <td>CMOC</td>
 <td><a href="https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html">https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html</a></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><a href="https://github.com/z88dk/z88dk">https://github.com/z88dk/z88dk</a></td>
 </tr>
 </tbody>
 </table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui ma per i quali buona parte delle stesse tecniche generiche rimangono valide:</p>
@@ -153,24 +159,29 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <thead>
 <tr>
 <th>Dev-Kit</th>
+<th>Architettura</th>
 <th>librerie multi-target</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Z88DK</td>
+<td>Zilog Z80</td>
 <td>standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap</td>
 </tr>
 <tr>
 <td>CC65</td>
+<td>MOS 6502</td>
 <td>standard C lib, conio, tgi (bitmap)</td>
 </tr>
 <tr>
 <td>CMOC</td>
+<td>Motorola 6809</td>
 <td>standard C lib</td>
 </tr>
 <tr>
 <td>ACK</td>
+<td>Intel 8080</td>
 <td>standard C lib</td>
 </tr>
 </tbody>
@@ -238,11 +249,6 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>(*)</td>
 </tr>
 <tr>
-<td>Zilog 80</td>
-<td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
-</tr>
-<tr>
 <td>MOS 6502</td>
 <td>CC65</td>
 <td><code>+none</code></td>
@@ -251,6 +257,11 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>Motorola 6809</td>
 <td>CMOC</td>
 <td><code>--nodefaultlibs</code></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
