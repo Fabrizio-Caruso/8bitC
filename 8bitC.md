@@ -275,9 +275,9 @@ Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularit
 Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
 <pre><code>	struct CharacterStruct
 	{
-	unsigned char _x;
-	unsigned char _y;
-	...
+		unsigned char _x;
+		unsigned char _y;
+		...
 	};
 	typedef struct CharacterStruct Character;
 </code></pre>
@@ -400,7 +400,7 @@ Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, opp
 	...
 	if(foo&amp;1) // equivalente a foo%2
 	{
-	...
+		...
 	}
 </code></pre>
 <h3 id="variabili-e-parametri">Variabili e parametri</h3>
