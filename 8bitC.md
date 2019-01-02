@@ -190,12 +190,12 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Inoltre tutti i compilatori prevedono una opzione (in genere <code>-D</code>) per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
 <p>Nel codice avremo qualcosa come:</p>
 <pre><code>...
-	#elif defined(__PV1000__)
-		#define XSize 28
-	#elif defined(__OSIC1P__) || defined(__G800__) || defined(__RX78__) 
-		#define XSize 24
-	#elif defined(__VIC20__) 
-		#define XSize 22
+		#elif defined(__PV1000__)
+			#define XSize 28
+		#elif defined(__OSIC1P__) || defined(__G800__) || defined(__RX78__) 
+			#define XSize 24
+		#elif defined(__VIC20__) 
+			#define XSize 22
 ...
 </code></pre>
 <p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
@@ -273,27 +273,27 @@ Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularit
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
 <p>In alcuni casi è possibile generalizzare il codice passando un parametro per evitare di scrivere due funzioni diverse molto simili.<br>
 Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
-<pre><code>struct CharacterStruct
-{
-unsigned char _x;
-unsigned char _y;
-...
-};
-typedef struct CharacterStruct Character;
+<pre><code>	struct CharacterStruct
+	{
+	unsigned char _x;
+	unsigned char _y;
+	...
+	};
+	typedef struct CharacterStruct Character;
 </code></pre>
 <p>Possiamo evitare di scrivere due diverse funzioni per agire su <code>_x</code> e su <code>_y</code> creando una unica funzione a cui si passa un <em>offset</em> che faccia da selettore:</p>
-<pre><code>unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
-{
-	if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
+<pre><code>	unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 	{
-		++(*((unsigned char *) hunterPtr+offset));
+		if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
+		{
+			++(*((unsigned char *) hunterPtr+offset));
+		}
+		else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; ... )
+		{
+			--(*((unsigned char *) hunterPtr+offset));
+		}
+	...
 	}
-	else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; ... )
-	{
-		--(*((unsigned char *) hunterPtr+offset));
-	}
-...
-}
 </code></pre>
 <p>Nel caso sopra stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>.</p>
 <p><strong>Avvertenze</strong>: Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
@@ -313,9 +313,9 @@ Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipend
 <p>Inoltre, per compilatori <em>single pass</em> (come la maggioranza dei cross-compilatori 8-bit come per esempio CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
 <p><strong><em>Esempio</em></strong> (preso da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistra a destra non capendo che <code>OFFS+3</code> è una costante.</p>
-<pre><code>#define OFFS   4
-int  i;
-i = i + OFFS + 3;
+<pre><code>	#define OFFS   4
+	int  i;
+	i = i + OFFS + 3;
 </code></pre>
 <p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
@@ -335,7 +335,11 @@ Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <
 <p>Siccome le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono ottimalmente tipi <code>signed</code>, dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
 <h4 id="size-matterns">“Size matterns!”</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
-Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit) ma non tutti i compilatori 8-bit dispongono di questi tipi.</p>
+Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit).<br>
+Il modo standard per includere questi tipi a taglia fissa</p>
+<pre><code>	#include &lt;stdint.h&gt;
+</code></pre>
+<p>Non tutti i compilatori 8-bit dispongono di questi tipi.</p>
 <p>Fortunatamente per la stragrande maggioranza dei compilatori 8-bit abbiamo la seguente situazione:</p>
 
 <table>
@@ -373,6 +377,11 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 <li>usare il più possibile <code>unsigned char</code> (o <code>uint8_t</code>) per le operazioni aritmetiche;</li>
 <li>usare <code>unsigned char</code> (o <code>uint8_t</code>) e <code>unsigned short</code> (o <code>uint16_t</code>) per tutte le altre operazioni, evitando se possibile qualunque operazione a 32 bit.</li>
 </ul>
+<p>Nota: In assenza di tipi con dimensione fissata, sarebbe una buona pratica creare dei <code>typedef</code> opportuni:</p>
+<pre><code>	typedef unsigned char uint8_t;
+	typedef unsigned short uint16_t;
+	typedef unsigned long uint32_t;
+</code></pre>
 <h3 id="scelta-delle-operazioni">Scelta delle operazioni</h3>
 <p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <code>signed</code> o tipi a 16 o peggio 32 bit).</p>
 <h4 id="non-produciamo-signed">Non produciamo <em>signed</em></h4>
@@ -380,19 +389,19 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 <h4 id="evitiamo-i-prodotti-espliciti">Evitiamo i prodotti espliciti</h4>
 <p>Tutte le architetture che abbiamo preso in considerazione, con la sola esclusione di Motorola 6809, non dispongono di una operazione per effettuare il prodotto di due valori a 8 bit.<br>
 Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, oppure limitarci a prodotti e divisioni che siano potenze di 2 e implementandoli con operazioni di shift con gli operatori <em>&lt;&lt;</em> e <em>&gt;&gt;</em>:</p>
-<pre><code>unsigned char foo, bar;
-...
-foo &lt;&lt; 2; // moltiplicazione per 2^2=4
-bar &gt;&gt; 1; // divisione per 2^1=2
+<pre><code>	unsigned char foo, bar;
+	...
+	foo &lt;&lt; 2; // moltiplicazione per 2^2=4
+	bar &gt;&gt; 1; // divisione per 2^1=2
 </code></pre>
 <h4 id="riscrivere-certe-operazioni">Riscrivere certe operazioni</h4>
 <p>Molte operazioni come il modulo possono essere riscritte in maniera più efficiente per gli 8 bit usando operatori bit a bit. Non sempre il compilatore ottimizza nel modo migliore. Quando il compilatore non ce la fa, dobbiamo dargli una mano noi:</p>
-<pre><code>unsigned char foo;
-...
-if(foo&amp;1) // equivalente a foo%2
-{
-...
-}
+<pre><code>	unsigned char foo;
+	...
+	if(foo&amp;1) // equivalente a foo%2
+	{
+	...
+	}
 </code></pre>
 <h3 id="variabili-e-parametri">Variabili e parametri</h3>
 <p>Uno dei più grossi limiti dell’architettura MOS 6502 non è la penuria di registri come si potrebbe pensare ma è la dimensione limitata del suo stack che lo rende inutilizzabile in C per la gestioni dello <em>scope</em> delle variabili.<br>
@@ -435,7 +444,7 @@ Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg
 <p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
 <p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
-Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non ottimizzeranno codice più file ma si limiteranno ad ottimizzare ogni file singolarmente.<br>
+Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
 Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
 Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
@@ -547,18 +556,18 @@ Vari esempi sono presenti in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
 <p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
 <p>Sintassi CC65 (esempio Vic 20)</p>
-<pre><code>.export _ghosts;
-_ghosts = $33c
-.export _bombs;
-_bombs = _ghosts + $28 
-.export _player;
-_player = _bombs + $14
+<pre><code>	.export _ghosts;
+	_ghosts = $33c
+	.export _bombs;
+	_bombs = _ghosts + $28 
+	.export _player;
+	_player = _bombs + $14
 </code></pre>
 <p>Sintassi Z88DK (esempio Galaksija)</p>
-<pre><code>PUBLIC _ghosts, _bombs, _player
-defc _ghosts = 0x2A00
-defc _bombs = _ghosts + $28 
-defc _player = _bombs + $14
+<pre><code>	PUBLIC _ghosts, _bombs, _player
+	defc _ghosts = 0x2A00
+	defc _bombs = _ghosts + $28 
+	defc _player = _bombs + $14
 </code></pre>
 <p>CMOC mette a dispozione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
@@ -568,10 +577,10 @@ defc _player = _bombs + $14
 Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
 <ul>
 <li>usare <em>puntatori a funzioni</em> per ottenere methodi polimorfici (cioè il cui comportamento è definito a run-time). Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli offset di B siano gli stessi degli offset di A.</li>
+<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
 </ul>
-<p>Esempio preso da<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a><br>
+<p>Esempio (preso da<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
 Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
 <pre><code>	struct CharacterStruct
 	{
@@ -640,7 +649,7 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 </tr>
 </tbody>
 </table><h4 id="velocità-vs-memoria">Velocità vs Memoria</h4>
-<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In alcuni casi l’obiettivo principale può invece essere la velocità anche a discapito della memoria. In generale il codice ottimizzato sarà compatto e veloce ma non sempre.<br>
+<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In alcuni casi l’obiettivo principale può invece essere la velocità anche a discapito della memoria. In generale il codice ottimizzato sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
 Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
 
 <table>
@@ -707,7 +716,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 </tbody>
 </table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
 <p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
-<p>Possiamo fare ancora di meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
+<p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
 <p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
 <h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
