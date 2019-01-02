@@ -25,12 +25,12 @@
 <li>conoscenza della programmazione strutturata e a oggetti;</li>
 <li>conoscenza dell’uso di compilatori e linker.</li>
 </ul>
-<p>Inoltre questo articolo <strong>non</strong> si occuperà in profondità</p>
+<p>Inoltre questo articolo <strong>non</strong> si occuperà in profondità di alcuni argomenti avanzati quali:</p>
 <ul>
-<li><strong>né</strong> di ambiti specifici della programmazione come grafica, suono, input/output,</li>
-<li><strong>né</strong> dell’interazione tra C e Assembly</li>
+<li>gli ambiti specifici della programmazione come grafica, suono, input/output, etc.</li>
+<li>l’interazione tra C e Assembly.</li>
 </ul>
-<p>essendo questi argomenti avanzati assai importanti che andrebbero affrontati in dettaglio in altri articoli.</p>
+<p>Questi argomenti avanzati sono molto importanti e meriterebbero degli articoli separati a loro dedicati.</p>
 <h2 id="terminologia">Terminologia</h2>
 <p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo:</p>
 <ul>
