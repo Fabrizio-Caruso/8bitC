@@ -3,7 +3,7 @@
 
 ---
 
-<h1 id="c-ottimizzato-per-gli-8-bit">C ottimizzato per gli 8-bit</h1>
+<h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
 <p>Questo articolo descrive alcune tecniche per ottimizzare codice in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
 <ul>
 <li>Intel 8080 (*)</li>
@@ -16,7 +16,7 @@
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
 <li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
-<li>descrivere tecniche generiche per scrivere codice <strong>portatile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente dal fatto che un sistema sia supportato esplicitamente da un compilatore o meno</li>
+<li>descrivere tecniche generiche per scrivere codice <strong>portabile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente dal fatto che un sistema sia supportato esplicitamente da un compilatore o meno</li>
 </ol>
 <h2 id="premesse">Premesse</h2>
 <p>Questo articolo <strong>non</strong> è un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
@@ -188,7 +188,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
 <p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
-<p>In tutti gli altri casi se vogliamo scrivere codice portatile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
+<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
 <li>dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</li>
@@ -226,7 +226,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </ul>
 <p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (per un esempio si veda la sezione di questo articolo che tratta l’uso delle routine della ROM).</p>
 <p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già a disposizione).</p>
-<p>Potremo quindi scrivere codice portatile anche a questi sistemi.</p>
+<p>Potremo quindi scrivere codice portabile anche a questi sistemi.</p>
 <p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
