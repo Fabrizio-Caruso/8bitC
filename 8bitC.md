@@ -441,7 +441,7 @@ In pratica i due scenari in cui è conveniente sono:</p>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
 <p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
-<h3 id="dove-mettere-i-dati">Dove mettere i dati</h3>
+<h3 id="struttura-ottimale-del-binario">Struttura ottimale del binario</h3>
 <p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.<br>
 Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
 <p>Spesso (ma non sempre) le architetture basate su MOS 6502 prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
@@ -450,7 +450,7 @@ Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefini
 <p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
 In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
 Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
-Una dettagliata descrizione è presente su:<br>
+Una descrizione dettagliata è presente su:<br>
 <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
 Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h5 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h5>
