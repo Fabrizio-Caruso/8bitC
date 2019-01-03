@@ -11,7 +11,7 @@
 <li>Motorola 6809</li>
 <li>Zilog Z80 (*)</li>
 </ul>
-<p>(*) Lo Zilog Z80 è una estensione dell’Intel 8080, quindi un binario Intel 8080 sarà utilizzabile su un sistema con Z80 ma il viceversa non è vero.</p>
+<p>(*) Lo Zilog Z80 è una estensione dell’Intel 8080, quindi un binario Intel 8080 sarà utilizzabile anche su un sistema con Z80 ma il viceversa non è vero.</p>
 <p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
@@ -224,6 +224,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
 <li>codice necessario per inizializzare correttamente il binario</li>
 </ul>
+<p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (per un esempio si veda la sezione di questo articolo che tratta l’uso delle routine della ROM).</p>
 <p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già a disposizione).</p>
 <p>Potremo quindi scrivere codice portatile anche a questi sistemi.</p>
 <p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
@@ -232,6 +233,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
 <li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
 </ul>
+<h4 id="compilare-per-sistemi-non-supportati">Compilare per sistemi non supportati</h4>
 <p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit in maniera da compilare per una data architettura senza alcuna dipendenza da un target specifico. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
 
 <table>
@@ -770,13 +772,8 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
 <p>Alcuni esempi sono in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
-<h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
-<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
-In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
-<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
-<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
-<h3 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h3>
-<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C.</p>
+<h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
+<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
 <p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
 <p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
 <p>Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:</p>
@@ -792,9 +789,14 @@ In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più
 </code></pre>
 <h4 id="le-librerie-spesso-lo-fanno-per-noi">Le librerie spesso lo fanno per noi</h4>
 <p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
+<h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
+In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
+<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
+<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
 <h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
 <p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
-<p>Esempio (Chip VDP presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+<p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
 I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
 <p>Esempio (Commodore Vic 20)<br>
 Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
