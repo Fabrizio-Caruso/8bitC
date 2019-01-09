@@ -461,19 +461,20 @@ If the data is in the source code instead, we will have to copy them and we will
 The most common case is the data for sprites and redefined characters or tiles.</p>
 <p>Often but not always many MOS 6502 architectures use <em>memory mapped</em> graphics memory and so use common RAM for graphics data.<br>
 On the other hand many Z80-based systems such as (MSZ, Specravideo, Memotech MTX, Sord M5, Tatung Einstein, etc.) use the Texas VDP graphics chip that has its own video memory.</p>
+<p>Different compilers provide different tools to define the final binary structure.</p>
 <h4 id="cc65-let-us-instruct-the-linker">[CC65] Let us instruct the linker</h4>
-<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
-In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
-Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
-Una descrizione dettagliata è presente su:<br>
+<p>It is possible to configure CC65’s linker through a .cfg file that describes the structure of the binary that we want to produce.<br>
+This is not very simple and a description of the linker would go beyond the scope of this article. For details we refer to<br>
 <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
-Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
-<h5 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h5>
-<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
-<h4 id="z88dk-appmake-fa-quasi-tutto-per-noi">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h4>
-<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costuisce dei binari nel formato richiesto.<br>
-Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice.<br>
-Questo argomento è trattato in dettaglio in<br>
+We advice to read the manual and start by modyfing the default .cfg file in order to adapt it to one’s use-case.</p>
+<h5 id="exomizer-can-help-us-also-on-this">Exomizer can help us (also) on this</h5>
+<p>In some cases we may have graphics data in a memory area far from the code and have them both on the same binary. If we do this, we may end up with a “hole” between the two areas.<br>
+A common example is provided by the C64 where graphics data may be in higher memory than the code.<br>
+In this case I recommend the <em>exomizer</em> tool to compress the binary:  <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
+<h4 id="z88dk-appmake-does-almost-everything-for-us">[Z88DK] <em>Appmake</em> does almost everything for us</h4>
+<p>Z88DK makes our life easier and its power <em>appmake</em> tool automatically builds binaries in the correct format for most scenarios.<br>
+Z88DK also allows the user to define <em>memory sections</em> and to redefine the binary “packagging” but doing this is quite complicated.<br>
+This topic is treated in detail in:<br>
 <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
 <p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
