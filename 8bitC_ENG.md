@@ -1,156 +1,208 @@
-﻿# Portable and Optimized C for 8-bit Systems
-
-This article describes some optimizing techniques for ANSI C code for **all** 8-bit *vintage* systems, i.e., computers, consoles, hand-helds, scientific calculators from the end of the '70s until mid '90s and in particular for the systems based on the following *architectures* (and the derived and compatible architectures): 
-
- - Intel 8080 (*)
- - MOS 6502 
- - Motorola 6809
- - Zilog Z80 (*)
-
-(*) The Zilog Z80 is an extension of the Intel 8080. Therefore an Intel 8080 binary is compatible with a Z80-based system but not the other way round.
-
-Most of the techniques presented here remain valid on other 8-bit architectures such as the ones found in microcontrollers, e.g., on the Intel 8051.
-
-The goal of this article is two-fold:
-
- 1. present general techniques to **optimize** C code for **all** 8-bit systems;
- 2. present general techniques to write **portable** C code, i.e., valid and compatible code for **all** 8-bit systems, including systems that are not natively and explicitly supported by C compilers 
-
-## Preconditions
-This article is **not** a introduction nor a manual for the *C* language and has the following preconditions:
- - knowledge of the *C* langiage;
- - knowledge of structured and object-oriented programming;
- - knowledge of basic use of compilers and linkers.
-
-Besides this article does not cover in depth some advanced topics such as:
-
- - coding in specific domains such as graphics, sound, input/output;
- - interaction between C and Assembly.
-
-These advanced topics are very important and would require separate articles.
+---
 
 
+---
 
-## Definitions
-In this article we will refer to *system*, *target* and *architecture* with the following meanings:
+<h1 id="portable-and-optimized-c-for-8-bit-systems">Portable and Optimized C for 8-bit Systems</h1>
+<p>This article describes some optimizing techniques for ANSI C code for <strong>all</strong> 8-bit <em>vintage</em> systems, i.e., computers, consoles, hand-helds, scientific calculators from the end of the '70s until mid '90s and in particular for the systems based on the following <em>architectures</em> (and the derived and compatible architectures):</p>
+<ul>
+<li>Intel 8080 (*)</li>
+<li>MOS 6502</li>
+<li>Motorola 6809</li>
+<li>Zilog Z80 (*)</li>
+</ul>
+<p>(*) The Zilog Z80 is an extension of the Intel 8080. Therefore an Intel 8080 binary is compatible with a Z80-based system but not the other way round.</p>
+<p>Most of the techniques presented here remain valid on other 8-bit architectures such as the ones found in microcontrollers, e.g., on the Intel 8051.</p>
+<p>The goal of this article is two-fold:</p>
+<ol>
+<li>present general techniques to <strong>optimize</strong> C code for <strong>all</strong> 8-bit systems;</li>
+<li>present general techniques to write <strong>portable</strong> C code, i.e., valid and compatible code for <strong>all</strong> 8-bit systems, including systems that are not natively and explicitly supported by C compilers</li>
+</ol>
+<h2 id="preconditions">Preconditions</h2>
+<p>This article is <strong>not</strong> a introduction nor a manual for the <em>C</em> language and has the following preconditions:</p>
+<ul>
+<li>knowledge of the <em>C</em> langiage;</li>
+<li>knowledge of structured and object-oriented programming;</li>
+<li>knowledge of basic use of compilers and linkers.</li>
+</ul>
+<p>Besides this article does not cover in depth some advanced topics such as:</p>
+<ul>
+<li>coding in specific domains such as graphics, sound, input/output;</li>
+<li>interaction between C and Assembly.</li>
+</ul>
+<p>These advanced topics are very important and would require separate articles.</p>
+<h2 id="definitions">Definitions</h2>
+<p>In this article we will refer to <em>system</em>, <em>target</em> and <em>architecture</em> with the following meanings:</p>
+<ul>
+<li>A <em>system</em> is any kind of processor-equipped machine such as computers, consoles, hand-helds, scientigic calculators, embedded systems, etc.</li>
+<li>A <em>target</em> of a compiler is any kind of <em>system</em> supported by the compiler, i.e., a system for which the compiler provides specific support with libraries and the generator of a binary in the specific format.</li>
+<li>An <em>architecture</em> is a processor family (e.g., Intel 8080, MOS 6502, etc.). Therefore a <em>target</em> has an <em>architecture</em> that corresponds to its processor. So it has only one architecture unless if it has more than two or more processors belonging to two different families (such as the Commodore 128, which has both a Z80 and a 6502-derived processor)</li>
+</ul>
+<h2 id="multi-target-cross-compilers">Multi-target cross-compilers</h2>
+<p>In order to produce binaries from source code we recommend <em>multi-target</em> <em>cross-compilers</em> (i.e., compilers that are run on a modern PC and that produce binaries for multiple <em>targets</em>).</p>
+<h3 id="cross-compilers-vs-native-compilers">Cross-compilers vs native compilers</h3>
+<p>We do not recommend the use of <em>native</em> compilers because they would be inconvenient (even if used inside an accellerated emulator) and would never produce the same kind of optimized code due to the limitated resources of the 8-bit system.</p>
+<p>In particular we will refer to the following <em>multi-targer</em> <em>cross-compilers</em>:</p>
+<p>We will refer in particular to the following <em>multi-target</em> <em>cross-compilers</em>:</p>
 
- - A *system* is any kind of processor-equipped machine such as computers, consoles, hand-helds, scientigic calculators, embedded systems, etc.
- - A *target* of a compiler is any kind of *system* supported by the compiler, i.e., a system for which the compiler provides specific support with libraries and the generator of a binary in the specific format.
- - An *architecture* is a processor family (e.g., Intel 8080, MOS 6502, etc.). Therefore a *target* has an *architecture* that corresponds to its processor. So it has only one architecture unless if it has more than two or more processors belonging to two different families (such as the Commodore 128, which has both a Z80 and a 6502-derived processor)
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Compiler/Dev-Kit</th>
+<th>Web Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td><a href="https://github.com/davidgiven/ack">https://github.com/davidgiven/ack</a></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><a href="https://github.com/cc65/cc65">https://github.com/cc65/cc65</a></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><a href="https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html">https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html</a></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><a href="https://github.com/z88dk/z88dk">https://github.com/z88dk/z88dk</a></td>
+</tr>
+</tbody>
+</table><p>We mention other <em>multi-target</em> <em>cross-compilers</em> that we do not cover here but for which most of the described general techniques are valid:</p>
+<ul>
+<li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) for several architectures including the 8-bit Zilog Z80 and Intel 8051;</li>
+<li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) for the Motorola 6809 (GCC adaptation);</li>
+<li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) for the MOS 6502 (GCC adaptation);</li>
+<li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) for the Intel 8080/8085 ;</li>
+<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) for Sega consoles (Sega Master System, Sega Game Gear, Sega SG-1000).</li>
+</ul>
+<p>We remark that the Z88DK dev-kit provides two compilers:</p>
+<ul>
+<li>the more reliable SCCZ80 that also offers fast compilation,</li>
+<li>the experimental ZSDCC (Z80-only optimized SDCC version) that can produce faster and more compact code than SCCZ80 at the cost of much slower compilation and the risk introducing erratic behavior.</li>
+</ul>
+<p>Almost of considered compilers generate code for just one architecture (they are <em>mono-architecture</em>) even though they are <em>multi-target</em>. ACK is an exception because it is <em>multi-architecture</em> (Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p>This article is <em>not</em> an introduction nor a manual for these compilers and it will <em>not</em> cover the following topics:</p>
+<ul>
+<li>compiler installation</li>
+<li>basic usage of the compiler</li>
+</ul>
+<p>For details on these topics we refer to the compiler’s manuals and web pages.</p>
+<p><strong>A sub-set of ANSI C</strong><br>
+In this article we will refer to <em>ANSI C</em> as to a large sub-set of the C89 standard where <code>float</code> and <code>long long</code> are optional but pointers to functions and pointers to <code>struct</code> are present.<br>
+We will not consider previous versions such as C in <em>K&amp;R</em> syntax.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Why should we use C to code for vintage 8-bit systems?<br>
+Traditionally these systems were coded in either Assembly or interpreted BASIC or a mix of the two.<br>
+Given the limited resources, Assembly was ofter necessary. BASIC was convenient for its simplicity and because an interpreter was often present on the system.</p>
+<p>If we limit our comparison to just Assembly, BASIC and C, the following tables summarizes the reasons of using C:</p>
 
-## Multi-target cross-compilers
-In order to produce binaries from source code we recommend *multi-target* *cross-compilers* (i.e., compilers that are run on a modern PC and that produce binaries for multiple *targets*).
+<table>
+<thead>
+<tr>
+<th>language</th>
+<th>simplicity</th>
+<th>portability</th>
+<th>efficiency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Assembly</td>
+<td>low</td>
+<td>no</td>
+<td>optimal</td>
+</tr>
+<tr>
+<td>BASIC</td>
+<td>high</td>
+<td>low</td>
+<td>low</td>
+</tr>
+<tr>
+<td>C</td>
+<td>high</td>
+<td>high</td>
+<td>good</td>
+</tr>
+</tbody>
+</table><h3 id="very-high-portability">Very high portability</h3>
+<p>Therefore the main reason for using ANSI C is its portability.<br>
+In particolar ANSI C allows us:</p>
+<ul>
+<li>to ease porting from different architectures</li>
+<li>to write “universal” code, that is valid code for different targets <em>without</em> any necessary modification</li>
+</ul>
+<h3 id="good-performance">Good performance</h3>
+<p>Someone declares C as a sort of universal Assembly language. I do not fully agree with this statement because optimally-written C will never beat optimally-written Assembly.<br>
+Nevertheless, C is the closest language to Assembly among the languages that allow high level programming.</p>
+<h3 id="sentimental-drawbacks">“Sentimental drawbacks”</h3>
+<p>One not fully rational reason for not using C in this context is the fact coding in C provides a less <em>vintage</em> experience compared to BASIC and Assembly because it was less common on the home computers from the 80s (but it was common on 8-bit business computers such as on computers that used the CP/M operating system).<br>
+A good reason for coding in C is that C allows us to code any 8-bit system.</p>
+<h2 id="writing-portable-code">Writing portable code</h2>
+<p>Writing easily portable code or even directly compilable for different architectures is possible is C through different strategies:</p>
+<ul>
+<li>Write code that is <em>hardware-agnostic</em> through <em>abstract interfaces</em> (that is hardware-independent APIs)</li>
+<li>Use different implementations of the *interfaces" and select them at compilation-time (by using <em>precompiler-directives</em> or by providing different files at linking-time)</li>
+</ul>
+<h3 id="writing-portable-code-for-targets-of-a-dev-kit">Writing portable code for targets of a dev-kit</h3>
+<p>This is trivial if our multi-target dev-kit provides a multi-target library or if we just use standard C libraries (e.g., stdio, stdlib, etc.). Under these conditions we just need to recompile our code. The multi-target library will do the “magic” for us.</p>
+<p>Unfortunately only CC65 and Z88DK provide significant multi-target libraries for input and output other than standard C libraries:</p>
 
-### Cross-compilers vs native compilers
-We do not recommend the use of *native* compilers because they would be inconvenient (even if used inside an accellerated emulator) and would never produce the same kind of optimized code due to the limitated resources of the 8-bit system.
-
-In particular we will refer to the following *multi-targer* *cross-compilers*:
- 
-We will refer in particular to the following *multi-target* *cross-compilers*:
-
-| Architecture |Compiler/Dev-Kit  | Web Page 
-|--|--|--|
-| Intel 8080 |  ACK |  https://github.com/davidgiven/ack
-| MOS 6502   |  CC65| https://github.com/cc65/cc65 
-| Motorola 6809 | CMOC | https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html 
-| Zilog 80   |  SCCZ80/ZSDCC (Z88DK) | https://github.com/z88dk/z88dk 
-
-We mention other *multi-target* *cross-compilers* that we do not cover here but for which most of the described general techniques are valid:
-
-- SDCC (http://sdcc.sourceforge.net/) per svariate architetture di microprocessori come lo Z80 e di microcontrollori come l'Intel 8051;
-- GCC-6809 (https://github.com/bcd/gcc) per 6809 (adattamento di GCC);
-- GCC-6502 (https://github.com/itszor/gcc-6502-bits) per 6502 (adattamento di GCC);
-- SmallC-85 (https://github.com/ncb85/SmallC-85) per Intel 8080/8085 ;
-- devkitSMS (https://github.com/sverx/devkitSMS) per Sega Master System, Sega Game Gear e Sega SG-1000.
-
-We remark that the Z88DK dev-kit provides two compilers:
-- the more reliable SCCZ80 that also offers fast compilation,
-- the experimental ZSDCC (Z80-only optimized SDCC version) that can produce faster and more compact code than SCCZ80 at the cost of much slower compilation and the risk introducing erratic behavior.
-
-Almost of considered compilers generate code for just one architecture (they are *mono-architecture*) even though they are *multi-target*. ACK is an exception because it is *multi-architecture* (Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).
-
-This article is *not* an introduction nor a manual for these compilers and it will *not* cover the following topics:
- - compiler installation
- - basic usage of the compiler
- 
-For details on these topics we refer to the compiler's manuals and web pages.
-
-**A sub-set of ANSI C** 
-In this article we will refer to *ANSI C* as to a large sub-set of the C89 standard where `float` and `long long` are optional but pointers to functions and pointers to `struct` are present.
-We will not consider previous versions such as C in *K&R* syntax.
-
-
-
-## Motivation
-Why should we use C to code for vintage 8-bit systems?
-Traditionally these systems were coded in either Assembly or interpreted BASIC or a mix of the two.
-Given the limited resources, Assembly was ofter necessary. BASIC was convenient for its simplicity and because an interpreter was often present on the system.
-
-If we limit our comparison to just Assembly, BASIC and C, the following tables summarizes the reasons of using C:
-
-| language | simplicity |  portability |  efficiency 
-|--|--|--|--|--|
-| Assembly |  low | no | optimal
-| BASIC    |  high |  low | low
-| C        |  high |  high | good 
-
-
-### Very high portability
-Therefore the main reason for using ANSI C is its portability. 
-In particolar ANSI C allows us:
- - to ease porting from different architectures
- - to write "universal" code, that is valid code for different targets *without* any necessary modification 
-
-### Good performance
-Someone declares C as a sort of universal Assembly language. I do not fully agree with this statement because optimally-written C will never beat optimally-written Assembly.
-Nevertheless, C is the closest language to Assembly among the languages that allow high level programming.
-
-### "Sentimental drawbacks"
-One not fully rational reason for not using C in this context is the fact coding in C provides a less *vintage* experience compared to BASIC and Assembly because it was less common on the home computers from the 80s (but it was common on 8-bit business computers such as on computers that used the CP/M operating system).
-A good reason for coding in C is that C allows us to code any 8-bit system. 
-
-
-
-## Writing portable code
-Writing easily portable code or even directly compilable for different architectures is possible is C through different strategies:
- - Write code that is *hardware-agnostic* through *abstract interfaces* (that is hardware-independent APIs)
- - Use different implementations of the *interfaces" and select them at compilation-time (by using *precompiler-directives* or by providing different files at linking-time)
-
- 
-### Writing portable code for targets of a dev-kit
-This is trivial if our multi-target dev-kit provides a multi-target library or if we just use standard C libraries (e.g., stdio, stdlib, etc.). Under these conditions we just need to recompile our code. The multi-target library will do the "magic" for us.
-
-Unfortunately only CC65 and Z88DK provide significant multi-target libraries for input and output other than standard C libraries:
-
-
-
-|Dev-Kit| Architecture |  multi-target libraries
-|--|--|--|
-| Z88DK| Zilog Z80 |standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap
-| CC65| MOS 6502 | standard C lib, conio, tgi (bitmap)
-| CMOC| Motorola 6809 | standard C lib
-| ACK | Intel 8080 | standard C lib
-
-In particular Z88DK has very powerful libraries for multi-target graphics and even provides APIs for software sprites (https://github.com/z88dk/z88dk/wiki/monographics) and redefined characters for most of its 80 targets.
-**Example**: The code of the game H-Tron (https://sourceforge.net/projects/h-tron/) uses Z88DK's APIs for low resolution bitmap graphics for a multitude of Z80-based targets.
-
-Therefore if we were to use exclusively the standard C libraries we could compile our code with ACK, CMOC, CC65 and Z88DK. If we used *conio* we could compile the code with CC65 and Z88DK. 
-
-In all other cases, if we want to write portable code on different architectures and systems, we would need to write a "hardware abstraction layer" that allows us to **separate**:
- - the code that does not depend on the hardware (e.g., the logic part)
- - the code that depends on the harware (e.g., input/output in a videogame)
- 
-This *patterm* is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this *pattern* in a way to select the different portions of code required by each hardware at compilation-time.
-In particular C provides a powerful pre-compiler with commands such as:
-
- - `#define` -> to define a *macro*
- - `#if` ... `defined(...)` ... `#elif` ... `#else` -> to select code portions that depend on the existence of value of a given macro
- 
-Moreover all compilers provide the option `-D` to pass a macro to the pre-compiler. Some compilers such as CC65 implicitly define a macro that depends on the selected target (e.g., *__VIC20__*).
-
-In our code we may have something like:
-~~~~
-...
+<table>
+<thead>
+<tr>
+<th>Dev-Kit</th>
+<th>Architecture</th>
+<th>multi-target libraries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z88DK</td>
+<td>Zilog Z80</td>
+<td>standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap</td>
+</tr>
+<tr>
+<td>CC65</td>
+<td>MOS 6502</td>
+<td>standard C lib, conio, tgi (bitmap)</td>
+</tr>
+<tr>
+<td>CMOC</td>
+<td>Motorola 6809</td>
+<td>standard C lib</td>
+</tr>
+<tr>
+<td>ACK</td>
+<td>Intel 8080</td>
+<td>standard C lib</td>
+</tr>
+</tbody>
+</table><p>In particular Z88DK has very powerful libraries for multi-target graphics and even provides APIs for software sprites (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) and redefined characters for most of its 80 targets.<br>
+<strong>Example</strong>: The code of the game H-Tron (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) uses Z88DK’s APIs for low resolution bitmap graphics for a multitude of Z80-based targets.</p>
+<p>Therefore if we were to use exclusively the standard C libraries we could compile our code with ACK, CMOC, CC65 and Z88DK. If we used <em>conio</em> we could compile the code with CC65 and Z88DK.</p>
+<p>In all other cases, if we want to write portable code on different architectures and systems, we would need to write a “hardware abstraction layer” that allows us to <strong>separate</strong>:</p>
+<ul>
+<li>the code that does not depend on the hardware (e.g., the logic part)</li>
+<li>the code that depends on the harware (e.g., input/output in a videogame)</li>
+</ul>
+<p>This <em>patterm</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> in a way to select the different portions of code required by each hardware at compilation-time.<br>
+In particular C provides a powerful pre-compiler with commands such as:</p>
+<ul>
+<li><code>#define</code> -&gt; to define a <em>macro</em></li>
+<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code> -&gt; to select code portions that depend on the existence of value of a given macro</li>
+</ul>
+<p>Moreover all compilers provide the option <code>-D</code> to pass a macro to the pre-compiler. Some compilers such as CC65 implicitly define a macro that depends on the selected target (e.g., <em><strong>VIC20</strong></em>).</p>
+<p>In our code we may have something like:</p>
+<pre><code>...
 		#elif defined(__PV1000__)
 			#define XSize 28
 		#elif defined(__OSIC1P__) || defined(__G800__) || defined(__RX78__) 
@@ -158,375 +210,428 @@ In our code we may have something like:
 		#elif defined(__VIC20__) 
 			#define XSize 22
 ...
-~~~~
-When we compile for the *Vic 20* target, the pre-compiler will select for us the *Vic 20*-specific definition of `XSize`.
-This also allows to select specific options for the configuration of the target (additional memory, video card, video mode, debug compilation, etc.).
+</code></pre>
+<p>When we compile for the <em>Vic 20</em> target, the pre-compiler will select for us the <em>Vic 20</em>-specific definition of <code>XSize</code>.<br>
+This also allows to select specific options for the configuration of the target (additional memory, video card, video mode, debug compilation, etc.).</p>
+<p>As main example we refer to the <em>Cross-Chase</em> project:<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
+<p>The code of <em>Cross-Chase</em> provides an example of how to write <em>universal</em> code for any system and architecture:</p>
+<ul>
+<li>the code of the game (<em>src/chase</em> directory) is hardware-independent</li>
+<li>the code of the <em>crossLib</em> library  (<em>src/cross_lib</em> directory) implements all the hardware-sepcific details</li>
+</ul>
+<h3 id="writing-portable-code-even-for-non-supported-systems">Writing portable code even for non-supported systems</h3>
+<p>The dev-kits under our consideration support a list of targets for each architecture by providing specific libraries. Nevertheless it is possible to exploit these dev-kits for other systems with the same architecture but we will have to implement all the hardware-specific code:</p>
+<ul>
+<li>the necessary code for input/output (e.g., graphics, sounds, keyboard, joystick, etc.)</li>
+<li>the necessary code for correct machine initialization</li>
+</ul>
+<p>Alternatively, it is possible to extend a dev-kit to support to new targets.</p>
+<p>In many cases, we can use the ROM routines to do this (see the section on the ROM routines)</p>
+<p>Moreover we may have to convert the binary to a format that can be acccepted by the system.</p>
+<p>Therefore, we can indeed write portable code for even these unsupported systems.</p>
+<p>For example CC&amp;% does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use the dev-kit to produce binaries for these targets:</p>
+<ul>
+<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supports (theoretically) any architecture even the unsupported ones such as for example the l’Olivetti Prodest PC128.</li>
+<li>The game Robotsfindskitten is been compiled for thr Atari 7800 with CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
+<li>BBC has already been added unofficially as an experimental new target in CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
+</ul>
+<h4 id="compilation-for-unsupported-targets">Compilation for unsupported targets</h4>
+<p>We give a list of compilation options for generic target for each dev-kit so that the compiler is instructued to compile without any dependence on a specific target. For more details we refer to the manual of the dev-kits.</p>
 
-As main example we refer to the *Cross-Chase* project:
-https://github.com/Fabrizio-Caruso/CROSS-CHASE
-
-The code of *Cross-Chase* provides an example of how to write *universal* code for any system and architecture:
- - the code of the game (*src/chase* directory) is hardware-independent
- - the code of the *crossLib* library  (*src/cross_lib* directory) implements all the hardware-sepcific details 
-
-### Writing portable code even for non-supported systems
-
-The dev-kits under our consideration support a list of targets for each architecture by providing specific libraries. Nevertheless it is possible to exploit these dev-kits for other systems with the same architecture but we will have to implement all the hardware-specific code:
- - the necessary code for input/output (e.g., graphics, sounds, keyboard, joystick, etc.)
- - the necessary code for correct machine initialization
- 
-Alternatively, it is possible to extend a dev-kit to support to new targets.
-
-In many cases, we can use the ROM routines to do this (see the section on the ROM routines)
-
-Moreover we may have to convert the binary to a format that can be acccepted by the system.
-
-Therefore, we can indeed write portable code for even these unsupported systems.
-
-For example CC&% does not support the *BBC Micro*, nor the *Atari 7800* and CMOC does not support the *Olivetti Prodest PC128*. Yet, it is possible to use the dev-kit to produce binaries for these targets:
- - Cross Chase (https://github.com/Fabrizio-Caruso/CROSS-CHASE) supports (theoretically) any architecture even the unsupported ones such as for example the l'Olivetti Prodest PC128.
- - The game Robotsfindskitten is been compiled for thr Atari 7800 with CC65 (https://sourceforge.net/projects/rfk7800/files/rfk7800/).
- - BBC has already been added unofficially as an experimental new target in CC65 (https://github.com/dominicbeesley/cc65).
-
-#### Compilation for unsupported targets
-We give a list of compilation options for generic target for each dev-kit so that the compiler is instructued to compile without any dependence on a specific target. For more details we refer to the manual of the dev-kits.
-
-| Architecture |Dev-Kit  | Option(s)
-|--|--|--|
-| Intel 8080 |  ACK |  (*)
-| MOS 6502   |  CC65| `+none` 
-| Motorola 6809 | CMOC | `--nodefaultlibs` 
-| Zilog 80   |  SCCZ80/ZSDCC (Z88DK) | `+test`, `+embedded` (new lib),  `+cpm` (generic CP/M target)
-
-(\*) ACK officially only supports the CP/M-80 for the Intel 8080 architecture but it is possible to use ACK to build generic Intel 8080 binaries but it is not very simple because ACK uses a sequence of commands to produce intermediate results (including the "EM" byte-code):
-
- 1. `ccp.ansi`:  C precompiler
- 2. `em_cemcom.ansi`: compiles precompiled C code into "EM" byte-code
- 3. `em_opt`: optimizes "EM" byte-code
- 4.  `cpm/ncg`: generates Intel 8080 Assembly from "EM" bytecode 
- 5.  `cpm/as`: generates Intel 8080 binary from Assembly 
- 6. `em_led`: links object files
-
-## General C code optimization
-We describe some general rules to improve the code that do not depend on whether the architecture is 8-bit or not.
-
-### Re-use same functions
-In general, in whatever programming language we want to code, it is important to avoid code duplication and unnecessary code.
-
-#### Structured programming
-We have to examine each function in order to find common portions that we can *factor* by introducing *sub-functions* that are original function can call.
-However we must take into account that, beyond a certain limit, excessive code granularity has negative effects because each function call has a computational and memory cost. 
-
-#### Parametrized code
-In some cases it is possible to generalize the code by passing a parameter to avoid writing very similar functions.
-An advanced example is in https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h where, given a `struct` with two fields `_x` and `_y`,  
-we want to be able to change the value of one field or the other in different situations:
-~~~~
-	struct CharacterStruct
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Dev-Kit</th>
+<th>Option(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td>(*)</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>+none</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>--nodefaultlibs</code></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><code>+test</code>, <code>+embedded</code> (new lib),  <code>+cpm</code> (generic CP/M target)</td>
+</tr>
+</tbody>
+</table><p>(*) ACK officially only supports the CP/M-80 for the Intel 8080 architecture but it is possible to use ACK to build generic Intel 8080 binaries but it is not very simple because ACK uses a sequence of commands to produce intermediate results (including the “EM” byte-code):</p>
+<ol>
+<li><code>ccp.ansi</code>:  C precompiler</li>
+<li><code>em_cemcom.ansi</code>: compiles precompiled C code into “EM” byte-code</li>
+<li><code>em_opt</code>: optimizes “EM” byte-code</li>
+<li><code>cpm/ncg</code>: generates Intel 8080 Assembly from “EM” bytecode</li>
+<li><code>cpm/as</code>: generates Intel 8080 binary from Assembly</li>
+<li><code>em_led</code>: links object files</li>
+</ol>
+<h2 id="general-c-code-optimization">General C code optimization</h2>
+<p>We describe some general rules to improve the code that do not depend on whether the architecture is 8-bit or not.</p>
+<h3 id="re-use-same-functions">Re-use same functions</h3>
+<p>In general, in whatever programming language we want to code, it is important to avoid code duplication and unnecessary code.</p>
+<h4 id="structured-programming">Structured programming</h4>
+<p>We have to examine each function in order to find common portions that we can <em>factor</em> by introducing <em>sub-functions</em> that are original function can call.<br>
+However we must take into account that, beyond a certain limit, excessive code granularity has negative effects because each function call has a computational and memory cost.</p>
+<h4 id="parametrized-code">Parametrized code</h4>
+<p>In some cases it is possible to generalize the code by passing a parameter to avoid writing very similar functions.<br>
+An advanced example is in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> where, given a <code>struct</code> with two fields <code>_x</code> and <code>_y</code>,<br>
+we want to be able to change the value of one field or the other in different situations:</p>
+<pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
 		unsigned char _y;
 		...
 	};
 	typedef struct CharacterStruct Character;
-~~~~
-We avoid two different functions for `_x` and `_y` by creating one function to which we pass an *offset* to select the field:
-
-~~~~
-	unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
+</code></pre>
+<p>We avoid two different functions for <code>_x</code> and <code>_y</code> by creating one function to which we pass an <em>offset</em> to select the field:</p>
+<pre><code>	unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
 	{
-		if((unsigned char) * ((unsigned char*)hunterPtr+offset) < ... )
+		if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
 		{
 			++(*((unsigned char *) hunterPtr+offset));
 		}
-		else if((unsigned char) *((unsigned char *) hunterPtr+offset) > ... )
+		else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; ... )
 		{
 			--(*((unsigned char *) hunterPtr+offset));
 		}
 	...
 	}
-~~~~
-
-In this case, we use the fact that the field `_y` is exactly one byte after the field `_x`. Therefore with `offset=0` we access `_x` and with `offset=1` we access `_y`.
-
-**Warning**: We must always remember that adding a parameter has a cost and we must verify that the cost of the parameter is lower than the cost of an extra function (e.g., by looking at the size of the obtained binary).
-
-
-#### Same code on similar *objects* 
-We can do even better and use the same code on *objects* that are not identical but shares some common features by using `offset` in `struct`, *pointers to functions*, etc.
-In general this is possible through *object-oriented programming* whose light-weight implementation for 8-bit systems is described in a subsequent section in this article.
-
-
-### Pre-increment/decrement  vs Post-increment/decrement
-We must avoid post-increment/decrement operators (`i++`, `i--`) when they are not needed, i.e.,  when we do not need the original value and replace them with (`++i`, `--i`).
-The reason is that the post-increment operator requires at least an extra operation to save the original value.
-Remark: It is totally useless to use a post-increment in a `for` loop.
-
-### Costant vs Variables
-Any architecture will perform better if variables are replace with constants.
-
-#### Use constants
-Therefore if a variable has a known value at compilation-time, it is important to replace it with a constant.
-If its value depends on some compilation option, then we should use a *macro* to set its value.
-
-#### Help the compiler to recognize constants
-Besides, for *single pass* compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler whether a given expression is a constant.
-
-**_Example_** (from da https://www.cc65.org/doc/coding.html):
-A *single pass* compiler may evaluate the following expression from left to right and miss the fact that `OFFS+3` is a constant:
-~~~~
-	#define OFFS   4
+</code></pre>
+<p>In this case, we use the fact that the field <code>_y</code> is exactly one byte after the field <code>_x</code>. Therefore with <code>offset=0</code> we access <code>_x</code> and with <code>offset=1</code> we access <code>_y</code>.</p>
+<p><strong>Warning</strong>: We must always remember that adding a parameter has a cost and we must verify that the cost of the parameter is lower than the cost of an extra function (e.g., by looking at the size of the obtained binary).</p>
+<h4 id="same-code-on-similar-objects">Same code on similar <em>objects</em></h4>
+<p>We can do even better and use the same code on <em>objects</em> that are not identical but shares some common features by using <code>offset</code> in <code>struct</code>, <em>pointers to functions</em>, etc.<br>
+In general this is possible through <em>object-oriented programming</em> whose light-weight implementation for 8-bit systems is described in a subsequent section in this article.</p>
+<h3 id="pre-incrementdecrement--vs-post-incrementdecrement">Pre-increment/decrement  vs Post-increment/decrement</h3>
+<p>We must avoid post-increment/decrement operators (<code>i++</code>, <code>i--</code>) when they are not needed, i.e.,  when we do not need the original value and replace them with (<code>++i</code>, <code>--i</code>).<br>
+The reason is that the post-increment operator requires at least an extra operation to save the original value.<br>
+Remark: It is totally useless to use a post-increment in a <code>for</code> loop.</p>
+<h3 id="costant-vs-variables">Costant vs Variables</h3>
+<p>Any architecture will perform better if variables are replace with constants.</p>
+<h4 id="use-constants">Use constants</h4>
+<p>Therefore if a variable has a known value at compilation-time, it is important to replace it with a constant.<br>
+If its value depends on some compilation option, then we should use a <em>macro</em> to set its value.</p>
+<h4 id="help-the-compiler-to-recognize-constants">Help the compiler to recognize constants</h4>
+<p>Besides, for <em>single pass</em> compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler whether a given expression is a constant.</p>
+<p><strong><em>Example</em></strong> (from da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+A <em>single pass</em> compiler may evaluate the following expression from left to right and miss the fact that <code>OFFS+3</code> is a constant:</p>
+<pre><code>	#define OFFS   4
 	int  i;
 	i = i + OFFS + 3;
-~~~~
-In this case it would be better to re-write `i = i + OFFS+3` as `i = OFFS+3+i` or `i = i + (OFFS+3)`.
+</code></pre>
+<p>In this case it would be better to re-write <code>i = i + OFFS+3</code> as <code>i = OFFS+3+i</code> or <code>i = i + (OFFS+3)</code>.</p>
+<h2 id="bit-specific-code-optimization">8-bit specific code optimization</h2>
+<p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.).<br>
+This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
+<h3 id="the-best-types-for-8-bit-systems">The “best types” for 8-bit systems</h3>
+<p>First of all we must take into account that we have the following situation:</p>
+<ul>
+<li>all arithmetic operations are just 8-bit</li>
+<li>most of other operations use 8 bits while some may use 16 bits and none uses 32 bits</li>
+<li><code>signed</code> operations are slower than <code>unsigned</code> operations</li>
+<li>the hardware does not support <em>floating point</em> operations</li>
+</ul>
+<h4 id="integer-vs-floating-point-types">Integer vs floating point types</h4>
+<p>The C languages provides <code>signed</code> integer types (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code>, etc.) and their <code>unsigned</code> counterparts.<br>
+Most cross compiler (but not CC65) support the <code>float</code> type (for <em>floating point</em> numbers), which we do not cover here.<br>
+We only remark that <code>float</code> numbers in 8-bit architecture are always <em>software float</em> and therefore have a high computational cost.<br>
+Hence we should only use them when strictly necessary.</p>
+<h4 id="our-friend-unsigned">Our friend <em>unsigned</em></h4>
+<p>Since the 8-bit architectures under consideration do <strong>NOT</strong> handle <code>signed</code> types well, we must avoid them whenever possible.</p>
+<h4 id="size-matters">“Size matters!”</h4>
+<p>The size of the standard integer types depend on the compiler and architecture and not on the C standard.<br>
+Recently the C99 standard has introduced some types that have an unambiguous size (e.g., <code>uint8_t</code> for an 8-bit <code>unsigend</code> integer).</p>
+<p>In order to use these types in our code we should include <code>stdint.h</code> with:</p>
+<pre><code>	#include &lt;stdint.h&gt;
+</code></pre>
+<p>Not all 8-bit cross compiler support these types.</p>
+<p>Fortunately for most 8-bit compilers we have the following situation:</p>
 
-
-
-## 8-bit specific code optimization 
-The C language has both high level constructs (such as `struct`, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.). 
-This is not enough to make C a programming language well-suited for programming 8-bit systems.
-
-### The "best types" for 8-bit systems
-First of all we must take into account that we have the following situation:
- - all arithmetic operations are just 8-bit
- - most of other operations use 8 bits while some may use 16 bits and none uses 32 bits
- - `signed` operations are slower than `unsigned` operations
- - the hardware does not support *floating point* operations
-
-#### Integer vs floating point types
-The C languages provides `signed` integer types (`char`, `short`, `int`, `long`, `long long`, etc.) and their `unsigned` counterparts.
-Most cross compiler (but not CC65) support the `float` type (for *floating point* numbers), which we do not cover here.
-We only remark that `float` numbers in 8-bit architecture are always *software float* and therefore have a high computational cost.
-Hence we should only use them when strictly necessary.
-
-#### Our friend *unsigned* 
-Since the 8-bit architectures under consideration do **NOT** handle `signed` types well, we must avoid them whenever possible. 
-
-#### "Size matters!"
-The size of the standard integer types depend on the compiler and architecture and not on the C standard.
-Recently the C99 standard has introduced some types that have an unambiguous size (e.g., `uint8_t` for an 8-bit `unsigend` integer).
-
-In order to use these types in our code we should include `stdint.h` with:
-~~~~
-	#include <stdint.h>
-~~~~
-Not all 8-bit cross compiler support these types.
-
-Fortunately for most 8-bit compilers we have the following situation:
-
-|  type | number of bits | equivalent type
-|--|--|--|
-| `unsigned char` | 8 | `uint8_t`
-| `unsigned short` | 16 | `uint16_t`
-| `unsigned int` | 16 | `uint16_t`
-| `unsigned long` | 32 | `uint32_t`
-
-Therefore we must:
-
- - whenever possible use `unsigned char` (or `uint8_t`) for arithmetic operatoins;
- - use `unsigned char` (or `uint8_t`) and `unsigned short` (or `uint16_t`) for all other operations and avoid all 32-bit operations.
-
-Remark: When the fixed-size types are not available we can introduce them by using `typedef`:
-~~~~
-	typedef unsigned char uint8_t;
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>number of bits</th>
+<th>equivalent type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unsigned char</code></td>
+<td>8</td>
+<td><code>uint8_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned short</code></td>
+<td>16</td>
+<td><code>uint16_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned int</code></td>
+<td>16</td>
+<td><code>uint16_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned long</code></td>
+<td>32</td>
+<td><code>uint32_t</code></td>
+</tr>
+</tbody>
+</table><p>Therefore we must:</p>
+<ul>
+<li>whenever possible use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operatoins;</li>
+<li>use <code>unsigned char</code> (or <code>uint8_t</code>) and <code>unsigned short</code> (or <code>uint16_t</code>) for all other operations and avoid all 32-bit operations.</li>
+</ul>
+<p>Remark: When the fixed-size types are not available we can introduce them by using <code>typedef</code>:</p>
+<pre><code>	typedef unsigned char uint8_t;
 	typedef unsigned short uint16_t;
 	typedef unsigned long uint32_t;
-~~~~
-
-### Choice of the operations
-When writing code for an 8-bit architecture we must avoid inefficient operations or operations that force us to use inefficient types (such as `signed` or 32-bit types).
-
-#### Avoid *signed*
-In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.
-
-
-#### Avoid explicit products
-All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values.
-Therefore, if possible, we should avoid the products or limit ourselves to products and divisions by power of 2 that we can implement with the *<<* e *>>* operators:
-~~~~
-	unsigned char foo, bar;
+</code></pre>
+<h3 id="choice-of-the-operations">Choice of the operations</h3>
+<p>When writing code for an 8-bit architecture we must avoid inefficient operations or operations that force us to use inefficient types (such as <code>signed</code> or 32-bit types).</p>
+<h4 id="avoid-signed">Avoid <em>signed</em></h4>
+<p>In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.</p>
+<h4 id="avoid-explicit-products">Avoid explicit products</h4>
+<p>All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values.<br>
+Therefore, if possible, we should avoid the products or limit ourselves to products and divisions by power of 2 that we can implement with the <em>&lt;&lt;</em> e <em>&gt;&gt;</em> operators:</p>
+<pre><code>	unsigned char foo, bar;
 	...
-	foo << 2; // multiply by 2^2=4
-	bar >> 1; // divide by 2^1=2
-~~~~
-
-#### Rewrite some operations
-Other operations such as *modulo* can be rewritten in a more efficient way for the 8-bit systems by using bit-wise operators because the compiler is not always capable of optimizing these operations:
-~~~~
-	unsigned char foo;
+	foo &lt;&lt; 2; // multiply by 2^2=4
+	bar &gt;&gt; 1; // divide by 2^1=2
+</code></pre>
+<h4 id="rewrite-some-operations">Rewrite some operations</h4>
+<p>Other operations such as <em>modulo</em> can be rewritten in a more efficient way for the 8-bit systems by using bit-wise operators because the compiler is not always capable of optimizing these operations:</p>
+<pre><code>	unsigned char foo;
 	...
-	if(foo&1) // equivalent to foo%2
+	if(foo&amp;1) // equivalent to foo%2
 	{
 		...
 	}
-~~~~
+</code></pre>
+<h3 id="variables-and-parameters">Variables and parameters</h3>
+<p>One of the greatest limitations of the MOS 6502-architecture is not the lack of registers as someone may think but it is the small size of its <em>hardware stack</em> (in <em>page one</em>: <code>$0100-01FF</code>),<br>
+which makes unusable in C for managing the <em>scope</em> of variables and parameter passing.<br>
+Therefore a C compiler for the MOS 6502 will most probably be forced to implement a <em>software stack</em>:</p>
+<ul>
+<li>to manage the scope of local variables,</li>
+<li>to manage parameter passing.</li>
+</ul>
+<p>The other 8-bit architectures under our consideration may suffer less from this problem but the scope of local variables and parameter passing also have a cost when a <em>hardware stack</em> can be used.</p>
+<h4 id="an-antipattern-may-help-us">An <em>antipattern</em> may help us</h4>
+<p>One way to mitigate this problem is to reduce the use of local variables and passed paramters. This is clearly an <em>antipattern</em> and if we were to apply it to all our code we would get some <em>spaghetti code</em>.<br>
+We must therefore wisely choose which variables deserve to be local and which variables can be declared as global.<br>
+We would then have less re-usable code but we will gain in efficiency. I am <strong>NOT</strong> suggesting the use of just global variables and to renounce to all parameters in functions.</p>
+<h4 id="do-no-use-re-entrant-function">[6502] Do no use re-entrant function</h4>
+<p>The CC65 compiler for the MOS 6502 architecture provides the <code>-Cl</code> that interprets all local variables as <code>static</code>, i.e., global.<br>
+This has the effect of avoiding the <em>software stack</em> for their scope. This also has the effect of making all the functions <em>non-reentrant</em>.<br>
+In practice this prevents us from using recursive function. This is not a serious loss because recursion would be a costly operation, which we should avoid on 8-bit systems.</p>
+<h4 id="use-page-zero">[6502] Use page zero</h4>
+<p>Standard C provides the <code>register</code> keyword to give a hint to the compiler to use a register for a given variable.<br>
+Most modern compiler simply ignore this keyword because their optimizers can choose better than the programmer.<br>
+This is also true for the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>pagina zero</em> for a given variable.<br>
+The MOS 6502 can access this page more efficiently than any other memory area.<br>
+The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer.<br>
+By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
+One may think that all variables should be declared as <code>register</code> but things are <strong>NOT</strong> so simple because everything has a cost.<br>
+In order to store a variable in page zero, some extra operations are required. Hence, page zero provides an advantage only for variables that are heavily used.<br>
+In practice the two most common scenarios where this is the case are:</p>
+<ol>
+<li>parameters of type pointer to <code>struct</code> that are used at least 3 times within the function scope;</li>
+<li>variables inside a loop that is repeated at least about 100 times.</li>
+</ol>
+<p>A reference with more details is: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
+<p>My personal advice is to compile and verify if the produced binary is shorter/faster.</p>
+<h3 id="optimal-binary-structured">Optimal binary structured</h3>
+<p>If our program uses data in a specific memory area, it would be better to have the data already stored in the binary and have the load process of the binary copy the data at the expected locations without any code to do actual copying of the data.<br>
+If the data is in the source code instead, we will have to copy them and we will also end up having them twice in memory.<br>
+The most common case is the data for sprites and redefined characters or tiles.</p>
+<p>Often but not always many MOS 6502 architectures use <em>memory mapped</em> graphics memory and so use common RAM for graphics data.<br>
+On the other hand many Z80-based systems such as (MSZ, Specravideo, Memotech MTX, Sord M5, Tatung Einstein, etc.) use the Texas VDP graphics chip that has its own video memory.</p>
+<h4 id="cc65-let-us-instruct-the-linker">[CC65] Let us instruct the linker</h4>
+<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
+In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
+Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
+Una descrizione dettagliata è presente su:<br>
+<a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
+Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
+<h5 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h5>
+<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
+<h4 id="z88dk-appmake-fa-quasi-tutto-per-noi">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h4>
+<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costuisce dei binari nel formato richiesto.<br>
+Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice.<br>
+Questo argomento è trattato in dettaglio in<br>
+<a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
+<h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
+<p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
+Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
+Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
+Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
+<h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
+<p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
+<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
+Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
+Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In particolare consiglio di cercare:</p>
+<ul>
+<li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
+<li>memoria usata dal BASIC</li>
+<li>aree di memoria dedicate a modi grafici (che non si intendono usare)</li>
+<li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
+</ul>
+<p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
+<p><em>Esempi utili</em><br>
+In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
 
-
-### Variabili e parametri
-Uno dei più grossi limiti dell'architettura MOS 6502 non è la penuria di registri come si potrebbe pensare ma è la dimensione limitata del suo *stack hardware* (in *pagina uno*: `$0100-01FF`) che lo rende inutilizzabile in C per la gestioni dello *scope* delle variabili e i parametri delle funzioni.
-Quindi un compilatore ANSI C per 6502 sarà quasi sicuramente costretto a usare uno *stack software* per
-
- - gestire lo scope delle variabili,
- - gestire il passaggio dei parametri.
- 
-Le altre architetture 8-bit che stiamo considerando soffrono meno di questo problema ma la gestione delle scope delle variabili e dei parametri ha un costo anche quando si usa uno *stack hardware*.
-
-#### Un *antipattern* può aiutarci
-Un modo per ridurre il problema è limitare l'uso delle variabili locali e dei parametri passati alle funzioni. Questo è chiaramente un *antipattern* e se lo applicassimo a tutto il nostro codice otterremo il classico *spaghetti code*. Dobbiamo quindi scegliere sapientemente quali variabili sono assolutamente locali e quali possono essere usate come globali. Avremo codice meno generico di quello che avremmo voluto ma sarà più efficiente. **NON** sto suggerendo di rendere tutte le variabili globali e di non passare mai parametri alle funzioni.
-
-#### [6502] Usare funzioni non re-entrant
-Il compilatore CC65 per l'architettura MOS 6502 mette a disposizione l'opzione `-Cl` che rende tutte le variabili locali come `static`, quindi globali. Questo ha l'effetto di evitare l'uso dello *stack software* per il loro scope. Ha però l'effetto di rendere tutte le nostre funzioni non re-entrant. In pratica questo ci impedisce di usare funzioni recursive. Questa non è un grave perdita perché la ricorsione sarebbe comunque una operazione troppo costosa per una architettura 8-bit.
-
-#### [6502] Usare la pagina zero
-Il C standard prevede la keyword `register` per suggerire al compilatore di mettere una variabile in un registro.
-In genere i compilatori moderni ignorano questa keyword perché lasciano questa scelta ai loro ottimizzatori. Questo è vero per i compilatori in questione ad eccezione di quello presenti in CC65 che la usa come suggerimento al compilatore per mettere una variabile in *pagina zero*. Il MOS 6502 accede in maniera più efficiente a tale pagina di memoria. Si può guadagnare memoria e velocità.
-Per quanto riguarda l'architettura MOS 6502, il sistema operativo di queste macchine usa una parte della pagina zero. Resta comunque una manciata di byte a disposizione del programmatore. 
-CC65 per default lascia 6 byte della pagina zero a disposizione delle variabili dichiarate con keyword `register`.
-Potrebbe sembrare quindi ovvio dichiarare molte variabili come `register` ma **NON** è così semplice perché tutto ha un costo. Per mettere una variabile sulla *pagina zero* sono necessarie diverse operazioni. Quindi se ne avrà un vantaggio quando le variabili sono molto usate.
-In pratica i due scenari in cui è conveniente sono:
-
- 1. parametri di tipo puntatore a `struct` usati almeno 3 volte all'interno di una funzione
- 2. variabile in un loop che si ripete almeno un centinaio di volte
-
-Un riferimento più preciso è dato da: https://www.cc65.org/doc/cc65-8.html
-
-Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.
-
-### Struttura ottimale del binario
-Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell'area di memoria in cui sono previsti.
-Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.
-
-Spesso (ma non sempre) le architetture basate su MOS 6502 prevedono video *memory mapped* in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.
-
-Molte architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata. Quindi non potremo mettere la grafica direttamente in questa memoria.
-
-#### [CC65] Istruiamo il linker
-Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.
-In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.
-Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.
-Una descrizione dettagliata è presente su:
-https://cc65.github.io/doc/ld65.html
-Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.
-
-##### Exomizer ci aiuta (anche) in questo caso
-In alcuni casi se la nostra grafica deve trovarsi in un'area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un "buco". Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare *exomizer* sul risultato finale: https://bitbucket.org/magli143/exomizer/wiki/Home
-
-#### [Z88DK] *Appmake* fa (quasi) tutto per noi
-Z88DK fa molto di più e il suo potente tool *appmake* costuisce dei binari nel formato richiesto.
-Z88DK consente comunque all'utente di definire sezioni di memoria e di definire il "packaging" del binario ma non è semplice.
-Questo argomento è trattato in dettaglio in
-https://github.com/z88dk/z88dk/issues/860
-
-
-
-### Codice su file diversi?
-In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.
-Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono *link-time optimization*, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.
-Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l'ottimizzatore potre metterla *in line* ma non lo farà se la funzione è definita in un altro file.
-Il mio consiglio **non** quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.
-
-
-## Uso avanzato della memoria
-Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).
-
-In molte architetture alcune aree della memoria RAM sono usate come *buffer* oppure sono dedicate a usi specifici come alcune modalità grafiche.
-Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree. 
-Per esempio per il Vic 20: http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt
-
-In particolare consiglio di cercare:
-
-- buffer della cassetta, della tastiera, della stampante, del disco, etc.
-- memoria usata dal BASIC
-- aree di memoria dedicate a modi grafici (che non si intendono usare)
-- aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario
-
-Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l'avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l'avvio potendolo comunque usare prima dell'avvio per caricare il nostro stesso programma da cassetta).
-
-*Esempi utili*
-In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:
-|computer|descrizione|area|
-|--|--|--|
-|Commodore 16|tape buffer| $0333-03F2
-|Commodore 16|BASIC input buffer | $0200-0258
-|Commodore Pet| system input buffer| $0200-0250
-|Commodore Pet | tape buffer | $033A-03F9
-|Commodore Vic 20 |tape buffer |$033C-03FB |
-|Commodore Vic 20 | BASIC input buffer | $0200-0258
-|Galaksija | variable a-z | $2A00-2A68
-|Sinclair Spectrum 16K/48K | printer buffer | $5B00-5BFF
-| Mattel Aquarius | random number space | $381F-3844
-| Mattel Aquarius | input buffer | $3860-38A8
-| Oric | alternate charset | $B800-B7FF |
-| Oric | grabable memory per modo hires| $9800-B3FF 
-| Oric | Page 4 | $0400-04FF
-| TRS-80 Model I/III/IV | RAM for ROM routines (*) | $4000-41FF
-|VZ200| printer buffer & misc| $7930-79AB
-|VZ200| BASIC line input buffer | $79E8-7A28
-
-(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: http://www.trs-80.com/trs80-zaps-internals.htm
-
-In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.
-
-Di seguito diamo un esempio di mappatura delle variabili a partire da `0xC000` in cui abbiamo definito uno `struct` di tipo `Character` che occupa 5 byte, e abbiamo le seguenti variabili:
-
- - `player` di tipo `Character`, 
- - `ghosts` di tipo `array` di 8 `Character` (40=$28 byte)
- - `bombs` di tipo array di 4 `Character` (20=$14 byte)
-~~~~
-	Character *ghosts = 0xC000;
+<table>
+<thead>
+<tr>
+<th>computer</th>
+<th>descrizione</th>
+<th>area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commodore 16</td>
+<td>tape buffer</td>
+<td>$0333-03F2</td>
+</tr>
+<tr>
+<td>Commodore 16</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>system input buffer</td>
+<td>$0200-0250</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>tape buffer</td>
+<td>$033A-03F9</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Galaksija</td>
+<td>variable a-z</td>
+<td>$2A00-2A68</td>
+</tr>
+<tr>
+<td>Sinclair Spectrum 16K/48K</td>
+<td>printer buffer</td>
+<td>$5B00-5BFF</td>
+</tr>
+<tr>
+<td>Mattel Aquarius</td>
+<td>random number space</td>
+<td>$381F-3844</td>
+</tr>
+<tr>
+<td>Mattel Aquarius</td>
+<td>input buffer</td>
+<td>$3860-38A8</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>alternate charset</td>
+<td>$B800-B7FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>grabable memory per modo hires</td>
+<td>$9800-B3FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>Page 4</td>
+<td>$0400-04FF</td>
+</tr>
+<tr>
+<td>TRS-80 Model I/III/IV</td>
+<td>RAM for ROM routines (*)</td>
+<td>$4000-41FF</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>printer buffer &amp; misc</td>
+<td>$7930-79AB</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>BASIC line input buffer</td>
+<td>$79E8-7A28</td>
+</tr>
+</tbody>
+</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
+<p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+<ul>
+<li><code>player</code> di tipo <code>Character</code>,</li>
+<li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
+<li><code>bombs</code> di tipo array di 4 <code>Character</code> (20=$14 byte)</li>
+</ul>
+<pre><code>	Character *ghosts = 0xC000;
 	Character *bombs = 0xC000+$28;
 	Character *player = 0xC000+$28+$14;
-~~~~
-Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse *deferenziazioni* e comunque crea delle variabili puntatore (ognuna delle quali dovrebbe occupare 2 byte) che il compilatore potrebbe comunque allocare in memoria.
-
-Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.
-I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia o migliaia di byte preziosi.
-Vari esempi sono presenti in:
-https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory
-
-In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  **aggiungiamo** un prefisso *underscore*.
-
-
-Sintassi CC65 (esempio Vic 20)
-```
-	.export _ghosts;
+</code></pre>
+<p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em> e comunque crea delle variabili puntatore (ognuna delle quali dovrebbe occupare 2 byte) che il compilatore potrebbe comunque allocare in memoria.</p>
+<p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
+I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia o migliaia di byte preziosi.<br>
+Vari esempi sono presenti in:<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
+<p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
+<p>Sintassi CC65 (esempio Vic 20)</p>
+<pre><code>	.export _ghosts;
 	_ghosts = $33c
 	.export _bombs;
 	_bombs = _ghosts + $28 
 	.export _player;
 	_player = _bombs + $14
-```
-
-Sintassi Z88DK (esempio Galaksija)
-```
-	PUBLIC _ghosts, _bombs, _player
+</code></pre>
+<p>Sintassi Z88DK (esempio Galaksija)</p>
+<pre><code>	PUBLIC _ghosts, _bombs, _player
 	defc _ghosts = 0x2A00
 	defc _bombs = _ghosts + $28 
 	defc _player = _bombs + $14
-```
-
-CMOC mette a disposizione l'opzione `--data=<indirizzo>` che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato. 
-
-La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.
-
-
-
-## La programmazione ad oggetti
-Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando *GObject* che è uno di questi framework).
-
-Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare *classi*, *polimorfismo* ed *ereditarietà* in maniera molto efficiente.
-Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:
-
-- usare *puntatori a funzioni* per ottenere metodi *polimorfici*, cioè il cui *binding* (e quindi comportamento) è dinamicamente definito a *run-time*. Si può evitare l'implementazione di una *vtable* se ci si limita a classi con un solo metodo polimorfico.
-- usare *puntatori a* `struct` e *composizione* per implementare sotto-classi: dato uno `struct` A, si implementa una sua sotto-classe con uno `struct` B definito come uno `struct` il cui **primo** campo è A. Usando puntatori a tali `struct`, il C garantisce che gli *offset* di B siano gli stessi degli offset di A. 
-
-
-Esempio (preso da
-https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase)
-Definiamo `Item` come un sotto-classe di `Character` a cui aggiungiamo delle variabili ed il metodo polimorfico `_effect()`:
-~~~~
-	struct CharacterStruct
+</code></pre>
+<p>CMOC mette a disposizione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
+<p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
+<h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
+<p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
+<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
+Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
+<ul>
+<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
+<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
+</ul>
+<p>Esempio (preso da<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
+Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
+<pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
 		unsigned char _y;
@@ -543,117 +648,156 @@ Definiamo `Item` come un sotto-classe di `Character` a cui aggiungiamo delle var
 		unsigned char _blink;
 	};
 	typedef struct ItemStruct Item;
-~~~~
-e poi potremo passare un puntatore a `Item` come se fosse un puntatore a `Character` (facendo un semplice *cast*):
-~~~~
-	Item *myItem;
+</code></pre>
+<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
+<pre><code>	Item *myItem;
 	void foo(Character * aCharacter);
 	...
 	foo((Character *)myItem);
-~~~~
+</code></pre>
+<p>Perché ci guadagniamo in termine di memoria?<br>
+Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
+<h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
+<p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
+<h3 id="ottimizzazione-aggressiva">Ottimizzazione “aggressiva”</h3>
+<p>Le seguenti opzioni applicano il massimo delle ottimizzazioni per produrre codice veloce e soprattutto compatto:</p>
 
-Perché ci guadagniamo in termine di memoria?
-Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td><code>-O6</code></td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>-O3</code></td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>ZSDCC (Z88DK)</td>
+<td><code>-SO3</code> <code>--max-alloc-node20000</code></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-O</code> <code>-Cl</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>-O2</code></td>
+</tr>
+</tbody>
+</table><h4 id="velocità-vs-memoria">Velocità vs Memoria</h4>
+<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In generale il codice ottimizzato per la velocità sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
+In alcuni altri casi l’obiettivo principale può essere la velocità anche a discapito della memoria.<br>
+Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
 
-## Compilazione ottimizzata
-Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando. 
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zilog Z80</td>
+<td>ZSDCC (Z88DK)</td>
+<td><code>--opt-code-size</code></td>
+<td>Ottimizza memoria</td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>--opt-code-speed</code></td>
+<td>Ottimizza velocità</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-Oi</code>, <code>-Os</code></td>
+<td>Ottimizza velocità</td>
+</tr>
+</tbody>
+</table><p><strong>Problemi noti</strong></p>
+<ul>
+<li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
+<li>CMOC: <code>-O2</code> ha dei bug</li>
+<li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
+</ul>
+<h3 id="ottimizzazione-più-sicura">Ottimizzazione più sicura</h3>
+<p>Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
 
-### Ottimizzazione "aggressiva" 
-Le seguenti opzioni applicano il massimo delle ottimizzazioni per produrre codice veloce e soprattutto compatto:
-
-| Architettura |Compilatore | Opzioni|
-|--|--|--|
-| Intel 8080 |  ACK |  `-O6` |
-| Zilog Z80   |  SCCZ80 (Z88DK) | `-O3` |
-| Zilog Z80   |  ZSDCC (Z88DK) | `-SO3` `--max-alloc-node20000`|
-| MOS 6502   |  CC65| `-O` `-Cl`|
-| Motorola 6809 | CMOC | `-O2` |
-
-#### Velocità vs Memoria
-In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In generale il codice ottimizzato per la velocità sarà sia compatto che veloce ma non sempre le due cose andranno assieme. 
-In alcuni altri casi l'obiettivo principale può essere la velocità anche a discapito della memoria.
-Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:
-
-| Architettura |Compilatore | Opzioni| Descrizione
-|--|--|--|--|
-| Zilog Z80   |  ZSDCC (Z88DK) | `--opt-code-size`| Ottimizza memoria
-| Zilog Z80   |  SCCZ80 (Z88DK) | `--opt-code-speed`| Ottimizza velocità
-| MOS 6502   |  CC65| `-Oi`, `-Os`| Ottimizza velocità
-
-
-
-**Problemi noti**
-- CC65: `-Cl` impedisce la ricorsione 
-- CMOC: `-O2` ha dei bug
-- ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con `-SO3` in assenza di `--max-alloc-node20000`.
-
-
-### Ottimizzazione più sicura 
-Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l'architettura Z80) si consiglia:
-
-| Architettura |Compilatore | Opzioni|
-|--|--|--|
-| Zilog Z80   |  SCCZ80 (Z88DK) | `-O3` |
-| MOS 6502   |  CC65| `-O`|
-| Motorola 6809 | CMOC | `-O1` |
-
-## Evitare il linking di codice inutile
-I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.
-
-Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.
-
-### Evitare la standard lib
-Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole. 
-
-#### [cp/m-80] Solo *getchar()* e *putchar\(c\)*
-Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente `getchar()` e `putchar(c)` e implementare tutto il resto.
-
-#### [z88dk] Pragmas per non generare codice
-Z88DK mette a disposizione una serie di *pragma* per istruire il compilatore a non generare codice inutile.
-
-Per esempio:
-~~~~
-#pragma printf = "%c %u"
-~~~~
-includerà solo i convertitori per `%c` e `%u` escludendo tutto il codice per gli altri.
-
-~~~~
-#pragma-define:CRT_INITIALIZE_BSS=0
-~~~~
-non genera codice per l'inizializzazione dell'area di memoria BSS.
-
-
-~~~~
-#pragma output CRT_ON_EXIT = 0x10001
-~~~~
-il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)
-
-
-~~~~
-#pragma output CLIB_MALLOC_HEAP_SIZE = 0
-~~~~
-elimina lo heap della memoria dinamica (nessuna malloc possibile)
-
-
-~~~~
-#pragma output CLIB_STDIO_HEAP_SIZE = 0
-~~~~
-elimina lo heap di stdio (non gestisce l'apertura di file)
-
-Alcuni esempi sono in 
-https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk
-
-
-## Usare le routine presenti in ROM
-La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E' quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d'uso dell'Assembly assieme al C può avvenire in modo *in line* (codice Assembly integrato all'interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.
-
-Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l'input/output.
-
-Esempio (preso da https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c)
-
-Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:
-~~~~
-	void PUTCH(unsigned char ch)
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>-O3</code></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-O</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>-O1</code></td>
+</tr>
+</tbody>
+</table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
+<p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
+<p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
+<h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
+<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
+<h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
+<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> e implementare tutto il resto.</p>
+<h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
+<p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
+<p>Per esempio:</p>
+<pre><code>#pragma printf = "%c %u"
+</code></pre>
+<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
+<pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
+</code></pre>
+<p>non genera codice per l’inizializzazione dell’area di memoria BSS.</p>
+<pre><code>#pragma output CRT_ON_EXIT = 0x10001
+</code></pre>
+<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)</p>
+<pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap della memoria dinamica (nessuna malloc possibile)</p>
+<pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
+<p>Alcuni esempi sono in<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
+<h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
+<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
+<p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
+<p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
+<p>Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:</p>
+<pre><code>	void PUTCH(unsigned char ch)
 	{
 		asm
 		{
@@ -662,35 +806,851 @@ Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prod
 			.byte 2
 		}
 	}
-~~~~
+</code></pre>
+<h4 id="le-librerie-spesso-lo-fanno-per-noi">Le librerie spesso lo fanno per noi</h4>
+<p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
+<h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
+In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
+<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
+<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
+<h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
+<p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
+<p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
+<p>Esempio (Commodore Vic 20)<br>
+Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
+<ul>
+<li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
+<li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
+<li>La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM</li>
+</ul>
+<p>Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.<br>
+Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
+Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <code>POKE(0x9005,0xFF);</code> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
+<h1 id="portable-and-optimized-c-for-8-bit-systems-1">Portable and Optimized C for 8-bit Systems</h1>
+<p>This article describes some optimizing techniques for ANSI C code for <strong>all</strong> 8-bit <em>vintage</em> systems, i.e., computers, consoles, hand-helds, scientific calculators from the end of the '70s until mid '90s and in particular for the systems based on the following <em>architectures</em> (and the derived and compatible architectures):</p>
+<ul>
+<li>Intel 8080 (*)</li>
+<li>MOS 6502</li>
+<li>Motorola 6809</li>
+<li>Zilog Z80 (*)</li>
+</ul>
+<p>(*) The Zilog Z80 is an extension of the Intel 8080. Therefore an Intel 8080 binary is compatible with a Z80-based system but not the other way round.</p>
+<p>Most of the techniques presented here remain valid on other 8-bit architectures such as the ones found in microcontrollers, e.g., on the Intel 8051.</p>
+<p>The goal of this article is two-fold:</p>
+<ol>
+<li>present general techniques to <strong>optimize</strong> C code for <strong>all</strong> 8-bit systems;</li>
+<li>present general techniques to write <strong>portable</strong> C code, i.e., valid and compatible code for <strong>all</strong> 8-bit systems, including systems that are not natively and explicitly supported by C compilers</li>
+</ol>
+<h2 id="preconditions-1">Preconditions</h2>
+<p>This article is <strong>not</strong> a introduction nor a manual for the <em>C</em> language and has the following preconditions:</p>
+<ul>
+<li>knowledge of the <em>C</em> langiage;</li>
+<li>knowledge of structured and object-oriented programming;</li>
+<li>knowledge of basic use of compilers and linkers.</li>
+</ul>
+<p>Besides this article does not cover in depth some advanced topics such as:</p>
+<ul>
+<li>coding in specific domains such as graphics, sound, input/output;</li>
+<li>interaction between C and Assembly.</li>
+</ul>
+<p>These advanced topics are very important and would require separate articles.</p>
+<h2 id="definitions-1">Definitions</h2>
+<p>In this article we will refer to <em>system</em>, <em>target</em> and <em>architecture</em> with the following meanings:</p>
+<ul>
+<li>A <em>system</em> is any kind of processor-equipped machine such as computers, consoles, hand-helds, scientigic calculators, embedded systems, etc.</li>
+<li>A <em>target</em> of a compiler is any kind of <em>system</em> supported by the compiler, i.e., a system for which the compiler provides specific support with libraries and the generator of a binary in the specific format.</li>
+<li>An <em>architecture</em> is a processor family (e.g., Intel 8080, MOS 6502, etc.). Therefore a <em>target</em> has an <em>architecture</em> that corresponds to its processor. So it has only one architecture unless if it has more than two or more processors belonging to two different families (such as the Commodore 128, which has both a Z80 and a 6502-derived processor)</li>
+</ul>
+<h2 id="multi-target-cross-compilers-1">Multi-target cross-compilers</h2>
+<p>In order to produce binaries from source code we recommend <em>multi-target</em> <em>cross-compilers</em> (i.e., compilers that are run on a modern PC and that produce binaries for multiple <em>targets</em>).</p>
+<h3 id="cross-compilers-vs-native-compilers-1">Cross-compilers vs native compilers</h3>
+<p>We do not recommend the use of <em>native</em> compilers because they would be inconvenient (even if used inside an accellerated emulator) and would never produce the same kind of optimized code due to the limitated resources of the 8-bit system.</p>
+<p>In particular we will refer to the following <em>multi-targer</em> <em>cross-compilers</em>:</p>
+<p>We will refer in particular to the following <em>multi-target</em> <em>cross-compilers</em>:</p>
 
-#### Le librerie spesso lo fanno per noi
-Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Compiler/Dev-Kit</th>
+<th>Web Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td><a href="https://github.com/davidgiven/ack">https://github.com/davidgiven/ack</a></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><a href="https://github.com/cc65/cc65">https://github.com/cc65/cc65</a></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><a href="https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html">https://perso.b2b2c.ca/~sarrazip/dev/cmoc.html</a></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><a href="https://github.com/z88dk/z88dk">https://github.com/z88dk/z88dk</a></td>
+</tr>
+</tbody>
+</table><p>We mention other <em>multi-target</em> <em>cross-compilers</em> that we do not cover here but for which most of the described general techniques are valid:</p>
+<ul>
+<li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) for several architectures including the 8-bit Zilog Z80 and Intel 8051;</li>
+<li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) for the Motorola 6809 (GCC adaptation);</li>
+<li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) for the MOS 6502 (GCC adaptation);</li>
+<li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) for the Intel 8080/8085 ;</li>
+<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) for Sega consoles (Sega Master System, Sega Game Gear, Sega SG-1000).</li>
+</ul>
+<p>We remark that the Z88DK dev-kit provides two compilers:</p>
+<ul>
+<li>the more reliable SCCZ80 that also offers fast compilation,</li>
+<li>the experimental ZSDCC (Z80-only optimized SDCC version) that can produce faster and more compact code than SCCZ80 at the cost of much slower compilation and the risk introducing erratic behavior.</li>
+</ul>
+<p>Almost of considered compilers generate code for just one architecture (they are <em>mono-architecture</em>) even though they are <em>multi-target</em>. ACK is an exception because it is <em>multi-architecture</em> (Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p>This article is <em>not</em> an introduction nor a manual for these compilers and it will <em>not</em> cover the following topics:</p>
+<ul>
+<li>compiler installation</li>
+<li>basic usage of the compiler</li>
+</ul>
+<p>For details on these topics we refer to the compiler’s manuals and web pages.</p>
+<p><strong>A sub-set of ANSI C</strong><br>
+In this article we will refer to <em>ANSI C</em> as to a large sub-set of the C89 standard where <code>float</code> and <code>long long</code> are optional but pointers to functions and pointers to <code>struct</code> are present.<br>
+We will not consider previous versions such as C in <em>K&amp;R</em> syntax.</p>
+<h2 id="motivation-1">Motivation</h2>
+<p>Why should we use C to code for vintage 8-bit systems?<br>
+Traditionally these systems were coded in either Assembly or interpreted BASIC or a mix of the two.<br>
+Given the limited resources, Assembly was ofter necessary. BASIC was convenient for its simplicity and because an interpreter was often present on the system.</p>
+<p>If we limit our comparison to just Assembly, BASIC and C, the following tables summarizes the reasons of using C:</p>
 
+<table>
+<thead>
+<tr>
+<th>language</th>
+<th>simplicity</th>
+<th>portability</th>
+<th>efficiency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Assembly</td>
+<td>low</td>
+<td>no</td>
+<td>optimal</td>
+</tr>
+<tr>
+<td>BASIC</td>
+<td>high</td>
+<td>low</td>
+<td>low</td>
+</tr>
+<tr>
+<td>C</td>
+<td>high</td>
+<td>high</td>
+<td>good</td>
+</tr>
+</tbody>
+</table><h3 id="very-high-portability-1">Very high portability</h3>
+<p>Therefore the main reason for using ANSI C is its portability.<br>
+In particolar ANSI C allows us:</p>
+<ul>
+<li>to ease porting from different architectures</li>
+<li>to write “universal” code, that is valid code for different targets <em>without</em> any necessary modification</li>
+</ul>
+<h3 id="good-performance-1">Good performance</h3>
+<p>Someone declares C as a sort of universal Assembly language. I do not fully agree with this statement because optimally-written C will never beat optimally-written Assembly.<br>
+Nevertheless, C is the closest language to Assembly among the languages that allow high level programming.</p>
+<h3 id="sentimental-drawbacks-1">“Sentimental drawbacks”</h3>
+<p>One not fully rational reason for not using C in this context is the fact coding in C provides a less <em>vintage</em> experience compared to BASIC and Assembly because it was less common on the home computers from the 80s (but it was common on 8-bit business computers such as on computers that used the CP/M operating system).<br>
+A good reason for coding in C is that C allows us to code any 8-bit system.</p>
+<h2 id="writing-portable-code-1">Writing portable code</h2>
+<p>Writing easily portable code or even directly compilable for different architectures is possible is C through different strategies:</p>
+<ul>
+<li>Write code that is <em>hardware-agnostic</em> through <em>abstract interfaces</em> (that is hardware-independent APIs)</li>
+<li>Use different implementations of the *interfaces" and select them at compilation-time (by using <em>precompiler-directives</em> or by providing different files at linking-time)</li>
+</ul>
+<h3 id="writing-portable-code-for-targets-of-a-dev-kit-1">Writing portable code for targets of a dev-kit</h3>
+<p>This is trivial if our multi-target dev-kit provides a multi-target library or if we just use standard C libraries (e.g., stdio, stdlib, etc.). Under these conditions we just need to recompile our code. The multi-target library will do the “magic” for us.</p>
+<p>Unfortunately only CC65 and Z88DK provide significant multi-target libraries for input and output other than standard C libraries:</p>
 
+<table>
+<thead>
+<tr>
+<th>Dev-Kit</th>
+<th>Architecture</th>
+<th>multi-target libraries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Z88DK</td>
+<td>Zilog Z80</td>
+<td>standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap</td>
+</tr>
+<tr>
+<td>CC65</td>
+<td>MOS 6502</td>
+<td>standard C lib, conio, tgi (bitmap)</td>
+</tr>
+<tr>
+<td>CMOC</td>
+<td>Motorola 6809</td>
+<td>standard C lib</td>
+</tr>
+<tr>
+<td>ACK</td>
+<td>Intel 8080</td>
+<td>standard C lib</td>
+</tr>
+</tbody>
+</table><p>In particular Z88DK has very powerful libraries for multi-target graphics and even provides APIs for software sprites (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) and redefined characters for most of its 80 targets.<br>
+<strong>Example</strong>: The code of the game H-Tron (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) uses Z88DK’s APIs for low resolution bitmap graphics for a multitude of Z80-based targets.</p>
+<p>Therefore if we were to use exclusively the standard C libraries we could compile our code with ACK, CMOC, CC65 and Z88DK. If we used <em>conio</em> we could compile the code with CC65 and Z88DK.</p>
+<p>In all other cases, if we want to write portable code on different architectures and systems, we would need to write a “hardware abstraction layer” that allows us to <strong>separate</strong>:</p>
+<ul>
+<li>the code that does not depend on the hardware (e.g., the logic part)</li>
+<li>the code that depends on the harware (e.g., input/output in a videogame)</li>
+</ul>
+<p>This <em>patterm</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> in a way to select the different portions of code required by each hardware at compilation-time.<br>
+In particular C provides a powerful pre-compiler with commands such as:</p>
+<ul>
+<li><code>#define</code> -&gt; to define a <em>macro</em></li>
+<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code> -&gt; to select code portions that depend on the existence of value of a given macro</li>
+</ul>
+<p>Moreover all compilers provide the option <code>-D</code> to pass a macro to the pre-compiler. Some compilers such as CC65 implicitly define a macro that depends on the selected target (e.g., <em><strong>VIC20</strong></em>).</p>
+<p>In our code we may have something like:</p>
+<pre><code>...
+		#elif defined(__PV1000__)
+			#define XSize 28
+		#elif defined(__OSIC1P__) || defined(__G800__) || defined(__RX78__) 
+			#define XSize 24
+		#elif defined(__VIC20__) 
+			#define XSize 22
+...
+</code></pre>
+<p>When we compile for the <em>Vic 20</em> target, the pre-compiler will select for us the <em>Vic 20</em>-specific definition of <code>XSize</code>.<br>
+This also allows to select specific options for the configuration of the target (additional memory, video card, video mode, debug compilation, etc.).</p>
+<p>As main example we refer to the <em>Cross-Chase</em> project:<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
+<p>The code of <em>Cross-Chase</em> provides an example of how to write <em>universal</em> code for any system and architecture:</p>
+<ul>
+<li>the code of the game (<em>src/chase</em> directory) is hardware-independent</li>
+<li>the code of the <em>crossLib</em> library  (<em>src/cross_lib</em> directory) implements all the hardware-sepcific details</li>
+</ul>
+<h3 id="writing-portable-code-even-for-non-supported-systems-1">Writing portable code even for non-supported systems</h3>
+<p>The dev-kits under our consideration support a list of targets for each architecture by providing specific libraries. Nevertheless it is possible to exploit these dev-kits for other systems with the same architecture but we will have to implement all the hardware-specific code:</p>
+<ul>
+<li>the necessary code for input/output (e.g., graphics, sounds, keyboard, joystick, etc.)</li>
+<li>the necessary code for correct machine initialization</li>
+</ul>
+<p>Alternatively, it is possible to extend a dev-kit to support to new targets.</p>
+<p>In many cases, we can use the ROM routines to do this (see the section on the ROM routines)</p>
+<p>Moreover we may have to convert the binary to a format that can be acccepted by the system.</p>
+<p>Therefore, we can indeed write portable code for even these unsupported systems.</p>
+<p>For example CC&amp;% does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use the dev-kit to produce binaries for these targets:</p>
+<ul>
+<li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supports (theoretically) any architecture even the unsupported ones such as for example the l’Olivetti Prodest PC128.</li>
+<li>The game Robotsfindskitten is been compiled for thr Atari 7800 with CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
+<li>BBC has already been added unofficially as an experimental new target in CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
+</ul>
+<h4 id="compilation-for-unsupported-targets-1">Compilation for unsupported targets</h4>
+<p>We give a list of compilation options for generic target for each dev-kit so that the compiler is instructued to compile without any dependence on a specific target. For more details we refer to the manual of the dev-kits.</p>
 
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Dev-Kit</th>
+<th>Option(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td>(*)</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>+none</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>--nodefaultlibs</code></td>
+</tr>
+<tr>
+<td>Zilog 80</td>
+<td>SCCZ80/ZSDCC (Z88DK)</td>
+<td><code>+test</code>, <code>+embedded</code> (new lib),  <code>+cpm</code> (generic CP/M target)</td>
+</tr>
+</tbody>
+</table><p>(*) ACK officially only supports the CP/M-80 for the Intel 8080 architecture but it is possible to use ACK to build generic Intel 8080 binaries but it is not very simple because ACK uses a sequence of commands to produce intermediate results (including the “EM” byte-code):</p>
+<ol>
+<li><code>ccp.ansi</code>:  C precompiler</li>
+<li><code>em_cemcom.ansi</code>: compiles precompiled C code into “EM” byte-code</li>
+<li><code>em_opt</code>: optimizes “EM” byte-code</li>
+<li><code>cpm/ncg</code>: generates Intel 8080 Assembly from “EM” bytecode</li>
+<li><code>cpm/as</code>: generates Intel 8080 binary from Assembly</li>
+<li><code>em_led</code>: links object files</li>
+</ol>
+<h2 id="general-c-code-optimization-1">General C code optimization</h2>
+<p>We describe some general rules to improve the code that do not depend on whether the architecture is 8-bit or not.</p>
+<h3 id="re-use-same-functions-1">Re-use same functions</h3>
+<p>In general, in whatever programming language we want to code, it is important to avoid code duplication and unnecessary code.</p>
+<h4 id="structured-programming-1">Structured programming</h4>
+<p>We have to examine each function in order to find common portions that we can <em>factor</em> by introducing <em>sub-functions</em> that are original function can call.<br>
+However we must take into account that, beyond a certain limit, excessive code granularity has negative effects because each function call has a computational and memory cost.</p>
+<h4 id="parametrized-code-1">Parametrized code</h4>
+<p>In some cases it is possible to generalize the code by passing a parameter to avoid writing very similar functions.<br>
+An advanced example is in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> where, given a <code>struct</code> with two fields <code>_x</code> and <code>_y</code>,<br>
+we want to be able to change the value of one field or the other in different situations:</p>
+<pre><code>	struct CharacterStruct
+	{
+		unsigned char _x;
+		unsigned char _y;
+		...
+	};
+	typedef struct CharacterStruct Character;
+</code></pre>
+<p>We avoid two different functions for <code>_x</code> and <code>_y</code> by creating one function to which we pass an <em>offset</em> to select the field:</p>
+<pre><code>	unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
+	{
+		if((unsigned char) * ((unsigned char*)hunterPtr+offset) &lt; ... )
+		{
+			++(*((unsigned char *) hunterPtr+offset));
+		}
+		else if((unsigned char) *((unsigned char *) hunterPtr+offset) &gt; ... )
+		{
+			--(*((unsigned char *) hunterPtr+offset));
+		}
+	...
+	}
+</code></pre>
+<p>In this case, we use the fact that the field <code>_y</code> is exactly one byte after the field <code>_x</code>. Therefore with <code>offset=0</code> we access <code>_x</code> and with <code>offset=1</code> we access <code>_y</code>.</p>
+<p><strong>Warning</strong>: We must always remember that adding a parameter has a cost and we must verify that the cost of the parameter is lower than the cost of an extra function (e.g., by looking at the size of the obtained binary).</p>
+<h4 id="same-code-on-similar-objects-1">Same code on similar <em>objects</em></h4>
+<p>We can do even better and use the same code on <em>objects</em> that are not identical but shares some common features by using <code>offset</code> in <code>struct</code>, <em>pointers to functions</em>, etc.<br>
+In general this is possible through <em>object-oriented programming</em> whose light-weight implementation for 8-bit systems is described in a subsequent section in this article.</p>
+<h3 id="pre-incrementdecrement--vs-post-incrementdecrement-1">Pre-increment/decrement  vs Post-increment/decrement</h3>
+<p>We must avoid post-increment/decrement operators (<code>i++</code>, <code>i--</code>) when they are not needed, i.e.,  when we do not need the original value and replace them with (<code>++i</code>, <code>--i</code>).<br>
+The reason is that the post-increment operator requires at least an extra operation to save the original value.<br>
+Remark: It is totally useless to use a post-increment in a <code>for</code> loop.</p>
+<h3 id="costant-vs-variables-1">Costant vs Variables</h3>
+<p>Any architecture will perform better if variables are replace with constants.</p>
+<h4 id="use-constants-1">Use constants</h4>
+<p>Therefore if a variable has a known value at compilation-time, it is important to replace it with a constant.<br>
+If its value depends on some compilation option, then we should use a <em>macro</em> to set its value.</p>
+<h4 id="help-the-compiler-to-recognize-constants-1">Help the compiler to recognize constants</h4>
+<p>Besides, for <em>single pass</em> compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler whether a given expression is a constant.</p>
+<p><strong><em>Example</em></strong> (from da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+A <em>single pass</em> compiler may evaluate the following expression from left to right and miss the fact that <code>OFFS+3</code> is a constant:</p>
+<pre><code>	#define OFFS   4
+	int  i;
+	i = i + OFFS + 3;
+</code></pre>
+<p>In this case it would be better to re-write <code>i = i + OFFS+3</code> as <code>i = OFFS+3+i</code> or <code>i = i + (OFFS+3)</code>.</p>
+<h2 id="bit-specific-code-optimization-1">8-bit specific code optimization</h2>
+<p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.).<br>
+This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
+<h3 id="the-best-types-for-8-bit-systems-1">The “best types” for 8-bit systems</h3>
+<p>First of all we must take into account that we have the following situation:</p>
+<ul>
+<li>all arithmetic operations are just 8-bit</li>
+<li>most of other operations use 8 bits while some may use 16 bits and none uses 32 bits</li>
+<li><code>signed</code> operations are slower than <code>unsigned</code> operations</li>
+<li>the hardware does not support <em>floating point</em> operations</li>
+</ul>
+<h4 id="integer-vs-floating-point-types-1">Integer vs floating point types</h4>
+<p>The C languages provides <code>signed</code> integer types (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code>, etc.) and their <code>unsigned</code> counterparts.<br>
+Most cross compiler (but not CC65) support the <code>float</code> type (for <em>floating point</em> numbers), which we do not cover here.<br>
+We only remark that <code>float</code> numbers in 8-bit architecture are always <em>software float</em> and therefore have a high computational cost.<br>
+Hence we should only use them when strictly necessary.</p>
+<h4 id="our-friend-unsigned-1">Our friend <em>unsigned</em></h4>
+<p>Since the 8-bit architectures under consideration do <strong>NOT</strong> handle <code>signed</code> types well, we must avoid them whenever possible.</p>
+<h4 id="size-matters-1">“Size matters!”</h4>
+<p>The size of the standard integer types depend on the compiler and architecture and not on the C standard.<br>
+Recently the C99 standard has introduced some types that have an unambiguous size (e.g., <code>uint8_t</code> for an 8-bit <code>unsigend</code> integer).</p>
+<p>In order to use these types in our code we should include <code>stdint.h</code> with:</p>
+<pre><code>	#include &lt;stdint.h&gt;
+</code></pre>
+<p>Not all 8-bit cross compiler support these types.</p>
+<p>Fortunately for most 8-bit compilers we have the following situation:</p>
 
-## Sfruttare l'hardware specifico
-Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l'hardware specifico per il quale stiamo scrivendo del codice.
-In alcuni casi conoscere l'hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>number of bits</th>
+<th>equivalent type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unsigned char</code></td>
+<td>8</td>
+<td><code>uint8_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned short</code></td>
+<td>16</td>
+<td><code>uint16_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned int</code></td>
+<td>16</td>
+<td><code>uint16_t</code></td>
+</tr>
+<tr>
+<td><code>unsigned long</code></td>
+<td>32</td>
+<td><code>uint32_t</code></td>
+</tr>
+</tbody>
+</table><p>Therefore we must:</p>
+<ul>
+<li>whenever possible use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operatoins;</li>
+<li>use <code>unsigned char</code> (or <code>uint8_t</code>) and <code>unsigned short</code> (or <code>uint16_t</code>) for all other operations and avoid all 32-bit operations.</li>
+</ul>
+<p>Remark: When the fixed-size types are not available we can introduce them by using <code>typedef</code>:</p>
+<pre><code>	typedef unsigned char uint8_t;
+	typedef unsigned short uint16_t;
+	typedef unsigned long uint32_t;
+</code></pre>
+<h3 id="choice-of-the-operations-1">Choice of the operations</h3>
+<p>When writing code for an 8-bit architecture we must avoid inefficient operations or operations that force us to use inefficient types (such as <code>signed</code> or 32-bit types).</p>
+<h4 id="avoid-signed-1">Avoid <em>signed</em></h4>
+<p>In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.</p>
+<h4 id="avoid-explicit-products-1">Avoid explicit products</h4>
+<p>All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values.<br>
+Therefore, if possible, we should avoid the products or limit ourselves to products and divisions by power of 2 that we can implement with the <em>&lt;&lt;</em> e <em>&gt;&gt;</em> operators:</p>
+<pre><code>	unsigned char foo, bar;
+	...
+	foo &lt;&lt; 2; // multiply by 2^2=4
+	bar &gt;&gt; 1; // divide by 2^1=2
+</code></pre>
+<h4 id="rewrite-some-operations-1">Rewrite some operations</h4>
+<p>Other operations such as <em>modulo</em> can be rewritten in a more efficient way for the 8-bit systems by using bit-wise operators because the compiler is not always capable of optimizing these operations:</p>
+<pre><code>	unsigned char foo;
+	...
+	if(foo&amp;1) // equivalent to foo%2
+	{
+		...
+	}
+</code></pre>
+<h3 id="variables-and-parameters-1">Variables and parameters</h3>
+<p>One of the greatest limitations of the MOS 6502-architecture is not the lack of registers as someone may think but it is the small size of its <em>hardware stack</em> (in <em>page one</em>: <code>$0100-01FF</code>),<br>
+which makes unusable in C for managing the <em>scope</em> of variables and parameter passing.<br>
+Therefore a C compiler for the MOS 6502 will most probably be forced to implement a <em>software stack</em>:</p>
+<ul>
+<li>to manage the scope of local variables,</li>
+<li>to manage parameter passing.</li>
+</ul>
+<p>The other 8-bit architectures under our consideration may suffer less from this problem but the scope of local variables and parameter passing also have a cost when a <em>hardware stack</em> can be used.</p>
+<h4 id="an-antipattern-may-help-us-1">An <em>antipattern</em> may help us</h4>
+<p>One way to mitigate this problem is to reduce the use of local variables and passed paramters. This is clearly an <em>antipattern</em> and if we were to apply it to all our code we would get some <em>spaghetti code</em>.<br>
+We must therefore wisely choose which variables deserve to be local and which variables can be declared as global.<br>
+We would then have less re-usable code but we will gain in efficiency. I am <strong>NOT</strong> suggesting the use of just global variables and to renounce to all parameters in functions.</p>
+<h4 id="do-no-use-re-entrant-function-1">[6502] Do no use re-entrant function</h4>
+<p>The CC65 compiler for the MOS 6502 architecture provides the <code>-Cl</code> that interprets all local variables as <code>static</code>, i.e., global.<br>
+This has the effect of avoiding the <em>software stack</em> for their scope. This also has the effect of making all the functions <em>non-reentrant</em>.<br>
+In practice this prevents us from using recursive function. This is not a serious loss because recursion would be a costly operation, which we should avoid on 8-bit systems.</p>
+<h4 id="use-page-zero-1">[6502] Use page zero</h4>
+<p>Standard C provides the <code>register</code> keyword to give a hint to the compiler to use a register for a given variable.<br>
+Most modern compiler simply ignore this keyword because their optimizers can choose better than the programmer.<br>
+This is also true for the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>pagina zero</em> for a given variable.<br>
+The MOS 6502 can access this page more efficiently than any other memory area.<br>
+The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer.<br>
+By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
+One may think that all variables should be declared as <code>register</code> but things are <strong>NOT</strong> so simple because everything has a cost.<br>
+In order to store a variable in page zero, some extra operations are required. Hence, page zero provides an advantage only for variables that are heavily used.<br>
+In practice the two most common scenarios where this is the case are:</p>
+<ol>
+<li>parameters of type pointer to <code>struct</code> that are used at least 3 times within the function scope;</li>
+<li>variables inside a loop that is repeated at least about 100 times.</li>
+</ol>
+<p>A reference with more details is: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
+<p>My personal advice is to compile and verify if the produced binary is shorter/faster.</p>
+<h3 id="optimal-binary-structured-1">Optimal binary structured</h3>
+<p>If our program uses data in a specific memory area, it would be better to have the data already stored in the binary and have the load process of the binary copy the data at the expected locations without any code to do actual copying of the data.<br>
+If the data is in the source code instead, we will have to copy them and we will also end up having them twice in memory.<br>
+The most common case is the data for sprites and redefined characters or tiles.</p>
+<p>Often but not always many MOS 6502 architectures use <em>memory mapped</em> graphics memory and so use common RAM for graphics data.<br>
+On the other hand many Z80-based systems such as (MSZ, Specravideo, Memotech MTX, Sord M5, Tatung Einstein, etc.) use the Texas VDP graphics chip that has its own video memory.</p>
+<h4 id="cc65-let-us-instruct-the-linker-1">[CC65] Let us instruct the linker</h4>
+<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
+In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
+Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
+Una descrizione dettagliata è presente su:<br>
+<a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
+Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
+<h5 id="exomizer-ci-aiuta-anche-in-questo-caso-1">Exomizer ci aiuta (anche) in questo caso</h5>
+<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
+<h4 id="z88dk-appmake-fa-quasi-tutto-per-noi-1">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h4>
+<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costuisce dei binari nel formato richiesto.<br>
+Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice.<br>
+Questo argomento è trattato in dettaglio in<br>
+<a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
+<h3 id="codice-su-file-diversi-1">Codice su file diversi?</h3>
+<p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
+Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
+Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
+Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
+<h2 id="uso-avanzato-della-memoria-1">Uso avanzato della memoria</h2>
+<p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
+<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
+Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
+Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In particolare consiglio di cercare:</p>
+<ul>
+<li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
+<li>memoria usata dal BASIC</li>
+<li>aree di memoria dedicate a modi grafici (che non si intendono usare)</li>
+<li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
+</ul>
+<p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
+<p><em>Esempi utili</em><br>
+In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
 
-### Usare le estensioni ASCII specifiche
-Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l'estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).
+<table>
+<thead>
+<tr>
+<th>computer</th>
+<th>descrizione</th>
+<th>area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Commodore 16</td>
+<td>tape buffer</td>
+<td>$0333-03F2</td>
+</tr>
+<tr>
+<td>Commodore 16</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>system input buffer</td>
+<td>$0200-0250</td>
+</tr>
+<tr>
+<td>Commodore Pet</td>
+<td>tape buffer</td>
+<td>$033A-03F9</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
+</tr>
+<tr>
+<td>Commodore Vic 20</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
+<td>Galaksija</td>
+<td>variable a-z</td>
+<td>$2A00-2A68</td>
+</tr>
+<tr>
+<td>Sinclair Spectrum 16K/48K</td>
+<td>printer buffer</td>
+<td>$5B00-5BFF</td>
+</tr>
+<tr>
+<td>Mattel Aquarius</td>
+<td>random number space</td>
+<td>$381F-3844</td>
+</tr>
+<tr>
+<td>Mattel Aquarius</td>
+<td>input buffer</td>
+<td>$3860-38A8</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>alternate charset</td>
+<td>$B800-B7FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>grabable memory per modo hires</td>
+<td>$9800-B3FF</td>
+</tr>
+<tr>
+<td>Oric</td>
+<td>Page 4</td>
+<td>$0400-04FF</td>
+</tr>
+<tr>
+<td>TRS-80 Model I/III/IV</td>
+<td>RAM for ROM routines (*)</td>
+<td>$4000-41FF</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>printer buffer &amp; misc</td>
+<td>$7930-79AB</td>
+</tr>
+<tr>
+<td>VZ200</td>
+<td>BASIC line input buffer</td>
+<td>$79E8-7A28</td>
+</tr>
+</tbody>
+</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
+<p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+<ul>
+<li><code>player</code> di tipo <code>Character</code>,</li>
+<li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
+<li><code>bombs</code> di tipo array di 4 <code>Character</code> (20=$14 byte)</li>
+</ul>
+<pre><code>	Character *ghosts = 0xC000;
+	Character *bombs = 0xC000+$28;
+	Character *player = 0xC000+$28+$14;
+</code></pre>
+<p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em> e comunque crea delle variabili puntatore (ognuna delle quali dovrebbe occupare 2 byte) che il compilatore potrebbe comunque allocare in memoria.</p>
+<p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
+I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia o migliaia di byte preziosi.<br>
+Vari esempi sono presenti in:<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
+<p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
+<p>Sintassi CC65 (esempio Vic 20)</p>
+<pre><code>	.export _ghosts;
+	_ghosts = $33c
+	.export _bombs;
+	_bombs = _ghosts + $28 
+	.export _player;
+	_player = _bombs + $14
+</code></pre>
+<p>Sintassi Z88DK (esempio Galaksija)</p>
+<pre><code>	PUBLIC _ghosts, _bombs, _player
+	defc _ghosts = 0x2A00
+	defc _bombs = _ghosts + $28 
+	defc _player = _bombs + $14
+</code></pre>
+<p>CMOC mette a disposizione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
+<p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
+<h2 id="la-programmazione-ad-oggetti-1">La programmazione ad oggetti</h2>
+<p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
+<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
+Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
+<ul>
+<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
+<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
+</ul>
+<p>Esempio (preso da<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
+Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
+<pre><code>	struct CharacterStruct
+	{
+		unsigned char _x;
+		unsigned char _y;
+		unsigned char _status;
+		Image* _imagePtr;
+	};
+	typedef struct CharacterStruct Character;
+...
+ 	struct ItemStruct
+	{
+		Character _character;
+		void (*_effect)(void);
+		unsigned short _coolDown;
+		unsigned char _blink;
+	};
+	typedef struct ItemStruct Item;
+</code></pre>
+<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
+<pre><code>	Item *myItem;
+	void foo(Character * aCharacter);
+	...
+	foo((Character *)myItem);
+</code></pre>
+<p>Perché ci guadagniamo in termine di memoria?<br>
+Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
+<h2 id="compilazione-ottimizzata-1">Compilazione ottimizzata</h2>
+<p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
+<h3 id="ottimizzazione-aggressiva-1">Ottimizzazione “aggressiva”</h3>
+<p>Le seguenti opzioni applicano il massimo delle ottimizzazioni per produrre codice veloce e soprattutto compatto:</p>
 
-### Sfruttare i chip grafici
-Conoscere il chip grafico può aiutarci a risparmiare tanta ram.
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intel 8080</td>
+<td>ACK</td>
+<td><code>-O6</code></td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>-O3</code></td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>ZSDCC (Z88DK)</td>
+<td><code>-SO3</code> <code>--max-alloc-node20000</code></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-O</code> <code>-Cl</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>-O2</code></td>
+</tr>
+</tbody>
+</table><h4 id="velocità-vs-memoria-1">Velocità vs Memoria</h4>
+<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In generale il codice ottimizzato per la velocità sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
+In alcuni altri casi l’obiettivo principale può essere la velocità anche a discapito della memoria.<br>
+Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
 
-Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)
-I sistemi basati su questo chip prevedono una modalità video testuale (*Mode 1*)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+<th>Descrizione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zilog Z80</td>
+<td>ZSDCC (Z88DK)</td>
+<td><code>--opt-code-size</code></td>
+<td>Ottimizza memoria</td>
+</tr>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>--opt-code-speed</code></td>
+<td>Ottimizza velocità</td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-Oi</code>, <code>-Os</code></td>
+<td>Ottimizza velocità</td>
+</tr>
+</tbody>
+</table><p><strong>Problemi noti</strong></p>
+<ul>
+<li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
+<li>CMOC: <code>-O2</code> ha dei bug</li>
+<li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
+</ul>
+<h3 id="ottimizzazione-più-sicura-1">Ottimizzazione più sicura</h3>
+<p>Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
 
-Esempio (Commodore Vic 20)
-Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:
-
-- In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore
-- Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)
-- La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM
-
-Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.
-Possiamo mappare le nostre variabili nei vari buffer non utilizzati.
-Se ci bastano n (n<=64) caratteri ridefiniti possiamo mapparne solo 64 con `POKE(0x9005,0xFF);` Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Compilatore</th>
+<th>Opzioni</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zilog Z80</td>
+<td>SCCZ80 (Z88DK)</td>
+<td><code>-O3</code></td>
+</tr>
+<tr>
+<td>MOS 6502</td>
+<td>CC65</td>
+<td><code>-O</code></td>
+</tr>
+<tr>
+<td>Motorola 6809</td>
+<td>CMOC</td>
+<td><code>-O1</code></td>
+</tr>
+</tbody>
+</table><h2 id="evitare-il-linking-di-codice-inutile-1">Evitare il linking di codice inutile</h2>
+<p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
+<p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
+<h3 id="evitare-la-standard-lib-1">Evitare la standard lib</h3>
+<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
+<h4 id="cpm-80-solo-getchar-e-putcharc-1">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
+<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> e implementare tutto il resto.</p>
+<h4 id="z88dk-pragmas-per-non-generare-codice-1">[z88dk] Pragmas per non generare codice</h4>
+<p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
+<p>Per esempio:</p>
+<pre><code>#pragma printf = "%c %u"
+</code></pre>
+<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
+<pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
+</code></pre>
+<p>non genera codice per l’inizializzazione dell’area di memoria BSS.</p>
+<pre><code>#pragma output CRT_ON_EXIT = 0x10001
+</code></pre>
+<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)</p>
+<pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap della memoria dinamica (nessuna malloc possibile)</p>
+<pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
+</code></pre>
+<p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
+<p>Alcuni esempi sono in<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
+<h2 id="usare-le-routine-presenti-in-rom-1">Usare le routine presenti in ROM</h2>
+<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
+<p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
+<p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
+<p>Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:</p>
+<pre><code>	void PUTCH(unsigned char ch)
+	{
+		asm
+		{
+			ldb ch
+			swi
+			.byte 2
+		}
+	}
+</code></pre>
+<h4 id="le-librerie-spesso-lo-fanno-per-noi-1">Le librerie spesso lo fanno per noi</h4>
+<p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
+<h2 id="sfruttare-lhardware-specifico-1">Sfruttare l’hardware specifico</h2>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
+In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
+<h3 id="usare-le-estensioni-ascii-specifiche-1">Usare le estensioni ASCII specifiche</h3>
+<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
+<h3 id="sfruttare-i-chip-grafici-1">Sfruttare i chip grafici</h3>
+<p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
+<p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
+<p>Esempio (Commodore Vic 20)<br>
+Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
+<ul>
+<li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
+<li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
+<li>La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM</li>
+</ul>
+<p>Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.<br>
+Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
+Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <code>POKE(0x9005,0xFF);</code> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
 
