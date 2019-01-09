@@ -283,76 +283,80 @@ In this case it would be better to re-write `i = i + OFFS+3` as `i = OFFS+3+i` o
 
 
 
-## Ottimizzare il codice per gli 8-bit
-Il C è un linguaggio che presenta sia costrutti ad alto livello (come `struct`, le funzioni come parametri, etc.) sia costruiti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.
+## 8-bit specific code optimization 
+The C language has both high level constructs (such as `struct`, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.). 
+This is not enough to make C a programming language well-suited for programming 8-bit systems.
 
-### I "tipi migliori" per gli 8-bit
-Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:
+### The "best types" for 8-bit systems
+First of all we must take into account that we have the following situation:
+ - all arithmetic operations are just 8-bit
+ - most of other operations use 8 bits while some may use 16 bits and none uses 32 bits
+ - `signed` operations are slower than `unsigned` operations
+ - the hardware does not support *floating point* operations
 
- - tutte le operazioni aritmetiche sono solo a 8 bit
- - la maggior parte delle operazioni sono ad 8 bit, alcune sono a 16-bit e nessuna operazione è a 32 bit
- - le operazioni `signed` (cioè con segno) sono più lente di quelle `unsigned`
- - l'hardware non supporta operazioni in *virgola mobile*
+#### Integer vs floating point types
+The C languages provides `signed` integer types (`char`, `short`, `int`, `long`, `long long`, etc.) and their `unsigned` counterparts.
+Most cross compiler (but not CC65) support the `float` type (for *floating point* numbers), which we do not cover here.
+We only remark that `float` numbers in 8-bit architecture are always *software float* and therefore have a high computational cost.
+Hence we should only use them when strictly necessary.
 
-#### Tipi interi vs tipi a virgola mobile
-Il C prevede tipi numerici interi con segno (`char`, `short`, `int`, `long`, `long long` e loro equivalenti in versione `unsigned`). 
-Molti compilatori (ma non CC65) prevedono il tipo `float` (numeri a *virgola mobile*) che qui non tratteremo. Bisogna considerare che i `float` delle architetture 8-bit sono tutti *software float* ed hanno quindi un costo computazionale notevole. Sarebbero quindi da usare solo se strettamente necessari.
-
-#### Il nostro amico *unsigned* 
-Siccome le architetture 8-bit che stiamo considerandno **NON** gestiscono ottimalmente tipi `signed`, dobbiamo evitare il più possibile l'uso di tipi numerici `signed`. 
+#### Our friend *unsigned* 
+Since the 8-bit architectures under consideration do **NOT** handle `signed` types well, we must avoid them whenever possible. 
 
 #### "Size matters!"
-La dimensione dei tipi numeri standard dipende dal compilatore e dall'architettura e non dal linguaggio.
-Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio `uint8_t` per l'intero `unsigend` a 8 bit).
-Il modo standard per includere questi tipi a taglia fissa 
+The size of the standard integer types depend on the compiler and architecture and not on the C standard.
+Recently the C99 standard has introduced some types that have an unambiguous size (e.g., `uint8_t` for an 8-bit `unsigend` integer).
+
+In order to use these types in our code we should include `stdint.h` with:
 ~~~~
 	#include <stdint.h>
 ~~~~
-Non tutti i compilatori 8-bit dispongono di questi tipi.
+Not all 8-bit cross compiler support these types.
 
-Fortunatamente per la stragrande maggioranza dei compilatori 8-bit abbiamo la seguente situazione:
+Fortunately for most 8-bit compilers we have the following situation:
 
-|  tipo | numero bit | equivalente
+|  type | number of bits | equivalent type
 |--|--|--|
 | `unsigned char` | 8 | `uint8_t`
 | `unsigned short` | 16 | `uint16_t`
 | `unsigned int` | 16 | `uint16_t`
 | `unsigned long` | 32 | `uint32_t`
 
-Quindi dovremo:
+Therefore we must:
 
- - usare il più possibile `unsigned char` (o `uint8_t`) per le operazioni aritmetiche;
-- usare `unsigned char` (o `uint8_t`) e `unsigned short` (o `uint16_t`) per tutte le altre operazioni, evitando se possibile qualunque operazione a 32 bit.
+ - whenever possible use `unsigned char` (or `uint8_t`) for arithmetic operatoins;
+ - use `unsigned char` (or `uint8_t`) and `unsigned short` (or `uint16_t`) for all other operations and avoid all 32-bit operations.
 
-Nota: In assenza di tipi con dimensione fissata, sarebbe una buona pratica creare dei `typedef` opportuni:
+Remark: When the fixed-size types are not available we can introduce them by using `typedef`:
 ~~~~
 	typedef unsigned char uint8_t;
 	typedef unsigned short uint16_t;
 	typedef unsigned long uint32_t;
 ~~~~
 
-### Scelta delle operazioni
-Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi `signed` o tipi a 16 o peggio 32 bit).
+### Choice of the operations
+When writing code for an 8-bit architecture we must avoid inefficient operations or operations that force us to use inefficient types (such as `signed` or 32-bit types).
 
-#### Non produciamo *signed*
-In particolare, se possibile, spesso si può riscrivere il codice in maniera da evitare sottrazioni e quando questo non è possibile, si può almeno fare in modo che il risultato della sottrazione sia sempre non-negativo.
+#### Avoid *signed*
+In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.
 
-#### Evitiamo i prodotti espliciti
-Tutte le architetture che abbiamo preso in considerazione, con la sola esclusione di Motorola 6809, non dispongono di una operazione per effettuare il prodotto di due valori a 8 bit.
-Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, oppure limitarci a prodotti e divisioni che siano potenze di 2 e implementandoli con operazioni di shift con gli operatori *<<* e *>>*:
+
+#### Avoid explicit products
+All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values.
+Therefore, if possible, we should avoid the products or limit ourselves to products and divisions by power of 2 that we can implement with the *<<* e *>>* operators:
 ~~~~
 	unsigned char foo, bar;
 	...
-	foo << 2; // moltiplicazione per 2^2=4
-	bar >> 1; // divisione per 2^1=2
+	foo << 2; // multiply by 2^2=4
+	bar >> 1; // divide by 2^1=2
 ~~~~
 
-#### Riscrivere certe operazioni
-Molte operazioni come il modulo possono essere riscritte in maniera più efficiente per gli 8 bit usando operatori bit a bit. Non sempre il compilatore ottimizza nel modo migliore. Quando il compilatore non ce la fa, dobbiamo dargli una mano noi:
+#### Rewrite some operations
+Other operations such as *modulo* can be rewritten in a more efficient way for the 8-bit systems by using bit-wise operators because the compiler is not always capable of optimizing these operations:
 ~~~~
 	unsigned char foo;
 	...
-	if(foo&1) // equivalente a foo%2
+	if(foo&1) // equivalent to foo%2
 	{
 		...
 	}
