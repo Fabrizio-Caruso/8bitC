@@ -78,6 +78,7 @@
 </table><p>We mention other <em>multi-target</em> <em>cross-compilers</em> that we do not cover here but for which most of the described general techniques are valid:</p>
 <ul>
 <li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) for several architectures including the 8-bit Zilog Z80 and Intel 8051;</li>
+<li>LCC1802 (<a href="https://sites.google.com/site/lcc1802/">https://sites.google.com/site/lcc1802/</a>) for the COSMAC 1802 8-bit processor;</li>
 <li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) for the Motorola 6809 (GCC adaptation);</li>
 <li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) for the MOS 6502 (GCC adaptation);</li>
 <li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) for the Intel 8080/8085 ;</li>
