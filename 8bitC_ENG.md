@@ -593,8 +593,7 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </tr>
 </tbody>
 </table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a:<br>
-<a href="https://lookaside.fbsbx.com/file/SORD_SYSVAR.txt?token=AWxszmSp3ocKG47DlyjrcsbtsDI35wDnpBLtDXOz4xnZHgWR3RcjrGEnHxVelZoN_0yUDCHa84JTKoxZIiGrTqrAHEMJw0qy0SAci8WPXfRoyHu9Bqui3SFlsZ76l8QxOxJavlCbVQR-2Bv7y1NFvUbt">https://lookaside.fbsbx.com/file/SORD_SYSVAR.txt?token=AWxszmSp3ocKG47DlyjrcsbtsDI35wDnpBLtDXOz4xnZHgWR3RcjrGEnHxVelZoN_0yUDCHa84JTKoxZIiGrTqrAHEMJw0qy0SAci8WPXfRoyHu9Bqui3SFlsZ76l8QxOxJavlCbVQR-2Bv7y1NFvUbt</a> and<br>
-<a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+<a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> and <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
 <p>In standard C we can only define some pointer and array variables at some specific memory locations.</p>
 <p>In the following with give a theoretical example on how to define some of these pointer and array variables at address starting at <code>0xC000</code> where given a 5-byte <code>struct</code> type <code>Character</code> we want to also handle the following variables:</p>
 <ul>
