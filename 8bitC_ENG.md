@@ -626,17 +626,18 @@ Remark: We need to <strong>add</strong> an <em>underscore</em> prefix to each va
 </code></pre>
 <p>CMOC provides the <code>--data=&lt;address&gt;</code> option to allocate all writable global variables at a given starting memory address.</p>
 <p>ACK documentation does not say anything about this. We could nevertheless define pointer and array types at given free memory locations through the generic standard syntax.</p>
-<h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
-<p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
-<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
-Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
+<h2 id="object-oriented-programming">Object-oriented programming</h2>
+<p>Contrary to common belief, object-oriented programming is possible in ANSI C and can help up produce more compact compact in certain situations. There are complete object-oriented frameworks for ANSI C (e.g., Gnome is writtwn with <em>GObject</em>, which is one of these frameworks).</p>
+<p>We can implement <em>classes</em>, <em>polymorphim</em> and <em>inheritance</em> very efficiently even for memory-limited 8-bit systems.</p>
+<p>A detailed description of object-oriented programming goes beyond the purpose of this articile.<br>
+Here we decribe how to implement its main features:</p>
 <ul>
-<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
+<li>Use<em>pointers to functions</em> to implement *polymorphic" methods, i.e., methods with <em>dynamic binding</em>, whose behavior is defined at <em>run-time</em>. It is possible to avoid the implementation of a <em>vtable</em> if we limit ourselves to classes with just one polymorphic method.</li>
+<li>Use <em>pointers to <code>struct</code></em> and <em>composition</em> to implelent <em>sub-classes</em>: given a  <code>struct</code> A, we implement a sub-class with a <code>struct</code> B defined as a  <code>struct</code> whose <strong>first</strong> field is of type A. When passing pointers to such new <code>struct</code>, the C language guarantees that the <em>offset</em> of B are the same as the ones of A and therefore a pointer to B can be <em>cast</em> into a pointer to A.</li>
 </ul>
-<p>Esempio (preso da<br>
+<p>Example (taken from<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
-Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
+Let us dfine <code>Item</code> as a sub-class of<code>Character</code> to which we add some variables and a polymorphic method <code>_effect()</code>:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
@@ -655,25 +656,26 @@ Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui
 	};
 	typedef struct ItemStruct Item;
 </code></pre>
-<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
-<pre><code>	Item *myItem;
+<p>We can then pass a pointer to  <code>Item</code> as if it were a pointer to  <code>Character</code> (by performing a simple <em>cast</em>):</p>
+<pre><code>	Item *myIem;
 	void foo(Character * aCharacter);
 	...
 	foo((Character *)myItem);
 </code></pre>
-<p>Perché ci guadagniamo in termine di memoria?<br>
-Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
+<p>Why can we save memory by doing this?<br>
+Because we may treat different, yet similar, objects with the same code and so avoid code duplication.</p>
 <h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
-<p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
-<h3 id="ottimizzazione-aggressiva">Ottimizzazione “aggressiva”</h3>
-<p>Le seguenti opzioni applicano il massimo delle ottimizzazioni per produrre codice veloce e soprattutto compatto:</p>
+<p>We won’t cover exaustively all compilation options of the cross-compilers under our consideration. We refer to their respective manuals for the derails.<br>
+Here we give a list of options to produced optimized code on our compilers.</p>
+<h3 id="aggressive-compilation">“Aggressive” compilation</h3>
+<p>The following options will apply the highest optimizations to produce faster and above all more compact code:</p>
 
 <table>
 <thead>
 <tr>
-<th>Architettura</th>
-<th>Compilatore</th>
-<th>Opzioni</th>
+<th>Architecture</th>
+<th>Compiler</th>
+<th>Options</th>
 </tr>
 </thead>
 <tbody>
@@ -703,18 +705,18 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 <td><code>-O2</code></td>
 </tr>
 </tbody>
-</table><h4 id="velocità-vs-memoria">Velocità vs Memoria</h4>
-<p>In generale su molti target 8-bit il problema maggiore è la presenza di poca memoria per codice e dati. In generale il codice ottimizzato per la velocità sarà sia compatto che veloce ma non sempre le due cose andranno assieme.<br>
-In alcuni altri casi l’obiettivo principale può essere la velocità anche a discapito della memoria.<br>
-Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propria preferenza tra velocità e memoria:</p>
+</table><h4 id="speed-vs-memory">Speed vs Memory</h4>
+<p>The most common problem for many 8-bit systems is the presence of little memory for code and data. Usually optimizing for speed also improves memory usage but this is not always the case.<br>
+In some other cases, our goal is speed even at the cost of extra memory.<br>
+Some compilers provide options to specify our preference with respect to speed and memory:</p>
 
 <table>
 <thead>
 <tr>
-<th>Architettura</th>
-<th>Compilatore</th>
-<th>Opzioni</th>
-<th>Descrizione</th>
+<th>Architecture</th>
+<th>Compiler</th>
+<th>Options</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
@@ -722,36 +724,36 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <td>Zilog Z80</td>
 <td>ZSDCC (Z88DK)</td>
 <td><code>--opt-code-size</code></td>
-<td>Ottimizza memoria</td>
+<td>Optimize memory</td>
 </tr>
 <tr>
 <td>Zilog Z80</td>
 <td>SCCZ80 (Z88DK)</td>
 <td><code>--opt-code-speed</code></td>
-<td>Ottimizza velocità</td>
+<td>Optimize speed</td>
 </tr>
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
 <td><code>-Oi</code>, <code>-Os</code></td>
-<td>Ottimizza velocità</td>
+<td>Optimize speed</td>
 </tr>
 </tbody>
-</table><p><strong>Problemi noti</strong></p>
+</table><p><strong>Known problems</strong></p>
 <ul>
-<li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
-<li>CMOC: <code>-O2</code> ha dei bug</li>
-<li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
+<li>CC65: <code>-Cl</code> prevents recursive functions</li>
+<li>CMOC: <code>-O2</code> has bugs</li>
+<li>ZSDCC: has bugs that do not depend on the options and has specific bugs that are triggered by <code>-SO3</code> when no <code>--max-alloc-node20000</code> option is provided.</li>
 </ul>
-<h3 id="ottimizzazione-più-sicura">Ottimizzazione più sicura</h3>
-<p>Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
+<h3 id="safer-optimization">Safer optimization</h3>
+<p>In order to avoid these problems and reduce compilation time (above all for the Z80 architecture) we suggest:</p>
 
 <table>
 <thead>
 <tr>
-<th>Architettura</th>
-<th>Compilatore</th>
-<th>Opzioni</th>
+<th>Architecture</th>
+<th>Compiler</th>
+<th>Options</th>
 </tr>
 </thead>
 <tbody>
@@ -771,32 +773,32 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <td><code>-O1</code></td>
 </tr>
 </tbody>
-</table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
-<p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
-<p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
-<h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
-<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
-<h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
-<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> e implementare tutto il resto.</p>
-<h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
-<p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
-<p>Per esempio:</p>
+</table><h2 id="avoid-linking-useless-code">Avoid linking useless code</h2>
+<p>Our compilers will not always be able to detect and remove unused and useless code from the binary. Therefore we must avoid to include it in the first place.</p>
+<p>We can do even better with some of the compilers by instructing them to not include some standard libraries or even portions of the libraries that we are sure not to use.</p>
+<h3 id="avoid-the-standard-library">Avoid the standard library</h3>
+<p>In some meaningful cases, we could avoid using the standard library in order to reduce significantly the size of the produced binary.</p>
+<h4 id="cpm-80-use-only-getchar-and-putcharc">[cp/m-80] Use only <code>getchar()</code> and <code>putchar(c)</code></h4>
+<p>Replacing functions such as <code>printf</code> and <code>scanf</code> with just <code>getchar()</code> and <code>putchar(c)</code> is very useful when using ACK to produce <code>CP/M-80</code> binaries because otherwise ACK links a huge implementation of the standard C library.</p>
+<h4 id="z88dk-special-pragmas-to-remove-code">[z88dk] Special <code>pragma</code>'s to remove code</h4>
+<p>Z88DK provides several <em>pragma</em> commands to instruct the compiler and linker to not include some useless code.</p>
+<p>For example:</p>
 <pre><code>#pragma printf = "%c %u"
 </code></pre>
-<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
+<p>includes only <code>%c</code> and <code>%u</code> converts and excludes all the others.</p>
 <pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
 </code></pre>
-<p>non genera codice per l’inizializzazione dell’area di memoria BSS.</p>
+<p>does not generate code to inizialize the BSS memory area.</p>
 <pre><code>#pragma output CRT_ON_EXIT = 0x10001
 </code></pre>
-<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)</p>
+<p>the program does not when it exists (e.g., to BASIC).</p>
 <pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
 </code></pre>
-<p>elimina lo heap della memoria dinamica (nessuna malloc possibile)</p>
+<p>no <code>heap</code> memory (i.e., no <code>malloc</code> are possible).</p>
 <pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
 </code></pre>
-<p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
-<p>Alcuni esempi sono in<br>
+<p>removes <code>stdio heap</code> (no file can be opened).</p>
+<p>More examples are in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
 <p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
