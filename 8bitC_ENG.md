@@ -478,24 +478,23 @@ Z88DK also allows the user to define <em>memory sections</em> and to redefine th
 This topic is treated in detail in:<br>
 <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
-<p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
-Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
-Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
-Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
-<h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
-<p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
-<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
-Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
-Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
-<p>In particolare consiglio di cercare:</p>
+<p>Usually separating a large code into multiple files is a good practice but it may produce poorer code for 8-bit optimizer because they do not perform <em>link-time optimization</em>, i.e., they cannot optimize code between two or more files but also optimize each file separately.<br>
+For example we have a function that is called only once and the function is defined in the same file where it is invoked, then the optimizer may be able to <em>inline</em> it but this would never be possible if the functions were defined in a separate file.<br>
+My advice is <strong>not</strong> to create one or few huge files but to take into account how separating the code into multiple files can affect the optimization.</p>
+<h2 id="advanced-memory-use">Advanced memory use</h2>
+<p>The C compiler usually produces a unique binary that contains both code and data, which will be loaded in specific memory locations (even with non contiguous memory areas).</p>
+<p>In many architectures some RAM areas are use as <em>buffers</em> for the ROM routines or are used only in some special cases (e.g., some graphics modes).<br>
+My advice is to study the memory map. For example for the Vic 20 we would have to look at:<br>
+<a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In particular we should look for:</p>
 <ul>
-<li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
-<li>memoria usata dal BASIC</li>
-<li>aree di memoria dedicate a modi grafici (che non si intendono usare)</li>
-<li>aree di memoria libere ma non contigue e che quindi non sarebbero parte del nostro binario</li>
+<li>cassette buffer, keyboard buffer, printer buffer disk buffer, etc.</li>
+<li>memory used by ROM routines and in particular by BASIC routines</li>
+<li>memory areas used by special graphics modes</li>
+<li>free small portions of free memory that are not usually used by code because they are not contiguous with the main code memory area.</li>
 </ul>
-<p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
-<p><em>Esempi utili</em><br>
+<p>There memory areas could be used by our code if they do not serve their standard purpose in our use-case, e.g., if we do not intend to use the tape after the program has been loaded (including from the tape), then we can use the tape buffer in our code to store some variables.</p>
+<p><em>Useful cases</em><br>
 In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
 
 <table>
@@ -573,6 +572,11 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$0400-04FF</td>
 </tr>
 <tr>
+<td>Sord M5</td>
+<td>RAM for ROM routines (*)</td>
+<td>$7000-$73FF</td>
+</tr>
+<tr>
 <td>TRS-80 Model I/III/IV</td>
 <td>RAM for ROM routines (*)</td>
 <td>$4000-41FF</td>
@@ -588,25 +592,26 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
-<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
-<p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a:<br>
+<a href="https://lookaside.fbsbx.com/file/SORD_SYSVAR.txt?token=AWxszmSp3ocKG47DlyjrcsbtsDI35wDnpBLtDXOz4xnZHgWR3RcjrGEnHxVelZoN_0yUDCHa84JTKoxZIiGrTqrAHEMJw0qy0SAci8WPXfRoyHu9Bqui3SFlsZ76l8QxOxJavlCbVQR-2Bv7y1NFvUbt">https://lookaside.fbsbx.com/file/SORD_SYSVAR.txt?token=AWxszmSp3ocKG47DlyjrcsbtsDI35wDnpBLtDXOz4xnZHgWR3RcjrGEnHxVelZoN_0yUDCHa84JTKoxZIiGrTqrAHEMJw0qy0SAci8WPXfRoyHu9Bqui3SFlsZ76l8QxOxJavlCbVQR-2Bv7y1NFvUbt</a> and<br>
+<a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+<p>In standard C we can only define some pointer and array variables at some specific memory locations.</p>
+<p>In the following with give a theoretical example on how to define some of these pointer and array variables at address starting at <code>0xC000</code> where given a 5-byte <code>struct</code> type <code>Character</code> we want to also handle the following variables:</p>
 <ul>
-<li><code>player</code> di tipo <code>Character</code>,</li>
-<li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
-<li><code>bombs</code> di tipo array di 4 <code>Character</code> (20=$14 byte)</li>
+<li><code>player</code> of type  <code>Character</code>,</li>
+<li><code>ghosts</code>, an <code>array</code> with 8 <code>Character</code> elements (40=$28 bytes)</li>
+<li><code>bombs</code>, an array with 4 <code>Character</code> elements (20=$14 bytes)</li>
 </ul>
 <pre><code>	Character *ghosts = 0xC000;
 	Character *bombs = 0xC000+$28;
 	Character *player = 0xC000+$28+$14;
 </code></pre>
-<p>Questa soluzione generica con puntatori non sempre produce il codice ottimale perché obbliga a fare diverse <em>deferenziazioni</em> e comunque crea delle variabili puntatore (ognuna delle quali dovrebbe occupare 2 byte) che il compilatore potrebbe comunque allocare in memoria.</p>
-<p>Non esiste un modo standard per dire al compilatore di mettere qualunque tipo di variabile in una specifica area di memoria.<br>
-I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di fare questo e guadagnare diverse centinaia o migliaia di byte preziosi.<br>
-Vari esempi sono presenti in:<br>
+<p>This generic solution with pointers does not always produce optimal code because it forces us to <em>dereference</em> our pointers and creates pointer variables (usually 2 bytes per pointer) that the compiler has to allocate in memory.</p>
+<p>No standard solution exist to store any other type of variables in a specific memory area but the CC65 and Z88DK linkers provide a special syntax to do this and let us save hundreds or even thousands of precious bytes. Some examples are in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
-<p>In particolare bisogna creare un file Assembly .s (con CC65) o .asm (con Z88DK) da linkare al nostro eseguibile in cui assegnamo un indirizzo ad ogni nome di variabile a cui  <strong>aggiungiamo</strong> un prefisso <em>underscore</em>.</p>
-<p>Sintassi CC65 (esempio Vic 20)</p>
+<p>In particolar we will have to create an Assembly file: a .s file (underCC65) or .asm file (under Z88DK) that we will link to our binary. In this file we will be able to assign each variable to a specific memory area.<br>
+Remark: We need to <strong>add</strong> an <em>underscore</em> prefix to each variable.</p>
+<p>CC65 syntax (Commodore Vic 20 example)</p>
 <pre><code>	.export _ghosts;
 	_ghosts = $33c
 	.export _bombs;
@@ -614,14 +619,14 @@ Vari esempi sono presenti in:<br>
 	.export _player;
 	_player = _bombs + $14
 </code></pre>
-<p>Sintassi Z88DK (esempio Galaksija)</p>
+<p>Z88DK syntax (Galaksija example)</p>
 <pre><code>	PUBLIC _ghosts, _bombs, _player
 	defc _ghosts = 0x2A00
 	defc _bombs = _ghosts + $28 
 	defc _player = _bombs + $14
 </code></pre>
-<p>CMOC mette a disposizione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
-<p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
+<p>CMOC provides the <code>--data=&lt;address&gt;</code> option to allocate all writable global variables at a given starting memory address.</p>
+<p>ACK documentation does not say anything about this. We could nevertheless define pointer and array types at given free memory locations through the generic standard syntax.</p>
 <h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
 <p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
 <p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
