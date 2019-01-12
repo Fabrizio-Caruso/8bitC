@@ -478,7 +478,7 @@ In this case I recommend the <em>exomizer</em> tool to compress the binary:  <a 
 Z88DK also allows the user to define <em>memory sections</em> and to redefine the binary “packagging” but doing this is quite complicated.<br>
 This topic is treated in detail in:<br>
 <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
-<h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
+<h3 id="code-on-multiple-files">Code on multiple files</h3>
 <p>Usually separating a large code into multiple files is a good practice but it may produce poorer code for 8-bit optimizer because they do not perform <em>link-time optimization</em>, i.e., they cannot optimize code between two or more files but also optimize each file separately.<br>
 For example we have a function that is called only once and the function is defined in the same file where it is invoked, then the optimizer may be able to <em>inline</em> it but this would never be possible if the functions were defined in a separate file.<br>
 My advice is <strong>not</strong> to create one or few huge files but to take into account how separating the code into multiple files can affect the optimization.</p>
