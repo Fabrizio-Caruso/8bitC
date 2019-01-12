@@ -13,7 +13,7 @@
 <li>Zilog Z80 (*)</li>
 </ul>
 <p>(*) The Zilog Z80 is an extension of the Intel 8080. Therefore an Intel 8080 binary is compatible with a Z80-based system but not the other way round.</p>
-<p>Most of the techniques presented here remain valid on other 8-bit architectures such as the COSMAC 1802 or the ones found in microcontrollers, e.g., on the Intel 8051.</p>
+<p>Most of the techniques presented here remain valid on other 8-bit architectures such as the COSMAC 1802 and the Intel 8051.</p>
 <p>The goal of this article is two-fold:</p>
 <ol>
 <li>present general techniques to <strong>optimize</strong> C code for <strong>all</strong> 8-bit systems;</li>
