@@ -495,7 +495,7 @@ My advice is to study the memory map. For example for the Vic 20 we would have t
 </ul>
 <p>There memory areas could be used by our code if they do not serve their standard purpose in our use-case, e.g., if we do not intend to use the tape after the program has been loaded (including from the tape), then we can use the tape buffer in our code to store some variables.</p>
 <p><em>Useful cases</em><br>
-In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
+In questa tabella diamo alcuni esempi utili per il C64 e per sistemi che hanno poca memoria disponibile:</p>
 
 <table>
 <thead>
@@ -507,14 +507,14 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </thead>
 <tbody>
 <tr>
-<td>Commodore 16</td>
-<td>tape buffer</td>
-<td>$0333-03F2</td>
-</tr>
-<tr>
-<td>Commodore 16</td>
+<td>Commodore 16/116/+4</td>
 <td>BASIC input buffer</td>
 <td>$0200-0258</td>
+</tr>
+<tr>
+<td>Commodore 16/116/+4</td>
+<td>tape buffer</td>
+<td>$0333-03F2</td>
 </tr>
 <tr>
 <td>Commodore Pet</td>
@@ -527,14 +527,14 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$033A-03F9</td>
 </tr>
 <tr>
-<td>Commodore Vic 20</td>
-<td>tape buffer</td>
-<td>$033C-03FB</td>
-</tr>
-<tr>
-<td>Commodore Vic 20</td>
+<td>Commodore C64 &amp; Vic 20</td>
 <td>BASIC input buffer</td>
 <td>$0200-0258</td>
+</tr>
+<tr>
+<td>Commodore C64 &amp; Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
 </tr>
 <tr>
 <td>Galaksija</td>
@@ -563,7 +563,7 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 </tr>
 <tr>
 <td>Oric</td>
-<td>grabable memory per modo hires</td>
+<td>grabable hires memory</td>
 <td>$9800-B3FF</td>
 </tr>
 <tr>
@@ -592,7 +592,7 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a:<br>
+</table><p>(*): Multiple buffer and auxiliary ram for ROM routiens. For more details please refer to:<br>
 <a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> and <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
 <p>In standard C we can only define some pointer and array variables at some specific memory locations.</p>
 <p>In the following with give a theoretical example on how to define some of these pointer and array variables at address starting at <code>0xC000</code> where given a 5-byte <code>struct</code> type <code>Character</code> we want to also handle the following variables:</p>
