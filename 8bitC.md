@@ -342,6 +342,7 @@ In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissim
 <pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
     #define PEEK(addr)      (*(unsigned char*) (addr))
 </code></pre>
+<p>Remark: I compilatori scriveranno codice ottimale nel caso in cui si passino delle costanti come parametri.</p>
 <p>Per maggiori dettagli facciamo riferimento a: <a href="https://github.com/cc65/wiki/wiki/PEEK-and-POKE">https://github.com/cc65/wiki/wiki/PEEK-and-POKE</a></p>
 <h3 id="i-tipi-migliori-per-gli-8-bit">I “tipi migliori” per gli 8-bit</h3>
 <p>Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:</p>
