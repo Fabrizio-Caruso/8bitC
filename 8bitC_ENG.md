@@ -21,7 +21,7 @@
 <h2 id="preconditions">Preconditions</h2>
 <p>This article is <strong>not</strong> a introduction nor a manual for the <em>C</em> language and has the following preconditions:</p>
 <ul>
-<li>knowledge of the <em>C</em> langiage;</li>
+<li>knowledge of the <em>C</em> language;</li>
 <li>knowledge of structured and object-oriented programming;</li>
 <li>knowledge of basic use of compilers and linkers.</li>
 </ul>
@@ -82,7 +82,7 @@
 <li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) for the Motorola 6809 (GCC adaptation);</li>
 <li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) for the MOS 6502 (GCC adaptation);</li>
 <li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) for the Intel 8080/8085 ;</li>
-<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) for Sega consoles (Sega Master System, Sega Game Gear, Sega SG-1000).</li>
+<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) for Sega  Z80-based consoles (Sega Master System, Sega Game Gear, Sega SG-1000).</li>
 </ul>
 <p>We remark that the Z88DK dev-kit provides two compilers:</p>
 <ul>
@@ -800,11 +800,11 @@ Some compilers provide options to specify our preference with respect to speed a
 <p>removes <code>stdio heap</code> (no file can be opened).</p>
 <p>More examples are in:<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
-<h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
-<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
-<p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
-<p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
-<p>Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:</p>
+<h2 id="use-rom-routines">Use ROM routines</h2>
+<p>Most of the 8-bit systems (almost all computers), have plenty of routines in ROM. It is important to know about them and use them when they are need. In order to use them explicitly in our code, we may have to write some <em>in line</em> Assembly in our C code (or use separate Assembly routines). How to do this is different in every dev-kit and we refer to their respective manuals for more details.</p>
+<p>This is very important for systems that are not natively supported by the compilers and for which all input/output routines have to be written.</p>
+<p>Example (taken from <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
+<p>In order to display characters on the screen for the Thomson Mo5, Mo6 and Olivetti Prodest PC128 (which are not supported by CMOC), we can use the ROM routine by using a little in line Assembly code:</p>
 <pre><code>	void PUTCH(unsigned char ch)
 	{
 		asm
@@ -815,25 +815,25 @@ Some compilers provide options to specify our preference with respect to speed a
 		}
 	}
 </code></pre>
-<h4 id="le-librerie-spesso-lo-fanno-per-noi">Le librerie spesso lo fanno per noi</h4>
-<p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
-<h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
-<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
-In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
-<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
-<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
-<h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
-<p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
-<p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
-I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
-<p>Esempio (Commodore Vic 20)<br>
-Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
+<h4 id="libraries-may-already-use-rom-routines">Libraries may already use ROM routines</h4>
+<p>Luckily we use ROM routines implicitly by just using the libraries that are provided by the dev-kit. This saves us a lot of RAM memory because the code is already stored in ROM.<br>
+Nevertheless we must take into consideration that when we use a ROM routine may add some constraints in our code because we cannot modify them and they may use some auxiliary RAM locations (e.g., buffers) that we won’t be allowed to use.</p>
+<h2 id="use-the-specific-hardware">Use the specific hardware</h2>
+<p>As seen in the previous section, even if we could in C we should not forget the specific hardware. In some cases the hardware can help us write more compact and faster code.</p>
+<h3 id="redefine-characters-only-when-needed">Redefine characters only when needed</h3>
+<p>When we need very simple low level graphics, we could avoid redefining all our characters. For example we could exploit the extended ASCII character set  (ATASCII, PETSCII, SHARPSCII, etc.). Even if some redefined characters are necessary we could just redefine the needed ones and in same cases, we could use characters in ROM and in RAM at the same time  (see the Vic 20 example in the next section).</p>
+<h3 id="exploit-the-graphics-chips">Exploit the graphics chips</h3>
+<p>In some cases we can save some significant amount of memory if we know the graphics chips.</p>
+<p>Example (Texas VDP TMS9918A chip such as the one on MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+Systems that use this chip have a special text color mode (<em>Mode 1</em>) where each character has as preassigned color. When using this text mode setting a character and its color is done by a single byte.</p>
+<p>Example (Commodore Vic 20)<br>
+The Commodore Vic 20 is a very special case because of its very limited RAM memory (total RAM: 5k, RAM available for the code: 3,5K) but it also comes with tricky ways to mitigate these limits:</p>
 <ul>
-<li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
-<li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
-<li>La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM</li>
+<li>It also has color ram (1024 nibbles).</li>
+<li>A large part of the non-code RAM can be used by the code (buffers, auxiliary locations, etc.)</li>
+<li>The most surprising feature is that each chip can map some characters in RAM and some in ROM.</li>
 </ul>
-<p>Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.<br>
-Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
-Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <code>POKE(0x9005,0xFF);</code> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
+<p>Therefore, we do not use RAM for colors. We can map some variables in some non-code RAM areas.<br>
+If we need n (n&lt;=64) redefined characters, we can just map 64 onto RAM by <code>POKE(0x9005,0xFF);</code>.<br>
+We can then redefine up to 64 characters and keep 64 standard characters (defined in ROM).</p>
 
