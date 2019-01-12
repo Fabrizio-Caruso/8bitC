@@ -339,6 +339,16 @@ A <em>single pass</em> compiler may evaluate the following expression from left 
 <h2 id="bit-specific-code-optimization">8-bit specific code optimization</h2>
 <p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.).<br>
 This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
+<h3 id="implement-peek-and-poke-in-c">Implement <code>peek</code> and <code>poke</code> in C</h3>
+<p>Mosr probably we will need to read and write single bytes from and to specific memory locations.<br>
+In old BASIC this was done through<br>
+<code>peek</code> and <code>poke</code> commands.<br>
+In c we must do this through poniters whose syntax is not very readable. In order to make our code more readable we can create the following macros:</p>
+<pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
+    #define PEEK(addr)      (*(unsigned char*) (addr))
+</code></pre>
+<p>Remark: The compilers will produce optimal code when we use constants as parameters of these macros.</p>
+<p>For more details we refer to: <a href="https://github.com/cc65/wiki/wiki/PEEK-and-POKE">https://github.com/cc65/wiki/wiki/PEEK-and-POKE</a></p>
 <h3 id="the-best-types-for-8-bit-systems">The “best types” for 8-bit systems</h3>
 <p>First of all we must take into account that we have the following situation:</p>
 <ul>
