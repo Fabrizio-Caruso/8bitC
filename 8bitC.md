@@ -77,7 +77,7 @@
 </tbody>
 </table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui ma per i quali buona parte delle stesse tecniche generiche rimangono valide:</p>
 <ul>
-<li>LCC1802 (<a href="https://sites.google.com/site/lcc1802/">https://sites.google.com/site/lcc1802/</a>) for the COSMAC 1802 8-bit processor;</li>
+<li>LCC1802 (<a href="https://sites.google.com/site/lcc1802/">https://sites.google.com/site/lcc1802/</a>) per il COSMAC 1802;</li>
 <li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) per svariate architetture di microprocessori come lo Z80 e di microcontrollori come l’Intel 8051;</li>
 <li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) per 6809 (adattamento di GCC);</li>
 <li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) per 6502 (adattamento di GCC);</li>
@@ -335,6 +335,14 @@ Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistr
 <p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruiti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
+<h3 id="implementare-peek-e-poke-in-c">Implementare <code>peek</code> e <code>poke</code> in C</h3>
+<p>Quasi sicuramente avremo bisogno di fare scrivere e leggere dei singoli byte su alcune specifiche locazioni di memoria.<br>
+Il modo per fare questo è in BASIC sarebbe attraverso i comando <code>peek</code> e <code>poke</code>.<br>
+In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissima. Potremo però costruirci delle utili macro che useremo nel nostro codice:</p>
+<pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
+    #define PEEK(addr)      (*(unsigned char*) (addr))
+</code></pre>
+<p>Per maggiori dettagli facciamo riferimento a: <a href="https://github.com/cc65/wiki/wiki/PEEK-and-POKE">https://github.com/cc65/wiki/wiki/PEEK-and-POKE</a></p>
 <h3 id="i-tipi-migliori-per-gli-8-bit">I “tipi migliori” per gli 8-bit</h3>
 <p>Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:</p>
 <ul>
@@ -467,6 +475,43 @@ Questo argomento è trattato in dettaglio in<br>
 Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
 Quindi se per esempio abbiamo una funzione che chiamiamo una sola volta e la funzione è definita nello stesso file in cui viene usata, l’ottimizzatore potre metterla <em>in line</em> ma non lo farà se la funzione è definita in un altro file.<br>
 Il mio consiglio <strong>non</strong> quello di creare file enormi con tutto ma è quello di tenere comunque conto di questo aspetto quando si decide di separare il codice su più file e di non abusare di questa buona pratica.</p>
+<h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
+<p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
+<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
+Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
+<ul>
+<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
+<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
+</ul>
+<p>Esempio (preso da<br>
+<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
+Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
+<pre><code>	struct CharacterStruct
+	{
+		unsigned char _x;
+		unsigned char _y;
+		unsigned char _status;
+		Image* _imagePtr;
+	};
+	typedef struct CharacterStruct Character;
+...
+ 	struct ItemStruct
+	{
+		Character _character;
+		void (*_effect)(void);
+		unsigned short _coolDown;
+		unsigned char _blink;
+	};
+	typedef struct ItemStruct Item;
+</code></pre>
+<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
+<pre><code>	Item *myItem;
+	void foo(Character * aCharacter);
+	...
+	foo((Character *)myItem);
+</code></pre>
+<p>Perché ci guadagniamo in termine di memoria?<br>
+Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
 <p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
 <p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche.<br>
@@ -613,43 +658,6 @@ Vari esempi sono presenti in:<br>
 </code></pre>
 <p>CMOC mette a disposizione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
-<h2 id="la-programmazione-ad-oggetti">La programmazione ad oggetti</h2>
-<p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
-<p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
-Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
-<ul>
-<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
-</ul>
-<p>Esempio (preso da<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
-Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
-<pre><code>	struct CharacterStruct
-	{
-		unsigned char _x;
-		unsigned char _y;
-		unsigned char _status;
-		Image* _imagePtr;
-	};
-	typedef struct CharacterStruct Character;
-...
- 	struct ItemStruct
-	{
-		Character _character;
-		void (*_effect)(void);
-		unsigned short _coolDown;
-		unsigned char _blink;
-	};
-	typedef struct ItemStruct Item;
-</code></pre>
-<p>e poi potremo passare un puntatore a <code>Item</code> come se fosse un puntatore a <code>Character</code> (facendo un semplice <em>cast</em>):</p>
-<pre><code>	Item *myItem;
-	void foo(Character * aCharacter);
-	...
-	foo((Character *)myItem);
-</code></pre>
-<p>Perché ci guadagniamo in termine di memoria?<br>
-Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
 <h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
 <p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
 <h3 id="ottimizzazione-aggressiva">Ottimizzazione “aggressiva”</h3>
