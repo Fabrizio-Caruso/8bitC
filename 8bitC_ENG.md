@@ -528,12 +528,12 @@ We list some useful memory areas for the Commodore 64 and a few memory-limited s
 <td>$033A-03F9</td>
 </tr>
 <tr>
-<td>Commodore C64 &amp; Vic 20</td>
+<td>Commodore 64 &amp; Vic 20</td>
 <td>BASIC input buffer</td>
 <td>$0200-0258</td>
 </tr>
 <tr>
-<td>Commodore C64 &amp; Vic 20</td>
+<td>Commodore 64 &amp; Vic 20</td>
 <td>tape buffer</td>
 <td>$033C-03FB</td>
 </tr>
