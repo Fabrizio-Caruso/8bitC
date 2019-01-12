@@ -3,6 +3,7 @@
 
 ---
 
+<p><img src="8bitC.jpg" alt="8-bit C"></p>
 <h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
 <p>Questo articolo descrive alcune tecniche per ottimizzare codice in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90 ed in particolare sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
 <ul>
@@ -12,7 +13,7 @@
 <li>Zilog Z80 (*)</li>
 </ul>
 <p>(*) Lo Zilog Z80 è una estensione dell’Intel 8080, quindi un binario Intel 8080 sarà utilizzabile anche su un sistema con Z80 ma il viceversa non è vero.</p>
-<p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quelle dei microcontrollori tra cui l’Intel 8051.</p>
+<p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quella del COSMAC 1802 e quella del microcontrollore Intel 8051.</p>
 <p>Lo scopo di questo articolo è duplice:</p>
 <ol>
 <li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
@@ -76,11 +77,12 @@
 </tbody>
 </table><p>Inoltre esistono altri <em>cross compilatori</em> C <em>multi-target</em> che non tratteremo qui ma per i quali buona parte delle stesse tecniche generiche rimangono valide:</p>
 <ul>
+<li>LCC1802 (<a href="https://sites.google.com/site/lcc1802/">https://sites.google.com/site/lcc1802/</a>) for the COSMAC 1802 8-bit processor;</li>
 <li>SDCC (<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>) per svariate architetture di microprocessori come lo Z80 e di microcontrollori come l’Intel 8051;</li>
 <li>GCC-6809 (<a href="https://github.com/bcd/gcc">https://github.com/bcd/gcc</a>) per 6809 (adattamento di GCC);</li>
 <li>GCC-6502 (<a href="https://github.com/itszor/gcc-6502-bits">https://github.com/itszor/gcc-6502-bits</a>) per 6502 (adattamento di GCC);</li>
 <li>SmallC-85 (<a href="https://github.com/ncb85/SmallC-85">https://github.com/ncb85/SmallC-85</a>) per Intel 8080/8085 ;</li>
-<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) per Sega Master System, Sega Game Gear e Sega SG-1000.</li>
+<li>devkitSMS (<a href="https://github.com/sverx/devkitSMS">https://github.com/sverx/devkitSMS</a>) per le console Sega basate su Z80 come Sega Master System, Sega Game Gear e Sega SG-1000.</li>
 </ul>
 <p>Si noti come il dev-kit Z88DK disponga di due compilatori:</p>
 <ul>
@@ -143,7 +145,7 @@ In particolare l’ANSI C ci pemette di:</p>
 <p>Qualcuno si spinge a dichiarare che il C sia una sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene.<br>
 Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly tra i linguaggi che permettono anche la programmazione ad alto livello.</p>
 <h3 id="controindicazioni-sentimentali">Controindicazioni “sentimentali”</h3>
-<p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come come sulle macchine che usavano il sistema operativo CP/M).<br>
+<p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come sulle macchine che usavano il sistema operativo CP/M).<br>
 Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare programmare l’hardware di quasi tutti i sistemi 8-bit.</p>
 <h2 id="scrivere-codice-portabile">Scrivere codice portabile</h2>
 <p>Scrivere codice facilmente portabile o addirittura direttammente compilabile per diverse piattaforme è possibile in C attraverso varie strategie:</p>
@@ -501,6 +503,16 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$0200-0258</td>
 </tr>
 <tr>
+<td>Commodore 64 &amp; Vic 20</td>
+<td>tape buffer</td>
+<td>$033C-03FB</td>
+</tr>
+<tr>
+<td>Commodore 64 &amp; Vic 20</td>
+<td>BASIC input buffer</td>
+<td>$0200-0258</td>
+</tr>
+<tr>
 <td>Commodore Pet</td>
 <td>system input buffer</td>
 <td>$0200-0250</td>
@@ -509,16 +521,6 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>Commodore Pet</td>
 <td>tape buffer</td>
 <td>$033A-03F9</td>
-</tr>
-<tr>
-<td>Commodore Vic 20</td>
-<td>tape buffer</td>
-<td>$033C-03FB</td>
-</tr>
-<tr>
-<td>Commodore Vic 20</td>
-<td>BASIC input buffer</td>
-<td>$0200-0258</td>
 </tr>
 <tr>
 <td>Galaksija</td>
@@ -556,6 +558,11 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$0400-04FF</td>
 </tr>
 <tr>
+<td>Sord M5</td>
+<td>RAM for ROM routines (*)</td>
+<td>$7000-$73FF</td>
+</tr>
+<tr>
 <td>TRS-80 Model I/III/IV</td>
 <td>RAM for ROM routines (*)</td>
 <td>$4000-41FF</td>
@@ -571,7 +578,8 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>(*): Diversi tipi di buffer e memoria ausiliare. Per maggiori dettagli fare riferimento a: <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+</table><p>(*): Multiple buffer and auxiliary ram for ROM routiens. For more details please refer to:<br>
+<a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> and <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
 <p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
 <p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
