@@ -23,7 +23,7 @@
 <ul>
 <li>knowledge of the <em>C</em> language;</li>
 <li>knowledge of structured and object-oriented programming;</li>
-<li>knowledge of basic use of compilers and linkers.</li>
+<li>familiarity with compilers and linkers.</li>
 </ul>
 <p>Besides this article does not cover in depth some advanced topics such as:</p>
 <ul>
@@ -328,7 +328,7 @@ Remark: It is totally useless to use a post-increment in a <code>for</code> loop
 If its value depends on some compilation option, then we should use a <em>macro</em> to set its value.</p>
 <h4 id="help-the-compiler-to-recognize-constants">Help the compiler to recognize constants</h4>
 <p>Besides, for <em>single pass</em> compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler whether a given expression is a constant.</p>
-<p><strong><em>Example</em></strong> (from da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
+<p><strong><em>Example</em></strong> (from <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 A <em>single pass</em> compiler may evaluate the following expression from left to right and miss the fact that <code>OFFS+3</code> is a constant:</p>
 <pre><code>	#define OFFS   4
 	int  i;
@@ -456,7 +456,7 @@ In practice the two most common scenarios where this is the case are:</p>
 </ol>
 <p>A reference with more details is: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
 <p>My personal advice is to compile and verify if the produced binary is shorter/faster.</p>
-<h3 id="optimal-binary-structured">Optimal binary structured</h3>
+<h3 id="binary-structure">Binary structure</h3>
 <p>If our program uses data in a specific memory area, it would be better to have the data already stored in the binary and have the load process of the binary copy the data at the expected locations without any code to do actual copying of the data.<br>
 If the data is in the source code instead, we will have to copy them and we will also end up having them twice in memory.<br>
 The most common case is the data for sprites and redefined characters or tiles.</p>
@@ -495,7 +495,7 @@ My advice is to study the memory map. For example for the Vic 20 we would have t
 </ul>
 <p>There memory areas could be used by our code if they do not serve their standard purpose in our use-case, e.g., if we do not intend to use the tape after the program has been loaded (including from the tape), then we can use the tape buffer in our code to store some variables.</p>
 <p><em>Useful cases</em><br>
-In questa tabella diamo alcuni esempi utili per il C64 e per sistemi che hanno poca memoria disponibile:</p>
+We list some useful memory areas for the Commodore 64 and a few memory-limited systems:</p>
 
 <table>
 <thead>
