@@ -3,6 +3,7 @@
 
 ---
 
+<p><img src="8bitC.jpg" alt="8-bit C"></p>
 <h1 id="portable-and-optimized-c-for-8-bit-systems">Portable and Optimized C for 8-bit Systems</h1>
 <p>This article describes some optimizing techniques for ANSI C code for <strong>all</strong> 8-bit <em>vintage</em> systems, i.e., computers, consoles, hand-helds, scientific calculators from the end of the '70s until mid '90s and in particular for the systems based on the following <em>architectures</em> (and the derived and compatible architectures):</p>
 <ul>
