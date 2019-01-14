@@ -270,7 +270,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td><code>+none</code> (per esempio il sopracitato BBC)</td>
+<td><code>+none</code></td>
 </tr>
 <tr>
 <td>Motorola 6809</td>
@@ -280,7 +280,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code> [per la nuova libreria],  <code>+cpm</code> [per vari sistemi CP/M] (per esempio i vari sistemi CP/M gestiti da Cross-Chase)</td>
+<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
