@@ -5,11 +5,11 @@
 
 <p><img src="8bitC.jpg" alt="8-bit C"></p>
 <h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
-<p>Questa è la prima parte di un articolo che descrive alcune tecniche per ottimizzare codice in ANSI C portabile per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90.<br>
+<p>Questa è la prima parte di una serie di tre articoli che descrivono tecniche per scrivere codice portabile e ottimizzato in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche e microcontrollori dalla fine degli anni 70 fino a metà degli anni 90.<br>
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
-<p>Il contenuto dell’articolo originale sarà presentato in tre articoli:</p>
+<p>Il contenuto dell’articolo originale sarà diviso nel seguente modo:</p>
 <ol>
-<li>Introduzione + Scrittura di codice C portabile per 8-bit</li>
+<li>Introduzione  + Scrittura di codice C portabile per 8-bit</li>
 <li>Tecniche per ottimizzare il codice C per 8-bit</li>
 <li>Tecniche avanzate per ottimizzare il codice C per 8-bit</li>
 </ol>
@@ -38,7 +38,7 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 </ul>
 <p>Inoltre questo articolo <strong>non</strong> si occuperà in profondità di alcuni argomenti avanzati quali:</p>
 <ul>
-<li>gli ambiti specifici della programmazione come grafica, suono, input/output, etc.</li>
+<li>alcuni ambiti specifici della programmazione come grafica, suono, input/output, etc.</li>
 <li>l’interazione tra C e Assembly.</li>
 </ul>
 <p>Questi argomenti avanzati sono molto importanti e meriterebbero degli articoli separati a loro dedicati.</p>
@@ -240,7 +240,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
 <li>codice necessario per inizializzare correttamente il binario</li>
 </ul>
-<p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (per un esempio si veda la sezione di questo articolo che tratta l’uso delle routine della ROM).</p>
+<p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie daremo un esempio di uso delle routine della ROM che trovare pure nella sezione dedicata alle routine della ROM su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
 <p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già a disposizione).</p>
 <p>Potremo quindi scrivere codice portabile anche a questi sistemi.</p>
 <p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
