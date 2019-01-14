@@ -8,9 +8,9 @@
 <h2 id="prima-parte-introduzione--e-scrittura-di-codice-c-portabile-per-8-bit"><em>Prima parte</em>: Introduzione  e Scrittura di codice C portabile per 8-bit</h2>
 <p>Questa è la prima parte di una serie di tre articoli che descrivono tecniche per scrivere codice portabile e ottimizzato in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche e microcontrollori dalla fine degli anni 70 fino a metà degli anni 90.<br>
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
-<p>Il contenuto dell’articolo originale sarà diviso nel seguente modo:</p>
+<p>Il contenuto dell’articolo originale sarà trattato in tre parti:</p>
 <ol>
-<li>Introduzione  + Scrittura di codice C portabile per 8-bit</li>
+<li>Introduzione e Scrittura di codice C portabile per 8-bit</li>
 <li>Tecniche per ottimizzare il codice C per 8-bit</li>
 <li>Tecniche avanzate per ottimizzare il codice C per 8-bit</li>
 </ol>
@@ -25,26 +25,26 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <p>(*) Lo Zilog Z80 è una estensione dell’Intel 8080, quindi un binario Intel 8080 sarà utilizzabile anche su un sistema con Z80 ma il viceversa non è vero.</p>
 <p>Buona parte di queste tecniche sono valide su altre architetture 8-bit come quella del COSMAC 1802 e quella del microcontrollore Intel 8051.</p>
 <h2 id="obiettivi">Obiettivi</h2>
-<p>Lo scopo di questo articolo è duplice:</p>
+<p>Lo scopo di questa serie di articoli è duplice:</p>
 <ol>
-<li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
 <li>descrivere tecniche generiche per scrivere codice <strong>portabile</strong>, cioè valido e compilabile su <strong>tutti</strong> i sistemi 8-bit indipendentemente dal fatto che un sistema sia supportato esplicitamente da un compilatore o meno</li>
+<li>descrivere tecniche generali per <strong>ottimizzare</strong> il codice C su <strong>tutti</strong> i sistemi 8-bit</li>
 </ol>
 <h2 id="premesse">Premesse</h2>
-<p>Questo articolo <strong>non</strong> è un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
+<p>Questa serie di articoli <strong>non</strong> è un manuale introduttivo al linguaggio <em>C</em> e richiede</p>
 <ul>
 <li>conoscenza del linguaggio <em>C</em>;</li>
 <li>conoscenza della programmazione strutturata e a oggetti;</li>
 <li>conoscenza dell’uso di compilatori e linker.</li>
 </ul>
-<p>Inoltre questo articolo <strong>non</strong> si occuperà in profondità di alcuni argomenti avanzati quali:</p>
+<p>Inoltre <strong>non</strong> ci occuperemo in profondità di alcuni argomenti avanzati quali:</p>
 <ul>
 <li>alcuni ambiti specifici della programmazione come grafica, suono, input/output, etc.</li>
 <li>l’interazione tra C e Assembly.</li>
 </ul>
 <p>Questi argomenti avanzati sono molto importanti e meriterebbero degli articoli separati a loro dedicati.</p>
 <h2 id="terminologia">Terminologia</h2>
-<p>Introduciamo alcuni termini che saranno ricorrenti in questo articolo (e nei successivi articoli):</p>
+<p>Introduciamo alcuni termini che saranno ricorrenti in questa serie di articoli:</p>
 <ul>
 <li>Un <em>sistema</em> è un qualunque tipo di macchina dotata di processore come computer, console, handheld, calcolatrici, sistemi embedded, etc.</li>
 <li>Un <em>target</em> di un compilatore è un sistema supportato dal compilatore, cioè un sistema per il quale il compilatore mette a disposizione supporto specifico come librerie e la generazione di un binario in formato specifico.</li>
@@ -108,7 +108,7 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 </ul>
 <p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.</p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
-In questo articolo per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
+In questa serie di articoli per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
 <h2 id="motivazione">Motivazione</h2>
 <p>Per quale motivo dovremmo usare il C per programmare dei sistemi 8-bit?<br>
@@ -270,7 +270,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>MOS 6502</td>
 <td>CC65</td>
-<td><code>+none</code></td>
+<td><code>+none</code> (per esempio il sopracitato BBC)</td>
 </tr>
 <tr>
 <td>Motorola 6809</td>
@@ -280,7 +280,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
+<td><code>+test</code>, <code>+embedded</code> [per la nuova libreria],  <code>+cpm</code> [per vari sistemi CP/M] (per esempio i vari sistemi CP/M gestiti da Cross-Chase)</td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
