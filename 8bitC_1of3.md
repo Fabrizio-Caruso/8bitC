@@ -5,6 +5,7 @@
 
 <p><img src="8bitC.jpg" alt="8-bit C"></p>
 <h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
+<h2 id="prima-parte-introduzione--e-scrittura-di-codice-c-portabile-per-8-bit"><em>Prima parte</em>: Introduzione  e Scrittura di codice C portabile per 8-bit</h2>
 <p>Questa è la prima parte di una serie di tre articoli che descrivono tecniche per scrivere codice portabile e ottimizzato in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche e microcontrollori dalla fine degli anni 70 fino a metà degli anni 90.<br>
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
 <p>Il contenuto dell’articolo originale sarà diviso nel seguente modo:</p>
@@ -163,7 +164,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
 <li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
 </ul>
-<h3 id="sistemi-supportati-dai-compilatori">Sistemi supportati dai compilatori</h3>
+<h3 id="codice-portabile-sui-target-dei-compilatori">Codice portabile sui target dei compilatori</h3>
 <p>Questo diventa banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target e la libreria multi-target del del dev-kit farà la “magia” per noi.</p>
 <p>Solo CC65 e Z88DK propongono interfacce multi-target per input e output oltre le librerie C standard:</p>
 
@@ -234,7 +235,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>il codice del gioco (directory <em>src/chase</em>) è indipendente dall’hardware</li>
 <li>il codice della libreria <em>crossLib</em> (directory <em>src/cross_lib</em>) implementa i dettagli di ogni hardware possibile</li>
 </ul>
-<h3 id="sistemi-non-supportati">Sistemi non supportati</h3>
+<h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target:</p>
 <ul>
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
