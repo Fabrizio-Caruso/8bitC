@@ -201,8 +201,9 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
 <h4 id="librerie-c-standard">Librerie C standard</h4>
 <p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK.</p>
-<h4 id="libreria-conio">Libreria CONIO</h4>
+<h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
 <p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
+<h4 id="creiamoci-delle-librerie">Creiamoci delle librerie</h4>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
@@ -291,4 +292,5 @@ Qui di seguito listo i comandi utili:</p>
 <li><code>cpm/as</code>: genera codice Intel 80 da Assembly</li>
 <li><code>em_led</code>: linker</li>
 </ol>
+<p>Un’alternativa a ACK per generare binari Intel 8080 generici è data dal già citato compilatore SmallC-85.</p>
 
