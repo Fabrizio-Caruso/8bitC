@@ -7,11 +7,11 @@
 <h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
 <p>Questa è la prima parte di un articolo che descrive alcune tecniche per ottimizzare codice in ANSI C portabile per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche dalla fine degli anni 70 fino a metà degli anni 90.<br>
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
-<p>Il contenuto dell’articolo sarà presentato in tre parti:</p>
+<p>Il contenuto dell’articolo originale sarà presentato in tre articoli:</p>
 <ol>
-<li>Introduzione + Scrittura di codice C portabile</li>
-<li>Tecniche per ottimizzare il codice C</li>
-<li>Tecniche avanzate per ottimizzare il codice C</li>
+<li>Introduzione + Scrittura di codice C portabile per 8-bit</li>
+<li>Tecniche per ottimizzare il codice C per 8-bit</li>
+<li>Tecniche avanzate per ottimizzare il codice C per 8-bit</li>
 </ol>
 <h2 id="architetture">Architetture</h2>
 <p>In particolare ci occuperemo dei sistemi basati sulle seguenti <em>architetture</em> (e architetture derivate e retrocompatibili):</p>
@@ -199,7 +199,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </tbody>
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
-<p>Quindi se usassimo esclusivamente le librerie standard C potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK. Mentre se usassimo anche <em>conio</em> avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
+<h4 id="librerie-c-standard">Librerie C standard</h4>
+<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK.</p>
+<h4 id="libreria-conio">Libreria CONIO</h4>
+<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
