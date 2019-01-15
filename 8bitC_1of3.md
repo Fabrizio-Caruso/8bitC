@@ -165,7 +165,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
 <li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
 </ul>
-<h3 id="codice-portabile-sui-target-dei-compilatori">Codice portabile sui target dei compilatori</h3>
+<h3 id="codice-portabile-allinterno-dei-target-dei-compilatori">Codice portabile all’interno dei target dei compilatori</h3>
 <p>Questo diventa banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target e la libreria multi-target del del dev-kit farà la “magia” per noi.</p>
 <p>Solo CC65 e Z88DK propongono interfacce multi-target per input e output oltre le librerie C standard:</p>
 
@@ -205,20 +205,18 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
 <h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
 <p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono un minimo controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
-<h4 id="libreria-multi-target-presenti-nei-dev-kit">Libreria multi-target presenti nei dev-kit</h4>
-<p>Se usiamo una libreria multi-target presente solo in un dev-kit come TGI per CC65 o gli sprite monocromatici di Z88DK, avremo codice multi-target valido solo tra i target di un dato dev-kit e architettura.</p>
-<h4 id="creiamoci-delle-librerie-multi-target-e-multi-architettura">Creiamoci delle librerie multi-target e multi-architettura</h4>
-<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
+<h4 id="scrivere-codice-portabile-su-architetture-diverse">Scrivere codice portabile su architetture diverse</h4>
+<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
-<li>dal codice che dipende dall’hardware (per esempio l’input, output in un gioco).</li>
+<li>dal codice che dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco).</li>
 </ul>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
 <li><code>#define</code> -&gt; per definire una macro</li>
 <li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
 </ul>
-<p>Inoltre tutti i compilatori prevedono una opzione (in genere <code>-D</code>) per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
+<p>Inoltre tutti i compilatori prevedono l’opzione  <code>-D</code> per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
 <p>Nel codice avremo qualcosa come:</p>
 <pre><code>...
 		#if defined(__PV1000__)
@@ -231,7 +229,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 		#endif
 ...
 </code></pre>
-<p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
+<p>e al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
 <p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
 <p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
@@ -247,7 +245,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </ul>
 <p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie diamo un semplice esempio che è anche su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
 <p>Inoltre dovremo procurarci o scrivere un convertitore del binario in un formato accettabile per il nuovo sistema.</p>
-<p>Per esempio CC65 non supporta né l’<em>BBC Micro</em> né l’<em>Atari 7800</em> e CMOC non supporta l’<em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target (o estenderli a nuovi target):</p>
+<p>Per esempio CC65 non supporta né il <em>BBC Micro</em> né l’<em>Atari 7800</em> e CMOC non supporta l’<em>Olivetti Prodest PC128</em> ma è comunque possibile usare (o estendere) questi dev-kit per produrre binari per questi target:</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
 <li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
@@ -283,7 +281,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code>,  <code>+cpm</code> (per vari sistemi CP/M generici)</td>
+<td><code>+test</code> (generico), <code>+embedded</code> (generico con nuove librerie),  <code>+cpm</code> (solo per generico CP/M)</td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”:</p>
