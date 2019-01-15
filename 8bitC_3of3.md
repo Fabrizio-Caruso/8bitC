@@ -102,7 +102,7 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <tr>
 <td>Sord M5</td>
 <td>RAM for ROM routines (*)</td>
-<td>$7000-$73FF</td>
+<td>$7000-73FF</td>
 </tr>
 <tr>
 <td>TRS-80 Model I/III/IV</td>
@@ -232,11 +232,9 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 </table><p><strong>Problemi noti</strong></p>
 <ul>
 <li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
-<li>CMOC: <code>-O2</code> ha dei bug</li>
 <li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
 </ul>
-<h3 id="ottimizzazione-più-sicura">Ottimizzazione più sicura</h3>
-<p>Per ovviare a i problemi sopramenzionati e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
+<p>Per ovviare a questi problemi e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
 
 <table>
 <thead>
@@ -256,11 +254,6 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <td>MOS 6502</td>
 <td>CC65</td>
 <td><code>-O</code></td>
-</tr>
-<tr>
-<td>Motorola 6809</td>
-<td>CMOC</td>
-<td><code>-O1</code></td>
 </tr>
 </tbody>
 </table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
