@@ -17,8 +17,14 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <p>Spesso guardando bene le funzioni che abbiamo scritto scopriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
-<p>In alcuni casi è possibile generalizzare il codice passando un parametro per evitare di scrivere due funzioni diverse molto simili.<br>
-Un esempio si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
+<p>In alcuni casi è possibile generalizzare il codice passando un parametro per evitare di scrivere due funzioni diverse molto simili.</p>
+<h5 id="passiamo-delle-variabili">Passiamo delle variabili</h5>
+<p>Se due funzioni fanno la stessa cosa su oggetti diversi, sarebbe meglio avere una unica funziona che faccia la stessa cosa a cui si passi l’oggetto.</p>
+<h5 id="passiamo-delle-funzioni">Passiamo delle funzioni</h5>
+<p>In altri casi avremo due funzioni simili la cui unica differenza è l’applicazione di una funzione diversa. In questo caso possiamo scrivere un’unica funzione a cui si passa un puntatore a funzione.</p>
+<h5 id="passiamo-degli-offset-di-struct">Passiamo degli offset di <code>struct</code></h5>
+<p>In altri casi possiamo avere due funzioni identiche la cui unica differenza è il campo di uno <code>struct</code> che si modifica. In questo caso possiamo scrivere un’unica funzione a cui passiamo l’<em>offset</em> dello <code>struct</code>.</p>
+<p>Un esempio avanzato si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
