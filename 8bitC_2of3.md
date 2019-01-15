@@ -37,8 +37,7 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
 
 </code></pre>
 <p>Quindi date due funzioni:</p>
-<pre><code>
-unsigned short square(unsigned char val)
+<pre><code>unsigned short square(unsigned char val)
 {
         return val*val;
 }
