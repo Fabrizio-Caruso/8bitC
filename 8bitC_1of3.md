@@ -186,7 +186,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>CC65</td>
 <td>MOS 6502</td>
-<td>standard C lib, conio, tgi (bitmap)</td>
+<td>standard C lib, conio, TGI (bitmap)</td>
 </tr>
 <tr>
 <td>CMOC</td>
@@ -204,7 +204,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h4 id="librerie-c-standard">Librerie C standard</h4>
 <p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
 <h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
-<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testale limitato a comandi come <code>printf</code>, <code>getch</code>, <code>gotoxy</code> che consentono un minimo controllo della posizione del testo.</p>
+<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono un minimo controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
 <h4 id="libreria-multi-target-presenti-nei-dev-kit">Libreria multi-target presenti nei dev-kit</h4>
 <p>Se usiamo una libreria multi-target presente solo in un dev-kit come TGI per CC65 o gli sprite monocromatici di Z88DK, avremo codice multi-target valido solo tra i target di un dato dev-kit e architettura.</p>
 <h4 id="creiamoci-delle-librerie-multi-target-e-multi-architettura">Creiamoci delle librerie multi-target e multi-architettura</h4>
@@ -233,8 +233,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </code></pre>
 <p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
-<p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>:<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
+<p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
 <p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
 <ul>
 <li>il codice del gioco (directory <em>src/chase</em>) è indipendente dall’hardware</li>
@@ -246,8 +245,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
 <li>codice necessario per inizializzare correttamente il binario</li>
 </ul>
-<p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie daremo un esempio di uso delle routine della ROM che trovare pure nella sezione dedicata alle routine della ROM su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
-<p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già disponibili).</p>
+<p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie diamo un semplice esempio che è anche su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
+<p>Inoltre dovremo procurarci o scrivere un convertitore del binario in un formato accettabile per il nuovo sistema.</p>
 <p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target (o estenderli a nuovi target):</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
@@ -255,7 +254,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>BBC è stato aggiunto come target sperimentale su CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
 </ul>
 <h4 id="compilare-per-sistemi-non-supportati">Compilare per sistemi non supportati</h4>
-<p>Qui diamo una lista delle opzioni di compilazione per target generico per ogni dev-kit in maniera da compilare per una data architettura senza alcuna dipendenza da un target specifico. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
+<p>Per potere compilare per un sistema non supportato dobbiamo usare alcune opzioni che servono ad eliminare le dipendenze da un  target specifico. Qui diamo una lista di alcune opzioni utili a questo scopo. Per maggiori dettagli facciamo riferimento ai rispettivi manuali.</p>
 
 <table>
 <thead>
@@ -284,7 +283,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>Zilog 80</td>
 <td>SCCZ80/ZSDCC (Z88DK)</td>
-<td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
+<td><code>+test</code>, <code>+embedded</code>,  <code>+cpm</code> (per vari sistemi CP/M generici)</td>
 </tr>
 </tbody>
 </table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”:</p>
