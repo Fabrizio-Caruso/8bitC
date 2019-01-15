@@ -234,29 +234,8 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
 <li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
 </ul>
-<p>Per ovviare a questi problemi e ridurre i tempi di compilazione (soprattutto per l’architettura Z80) si consiglia:</p>
-
-<table>
-<thead>
-<tr>
-<th>Architettura</th>
-<th>Compilatore</th>
-<th>Opzioni</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Zilog Z80</td>
-<td>SCCZ80 (Z88DK)</td>
-<td><code>-O3</code></td>
-</tr>
-<tr>
-<td>MOS 6502</td>
-<td>CC65</td>
-<td><code>-O</code></td>
-</tr>
-</tbody>
-</table><h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
+<p>Per ridurre i tempi di compilazione di ZSDCC  (a volte lunghissimi) e i suoi bug, consigliamo di usare SCCZ80 con opzione <code>-O3</code> durante la fase di sviluppo.  ZSDCC andrebbe provato alla fine.</p>
+<h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
 <p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
 <p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
