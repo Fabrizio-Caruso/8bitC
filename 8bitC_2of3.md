@@ -49,9 +49,9 @@ unsigned short next(unsigned char val)
 }
 </code></pre>
 <p>potremo usare <code>sumOfSomething</code> con l’una o l’altra evitando di dovere scrivere il codice che fa la somma:</p>
-<pre><code>printf("%d\n", sumOfSomething(4,square);
+<pre><code>printf("%d\n", sumOfSomething(4,square));
 
-printf("%d\n", sumOfSomething(4,next);
+printf("%d\n", sumOfSomething(4,next));
 </code></pre>
 <h5 id="passiamo-degli-offset-di-struct">Passiamo degli offset di <code>struct</code></h5>
 <p>In altri casi possiamo avere due funzioni identiche la cui unica differenza è il campo di uno <code>struct</code> che si modifica. In questo caso possiamo scrivere un’unica funzione a cui passiamo l’<em>offset</em> dello <code>struct</code>.</p>
