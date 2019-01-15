@@ -234,8 +234,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
 <p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
 <ul>
-<li>il codice del gioco (directory <em>src/chase</em>) è indipendente dall’hardware</li>
-<li>il codice della libreria <em>crossLib</em> (directory <em>src/cross_lib</em>) implementa i dettagli di ogni hardware possibile</li>
+<li>il codice del gioco (directory <code>src/chase</code>) è indipendente dall’hardware</li>
+<li>il codice della libreria <code>crossLib</code> (directory <code>src/cross_lib</code>) implementa i dettagli di ogni hardware possibile</li>
 </ul>
 <h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target:</p>
