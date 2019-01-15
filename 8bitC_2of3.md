@@ -10,7 +10,8 @@
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
 <p>Consigliamo la lettura del primo articolo in cui abbiamo presentato i vari cross compilatori C per architetture 8 bit e abbiamo dato alcune indicazioni su come scrivere codice C portabile su tutte le architetture 8 bit.</p>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
-<p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
+<p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.<br>
+Non tutte le buone pratiche di programmazione saranno ottimali per gli 8 bit. In questa sezione diamo esempi di pratiche generali che rimangono efficienti anche su architetture 8 bit.</p>
 <h3 id="riutilizziamo-le-stesse-funzioni">Riutilizziamo le stesse funzioni</h3>
 <p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.</p>
 <h4 id="programmazione-strutturata">Programmazione strutturata</h4>
@@ -21,7 +22,37 @@ Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularit
 <h5 id="passiamo-delle-variabili">Passiamo delle variabili</h5>
 <p>Se due funzioni fanno la stessa cosa su oggetti diversi, sarebbe meglio avere una unica funziona che faccia la stessa cosa a cui si passi l’oggetto.</p>
 <h5 id="passiamo-delle-funzioni">Passiamo delle funzioni</h5>
-<p>In altri casi avremo due funzioni simili la cui unica differenza è l’applicazione di una funzione diversa. In questo caso possiamo scrivere un’unica funzione a cui si passa un puntatore a funzione.</p>
+<p>In altri casi avremo due funzioni simili la cui unica differenza è l’applicazione di una funzione diversa. In questo caso possiamo scrivere un’unica funzione a cui si passa un puntatore a funzione.<br>
+Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne diamo un esempio in cui definiamo la funzione <code>sumOfSomething(range, something)</code> che somma il valore di <code>something(i)</code> per i che va da zero a <code>i-1</code>:</p>
+<pre><code>unsigned short sumOfSomething(unsigned char range, unsigned short (* something) (unsigned char))
+{
+    unsigned char i;
+    unsigned short res =0;
+    for(i=0;i&lt;range;++i)
+    {
+        res+=something(i);
+    }
+    return res;
+}
+
+</code></pre>
+<p>Quindi date due funzioni:</p>
+<pre><code>
+unsigned short square(unsigned char val)
+{
+        return val*val;
+}
+
+unsigned short next(unsigned char val)
+{
+    return ++val;
+}
+</code></pre>
+<p>potremo usare <code>sumOfSomething</code> con l’una o l’altra evitando di dovere scrivere il codice che fa la somma:</p>
+<pre><code>printf("%d\n", sumOfSomething(4,square);
+
+printf("%d\n", sumOfSomething(4,next);
+</code></pre>
 <h5 id="passiamo-degli-offset-di-struct">Passiamo degli offset di <code>struct</code></h5>
 <p>In altri casi possiamo avere due funzioni identiche la cui unica differenza è il campo di uno <code>struct</code> che si modifica. In questo caso possiamo scrivere un’unica funzione a cui passiamo l’<em>offset</em> dello <code>struct</code>.</p>
 <p>Un esempio avanzato si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
