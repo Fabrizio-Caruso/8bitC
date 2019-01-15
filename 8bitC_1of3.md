@@ -106,7 +106,8 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <li>l’istallazione dei compilatori;</li>
 <li>elementi specifici per l’uso di base di un compilatore</li>
 </ul>
-<p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.</p>
+<p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.<br>
+Una introduzione all’uso CC65 è anche disponibile su <a href="https://www.retroacademy.it/author/fabrizio-lodi/">https://www.retroacademy.it/author/fabrizio-lodi/</a></p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
 In questa serie di articoli per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
@@ -201,10 +202,12 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
 <h4 id="librerie-c-standard">Librerie C standard</h4>
-<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule senza controllo preciso della posizione del testo.</p>
+<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
 <h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
-<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testale con controllo della posizione del testo.</p>
-<h4 id="creiamoci-delle-librerie-multi-target">Creiamoci delle librerie multi-target</h4>
+<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testale limitato a comandi come <code>printf</code>, <code>getch</code>, <code>gotoxy</code> che consentono un minimo controllo della posizione del testo.</p>
+<h4 id="libreria-multi-target-presenti-nei-dev-kit">Libreria multi-target presenti nei dev-kit</h4>
+<p>Se usiamo una libreria multi-target presente solo in un dev-kit come TGI per CC65 o gli sprite monocromatici di Z88DK, avremo codice multi-target valido solo tra i target di un dato dev-kit e architettura.</p>
+<h4 id="creiamoci-delle-librerie-multi-target-e-multi-architettura">Creiamoci delle librerie multi-target e multi-architettura</h4>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
