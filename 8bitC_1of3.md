@@ -201,10 +201,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
 <p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
 <h4 id="librerie-c-standard">Librerie C standard</h4>
-<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK.</p>
+<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule senza controllo preciso della posizione del testo.</p>
 <h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
-<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em>.</p>
-<h4 id="creiamoci-delle-librerie">Creiamoci delle librerie</h4>
+<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testale con controllo della posizione del testo.</p>
+<h4 id="creiamoci-delle-librerie-multi-target">Creiamoci delle librerie multi-target</h4>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà costruirsi delle API. Sostanzialmente si deve creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
@@ -213,17 +213,19 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
 <li><code>#define</code> -&gt; per definire una macro</li>
-<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
+<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
 </ul>
 <p>Inoltre tutti i compilatori prevedono una opzione (in genere <code>-D</code>) per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
 <p>Nel codice avremo qualcosa come:</p>
 <pre><code>...
-		#elif defined(__PV1000__)
+		#if defined(__PV1000__)
 			#define XSize 28
 		#elif defined(__OSIC1P__) || defined(__G800__) || defined(__RX78__) 
 			#define XSize 24
 		#elif defined(__VIC20__) 
 			#define XSize 22
+...
+		#endif
 ...
 </code></pre>
 <p>per cui al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
@@ -242,9 +244,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>codice necessario per inizializzare correttamente il binario</li>
 </ul>
 <p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie daremo un esempio di uso delle routine della ROM che trovare pure nella sezione dedicata alle routine della ROM su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
-<p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già a disposizione).</p>
-<p>Potremo quindi scrivere codice portabile anche a questi sistemi.</p>
-<p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target:</p>
+<p>Inoltre dovremmo anche usare dei convertitori del binario in un formato accettabile per il nuovo sistema (e potremmo essere costretti a doverli scrivere qualora non siano già disponibili).</p>
+<p>Per esempio CC65 non supporta <em>BBC Micro</em> e <em>Atari 7800</em> e CMOC non supporta <em>Olivetti Prodest PC128</em> ma è comunque possibile usare i dev-kit per produrre binari per questi target (o estenderli a nuovi target):</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supporta (in principio) qualunque architettura anche non supportata direttamente dai compilatori come per esempio l’Olivetti Prodest PC128.</li>
 <li>Il gioco Robotsfindskitten è stato portato per l’Atari 7800 usando CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
@@ -283,11 +284,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td><code>+test</code>, <code>+embedded</code> (nuova libreria),  <code>+cpm</code> (per vari sistemi CP/M)</td>
 </tr>
 </tbody>
-</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze da di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”.<br>
-Qui di seguito listo i comandi utili:</p>
+</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”:</p>
 <ol>
-<li><code>ccp.ansi</code>:  precompilatore del C</li>
-<li><code>em_cemcom.ansi</code>: compila C preprocessato producendo bytecode</li>
+<li><code>ccp.ansi</code>:  precompilatore</li>
+<li><code>em_cemcom.ansi</code>: compila C preprocompilato producendo bytecode</li>
 <li><code>em_opt</code>: ottimizza il bytecode</li>
 <li><code>cpm/ncg</code>: genera Assembly da bytecode</li>
 <li><code>cpm/as</code>: genera codice Intel 80 da Assembly</li>
