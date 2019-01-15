@@ -182,7 +182,7 @@ Vari esempi sono presenti in:<br>
 <tr>
 <td>Zilog Z80</td>
 <td>ZSDCC (Z88DK)</td>
-<td><code>-SO3</code> <code>--max-alloc-node20000</code></td>
+<td><code>-compiler=sdcc</code> <code>-SO3</code> <code>--max-alloc-node20000</code></td>
 </tr>
 <tr>
 <td>MOS 6502</td>
@@ -213,7 +213,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <tr>
 <td>Zilog Z80</td>
 <td>ZSDCC (Z88DK)</td>
-<td><code>--opt-code-size</code></td>
+<td><code>-compiler=sdcc</code> <code>--opt-code-size</code></td>
 <td>Ottimizza memoria</td>
 </tr>
 <tr>
