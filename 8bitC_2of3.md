@@ -5,9 +5,10 @@
 
 <p><img src="8bitC.jpg" alt="8-bit C"></p>
 <h1 id="c-portabile-e-ottimizzato-per-gli-8-bit">C portabile e ottimizzato per gli 8-bit</h1>
+<h2 id="seconda-parte-tecniche-per-ottimizzare-il-codice-c-per-8-bit"><em>Seconda parte</em>: Tecniche per ottimizzare il codice C per 8-bit</h2>
 <p>Questa è la seconda parte di una serie di tre articoli che descrivono tecniche per scrivere codice portabile e ottimizzato in ANSI C per <strong>tutti</strong> i sistemi 8-bit <em>vintage</em>, cioè computer, console, handheld, calcolatrici scientifiche e microcontrollori dalla fine degli anni 70 fino a metà degli anni 90.<br>
 L’articolo completo è disponibile on-line su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a></p>
-<p>Consigliamo la lettura del primo articolo in cui abbiamo brevemente presentato i vari cross compilatori C per architetture 8 bit e abbiamo dato alcune indicazioni su come scrivere codice C portabile su tutte le architetture 8 bit.</p>
+<p>Consigliamo la lettura del primo articolo in cui abbiamo presentato i vari cross compilatori C per architetture 8 bit e abbiamo dato alcune indicazioni su come scrivere codice C portabile su tutte le architetture 8 bit.</p>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.</p>
 <h3 id="riutilizziamo-le-stesse-funzioni">Riutilizziamo le stesse funzioni</h3>
