@@ -208,10 +208,11 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h4 id="librerie-fatte-in-casa">Librerie “fatte in casa”</h4>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà crearsi una libreria multi-target e multi-architettura.</p>
 <h3 id="scrivere-codice-portabile-su-architetture-diverse">Scrivere codice portabile su architetture diverse</h3>
-<p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna scrivere un libreria che faccia da <em>hardware abstraction layer</em> che deve <strong>separare</strong></p>
+<p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna usare (e scriversi se non presente) una libreria che faccia da <em>hardware abstraction layer</em>.<br>
+Lo scopo è quindi di <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
-<li>dal codice che dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco).</li>
+<li>dal codice della libreria la cui implementazione dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco) ma la cui interfaccia non dipende dall’hardware.</li>
 </ul>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
@@ -233,7 +234,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </code></pre>
 <p>e al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
-<p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a></p>
+<h4 id="cross-chase-e-crosslib"><em>Cross-Chase</em> e <em>CrossLib</em></h4>
+<p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a> in cui un gioco è compilabile su più di 100 sistemi 8-bit diversi con circa 200 configurazioni diverse usando sempre lo <strong>stesso codice</strong> del gioco grazie alla libreria universale <em>CrossLib</em>.</p>
 <p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
 <ul>
 <li>il codice del gioco (directory <code>src/chase</code>) è indipendente dall’hardware</li>
