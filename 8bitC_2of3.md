@@ -219,6 +219,8 @@ In pratica i due scenari in cui è conveniente sono:</p>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
 <p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
+<h4 id="evitare-lallocazione-dinamica-della-memoria">Evitare l’allocazione dinamica della memoria</h4>
+<p>I compilatori che stiamo considerando consentono di allocare e deallocare la memoria dinamicamente (con comandi come <code>malloc</code> e <code>free</code>) ma questo ha un ovvio costo computazionale. Se possibile è preferibile allocare tutta la memoria staticamente.</p>
 <h3 id="struttura-ottimale-del-binario">Struttura ottimale del binario</h3>
 <p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.<br>
 Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
