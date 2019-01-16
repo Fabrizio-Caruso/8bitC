@@ -47,11 +47,13 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
     return ++val;
 }
 </code></pre>
-<p>potremo usare <code>sumOfSomething</code> con l’una o l’altra evitando di dovere scrivere il codice che fa la somma due volte:</p>
+<p>potremo usare <code>sumOfSomething</code> con l’una o l’altra funzione evitando di dovere scrivere il codice che fa la somma due volte:</p>
 <pre><code>printf("%d\n",sumOfSomething(4,square));
 </code></pre>
+<p>mostrerà 14, cioè la somma dei quadrati di 0,1,2,3.</p>
 <pre><code>printf("%d\n",sumOfSomething(4,next));
 </code></pre>
+<p>mostrerà 10, cioè la somma di 1,2,3,4.</p>
 <h5 id="passiamo-degli-offset-di-struct">Passiamo degli offset di <code>struct</code></h5>
 <p>In altri casi possiamo avere due funzioni quasi identiche la cui unica differenza è il campo di uno <code>struct</code> che si modifica. In questo caso possiamo scrivere un’unica funzione a cui passiamo l’<em>offset</em> dello <code>struct</code>.</p>
 <p>Un esempio avanzato si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
