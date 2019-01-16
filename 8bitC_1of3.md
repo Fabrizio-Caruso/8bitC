@@ -211,7 +211,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna usare (e scriversi se non presente) una libreria che faccia da <em>hardware abstraction layer</em>.<br>
 Lo scopo è quindi di <strong>separare</strong></p>
 <ul>
-<li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
+<li>il codice che non dipende dall’hardware (per esempio la logica di un gioco) che usa l’interfaccia della libreria</li>
 <li>dal codice della libreria la cui implementazione dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco) ma la cui interfaccia non dipende dall’hardware.</li>
 </ul>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
@@ -239,7 +239,7 @@ Lo scopo è quindi di <strong>separare</strong></p>
 <p>Se guardiamo il codice pubblicato sulla sopracitata pagina GitHub vediamo come sia stato separato in:</p>
 <ul>
 <li>codice del gioco (directory <code>src/chase</code>) totalmente indipendente dall’hardware,</li>
-<li>codice della libreria <code>crossLib</code> (directory <code>src/cross_lib</code>) cheimplementa i dettagli di ogni hardware possibile.</li>
+<li>codice della libreria <em>CrossLib</em> (directory <code>src/cross_lib</code>) cheimplementa i dettagli di ogni hardware possibile.</li>
 </ul>
 <h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target:</p>
