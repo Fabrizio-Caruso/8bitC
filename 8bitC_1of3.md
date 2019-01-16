@@ -204,9 +204,11 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h4 id="librerie-c-standard">Librerie C standard</h4>
 <p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
 <h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
-<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile per <em>CC65</em> e <em>Z88DK</em> ed avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono un minimo controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
-<h4 id="scrivere-codice-portabile-su-architetture-diverse">Scrivere codice portabile su architetture diverse</h4>
-<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà creare un <em>hardware abstraction layer</em> che permette di <strong>separare</strong></p>
+<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile con <em>CC65</em> e <em>Z88DK</em> ma avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono il controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
+<h4 id="librerie-fatte-in-casa">Librerie “fatte in casa”</h4>
+<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà crearsi una libreria multi-target e multi-architettura.</p>
+<h3 id="scrivere-codice-portabile-su-architetture-diverse">Scrivere codice portabile su architetture diverse</h3>
+<p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna scrivere un libreria che faccia da <em>hardware abstraction layer</em> che deve <strong>separare</strong></p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco)</li>
 <li>dal codice che dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco).</li>
