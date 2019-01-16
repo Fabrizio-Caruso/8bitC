@@ -233,13 +233,13 @@ Lo scopo è quindi di <strong>separare</strong></p>
 ...
 </code></pre>
 <p>e al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
-<p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, modo grafico, compilazione di debug, etc.).</p>
+<p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, modo grafico, debug, etc.).</p>
 <h4 id="cross-chase-e-crosslib"><em>Cross-Chase</em> e <em>CrossLib</em></h4>
-<p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a> in cui un gioco è compilabile su più di 100 sistemi 8-bit diversi con circa 200 configurazioni diverse usando sempre lo <strong>stesso codice</strong> del gioco grazie alla libreria universale <em>CrossLib</em>.</p>
-<p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
+<p>Il progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a> propone il codice di un gioco compilabile su più di 100 sistemi 8-bit diversi con circa 200 configurazioni diverse usando sempre lo <strong>stesso codice</strong> del gioco grazie alla libreria universale <em>CrossLib</em>.</p>
+<p>Se guardiamo il codice pubblicato sulla sopracitata pagina GitHub vediamo come sia stato separato in:</p>
 <ul>
-<li>il codice del gioco (directory <code>src/chase</code>) è indipendente dall’hardware</li>
-<li>il codice della libreria <code>crossLib</code> (directory <code>src/cross_lib</code>) implementa i dettagli di ogni hardware possibile</li>
+<li>codice del gioco (directory <code>src/chase</code>) totalmente indipendente dall’hardware,</li>
+<li>codice della libreria <code>crossLib</code> (directory <code>src/cross_lib</code>) cheimplementa i dettagli di ogni hardware possibile.</li>
 </ul>
 <h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target:</p>
