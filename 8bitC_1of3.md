@@ -233,7 +233,7 @@ Lo scopo è quindi di <strong>separare</strong></p>
 ...
 </code></pre>
 <p>e al momento di compilare per il <em>Vic 20</em> il precompilatore selezionerà per noi la definizione di <code>XSize</code> specifica del <em>Vic 20</em>.</p>
-<p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, scheda grafica aggiuntivo, modo grafica, compilazione di debug, etc.).</p>
+<p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, modo grafico, compilazione di debug, etc.).</p>
 <h4 id="cross-chase-e-crosslib"><em>Cross-Chase</em> e <em>CrossLib</em></h4>
 <p>Come esempio principale faremo riferimento al progetto <em>Cross-Chase</em>: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a> in cui un gioco è compilabile su più di 100 sistemi 8-bit diversi con circa 200 configurazioni diverse usando sempre lo <strong>stesso codice</strong> del gioco grazie alla libreria universale <em>CrossLib</em>.</p>
 <p>Il codice di <em>Cross-Chase</em> fornisce un esempio su come scrivere codice <em>universale</em> valido per qualsiasi sistema ed architettura:</p>
