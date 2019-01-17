@@ -106,8 +106,7 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <li>l’istallazione dei compilatori;</li>
 <li>elementi specifici per l’uso di base di un compilatore</li>
 </ul>
-<p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.<br>
-Una introduzione all’uso di CC65 è anche disponibile su <a href="https://www.retroacademy.it/author/fabrizio-lodi/">https://www.retroacademy.it/author/fabrizio-lodi/</a></p>
+<p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori. Una introduzione all’uso di CC65 è disponibile su <a href="https://www.retroacademy.it/author/fabrizio-lodi/">https://www.retroacademy.it/author/fabrizio-lodi/</a></p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
 In questa serie di articoli per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
