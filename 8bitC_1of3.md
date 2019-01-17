@@ -51,9 +51,7 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <li>Un <em>architettura</em> è un tipo di processore (Intel 8080, 6502, Zilog Z80, Motorola 6809, etc.) . Un <em>target</em> appartiene quindi ad una sola architettura data dal suo processore (con rare eccezioni come il Commodore 128 che ha sia un processore derivato dal 6502 e uno Zilog Z80).</li>
 </ul>
 <h2 id="cross-compilatori-multi-target">Cross-compilatori multi-target</h2>
-<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi <em>target</em>).</p>
-<h3 id="cross-compilatori-vs-compilatori-nativi">Cross-compilatori vs compilatori nativi</h3>
-<p>Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accelerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
+<p>Per produrre i nostri binari 8-bit consigliamo l’uso di <em>cross compilatori</em> <em>multi-target</em> (cioè compilatori eseguiti su PC che producono binari per diversi <em>target</em>). Non consigliamo l’uso di compilatori <em>nativi</em> perché sarebbero molto scomodi (anche se usati all’interno di un emulatore accelerato al massimo) e non potrebbero mai produrre codice ottimizzato perché l’ottimizzatore sarebbe limitato dalla risorse della macchina 8-bit.</p>
 <p>Faremo particolare riferimento ai seguenti <em>cross compilatori</em> <em>multi-target</em>:</p>
 
 <table>
