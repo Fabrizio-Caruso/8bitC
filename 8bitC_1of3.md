@@ -165,7 +165,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
 <li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
 </ul>
-<h3 id="codice-portabile-allinterno-dei-target-dei-compilatori">Codice portabile all’interno dei target dei compilatori</h3>
+<h3 id="codice-portabile-tra-target-dello-stesso-compilatore-o-dev-kit">Codice portabile tra target dello stesso compilatore o dev-kit</h3>
 <p>Questo diventa banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target e la libreria multi-target del del dev-kit farà la “magia” per noi.</p>
 <p>Solo CC65 e Z88DK propongono interfacce multi-target per input e output oltre le librerie C standard:</p>
 
@@ -181,12 +181,12 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <tr>
 <td>Z88DK</td>
 <td>Zilog Z80</td>
-<td>standard C lib, conio, vt52, vt100, sprite software, UDG, bitmap</td>
+<td>standard C lib, CONIO(testuale), vt52 (testuale), vt100 (testuale), sprite software, UDG, bitmap, joystick Z88DK</td>
 </tr>
 <tr>
 <td>CC65</td>
 <td>MOS 6502</td>
-<td>standard C lib, conio, TGI (bitmap)</td>
+<td>standard C lib, CONIO(testuale), TGI (bitmap), joystick CC65</td>
 </tr>
 <tr>
 <td>CMOC</td>
@@ -199,17 +199,23 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td>standard C lib</td>
 </tr>
 </tbody>
-</table><p>In particolare Z88DK possiede strumenti potentissimi per la grafica multi-target (solo su Z80) e fornisce diverse API sia per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) che per i caratteri ridefiniti per buona parte dei suoi 80 target.</p>
-<p><strong><em>Esempio</em></strong>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
+</table><h4 id="librerie-specifiche-di-cc65">Librerie specifiche di CC65</h4>
+<p>CC65 fornisce la libreria <em>CONIO</em> per la visualizzazione di testo e la libreria grafica multi-target TGI per grafica bit-map tra alcuni dei suoi target e API proprie per leggere lo stato dei joystick.</p>
+<h4 id="librerie-specifiche-di-z88dk">Librerie specifiche di Z88DK</h4>
+<p>Anche Z88DK fornisce la libreria <em>CONIO</em> e API proprie per leggere lo stato dei joystick. Inoltre fornisce molti strumenti per la grafica multi-target tra cui API per grafica bitmap, per gli sprite software (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) e per caratteri ridefiniti per buona parte dei suoi 80 target.</p>
+<p><em>Esempio</em>:  Il gioco multi-piattaforma H-Tron è un esempio (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) in cui si usano le API previste dal dev-kit Z88DK per creare un gioco su molti sistemi basati sull’architettura Z80.</p>
+<h4 id="crearsi-una-libreria-multi-target-sulla-stessa-architettura">Crearsi una libreria multi-target sulla stessa architettura</h4>
+<p>In tutti i casi in cui le librerie a disposizione non facciano al caso nostro bisognerà crearsi una libreria multi-target sfruttando eventualmente tutto quello che lo specifico dev-kit mette a disposizione.</p>
+<h3 id="scrivere-codice-portabile-tra-architetture-diverse">Scrivere codice portabile tra architetture diverse</h3>
+<p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna usare eventuali librerie comuni a dev-kit diversi o scriversi una libreria multi-architettura e quindi anche compilabile da compilatori di dev-kit <strong>diversi</strong>.</p>
 <h4 id="librerie-c-standard">Librerie C standard</h4>
-<p>Se usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
-<h4 id="libreria-conio">Libreria <em>CONIO</em></h4>
-<p>Se usassimo le librerie C standard e anche <em>conio</em> (libreria che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile con <em>CC65</em> e <em>Z88DK</em> ma avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono il controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
-<h4 id="librerie-fatte-in-casa">Librerie “fatte in casa”</h4>
-<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture e sistemi diversi bisognerà crearsi una libreria multi-target e multi-architettura.</p>
-<h3 id="scrivere-codice-portabile-su-architetture-diverse">Scrivere codice portabile su architetture diverse</h3>
-<p>Per potere avere codice portabile su target e eventualmente anche su architetture diverse bisogna usare (e scriversi se non presente) una libreria che faccia da <em>hardware abstraction layer</em>.<br>
-Lo scopo è quindi di <strong>separare</strong></p>
+<p>Se per l’input/output usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo</p>
+<h4 id="libreria-conio-comune-tra-cc65-e-z88dk">Libreria <em>CONIO</em> comune tra CC65 e Z88DK</h4>
+<p>Se per l’input/output, oltre alle librerie standard C, usassimo solo la libreria <em>CONIO</em> (che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile con <em>CC65</em> e <em>Z88DK</em> ma avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono il controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
+<h4 id="crearsi-una-libreria-multi-architettura">Crearsi una libreria multi-architettura</h4>
+<p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture diverse bisognerà crearsi una libreria multi-target e multi-architettura che quindi non avrà alcuna dipendenza da un dev-kit.</p>
+<h3 id="scrivere-una-libreria">Scrivere una libreria</h3>
+<p>Scrivere una libreria multi-target o addirittura multi-architettura significa creare un <em>hardware abstraction layer</em> il cui scopo e di permettere la <strong>separazione</strong> tra:</p>
 <ul>
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco) che usa l’interfaccia della libreria</li>
 <li>dal codice della libreria la cui implementazione dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco) ma la cui interfaccia non dipende dall’hardware.</li>
