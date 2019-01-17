@@ -248,10 +248,10 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>codice della libreria <em>CrossLib</em> (directory <code>src/cross_lib</code>) cheimplementa i dettagli di ogni hardware possibile.</li>
 </ul>
 <h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
-<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare questi dev-kit per altri target con la stessa architettura ma dovremo fare più lavoro e saremo costretti ad implementare tutta la parte di codice specifica del target:</p>
+<p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare un dato dev-kit per altri sistemi con la stessa architettura ma saremo dovremo implementare tutta la parte di codice specifica del target:</p>
 <ul>
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
-<li>codice necessario per inizializzare correttamente il binario</li>
+<li>codice necessario per inizializzare il sistema</li>
 </ul>
 <p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie diamo un semplice esempio che è anche su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
 <p>Inoltre dovremo procurarci o scrivere un convertitore del binario in un formato accettabile per il nuovo sistema.</p>
