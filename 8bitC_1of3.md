@@ -144,15 +144,13 @@ Data la limitatezza delle risorse è spesso necessario ricorrere all’Assembly.
 </tr>
 </tbody>
 </table><h3 id="portabilità-estrema">Portabilità estrema</h3>
-<p>Quindi la ragione principale per l’uso del C è la sua portabilità assoluta. In particolare se si usa un sottoinsieme dell’ANSI C che è uno standard.<br>
-In particolare l’ANSI C ci pemette di:</p>
+<p>Quindi la ragione principale per l’uso del C è la sua portabilità assoluta. In particolare se si usa un sottoinsieme dell’ANSI C che è uno standard.  In particolare l’ANSI C ci pemette di:</p>
 <ul>
 <li>fare porting semplificato tra una architettura all’altra</li>
 <li>scrivere codice “universale”, cioè valido per diversi target <strong>senza</strong> alcuna modifica</li>
 </ul>
 <h3 id="buone-performance">Buone performance</h3>
-<p>Qualcuno si spinge a dichiarare che il C sia una sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene.<br>
-Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly tra i linguaggi che permettono anche la programmazione ad alto livello.</p>
+<p>Qualcuno si spinge a dichiarare che il C sia una sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene. Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly tra i linguaggi che permettono anche la programmazione ad alto livello.</p>
 <h3 id="controindicazioni-sentimentali">Controindicazioni “sentimentali”</h3>
 <p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come sulle macchine che usavano il sistema operativo CP/M).<br>
 Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare programmare l’hardware di quasi tutti i sistemi 8-bit.</p>
