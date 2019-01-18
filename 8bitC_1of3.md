@@ -105,8 +105,7 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <li>elementi specifici per l’uso di base di un compilatore</li>
 </ul>
 <p>Per i dettagli sull’istallazione e l’uso di base dei compilatori in questione, facciamo riferimento ai manuali e alle pagine web dei relativi compilatori.<br>
-Un articolo sul Cross Development (di Giorgio Balestrieri) sul numero 2 anno 1 di RetroMagazine ha presentato CC65 assieme ad altri tools di sviluppo (<a href="http://www.retromagazine.net/download/RetroMagazine_02.pdf">http://www.retromagazine.net/download/RetroMagazine_02.pdf</a>),<br>
-Una introduzione all’uso di CC65 (di Fabrizio Lodi) è disponibile su <a href="https://www.retroacademy.it/author/fabrizio-lodi/">https://www.retroacademy.it/author/fabrizio-lodi/</a></p>
+Un articolo sul Cross Development (di Giorgio Balestrieri) sul numero 2 anno 1 di RetroMagazine ha presentato CC65 assieme ad altri tools di sviluppo (<a href="http://www.retromagazine.net/download/RetroMagazine_02.pdf">http://www.retromagazine.net/download/RetroMagazine_02.pdf</a>). Una introduzione all’uso di CC65 (di Fabrizio Lodi) è disponibile su <a href="https://www.retroacademy.it/author/fabrizio-lodi/">https://www.retroacademy.it/author/fabrizio-lodi/</a></p>
 <p><strong>Sottoinsieme di ANSI C</strong><br>
 In questa serie di articoli per ANSI C intendiamo sostanzialmente un grosso sotto-insieme dello standard C89 in cui i <code>float</code> e i <code>long long</code> sono opzionali ma i puntatori a funzioni e puntatori a <code>struct</code> sono presenti.<br>
 Non stiamo considerando versioni precedenti del C come per esempio C in sintassi <em>K&amp;R</em>.</p>
