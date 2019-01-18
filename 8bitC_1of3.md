@@ -156,7 +156,7 @@ Data la limitatezza delle risorse è spesso necessario ricorrere all’Assembly.
 <p>Una ragione non-razionale ma “sentimentale” per non usare il C sarebbe data dal fatto che il C è sicuramente meno <em>vintage</em> del BASIC e Assembly perché non era un linguaggio comune sugli home computer degli anni 80 (ma lo era sui computer professionali 8-bit come sulle macchine che usavano il sistema operativo CP/M).<br>
 Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare programmare l’hardware di quasi tutti i sistemi 8-bit.</p>
 <h2 id="scrivere-codice-portabile">Scrivere codice portabile</h2>
-<p>Scrivere codice facilmente portabile o addirittura direttammente compilabile per diverse piattaforme è possibile in C attraverso varie strategie:</p>
+<p>Scrivere codice facilmente portabile o addirittura direttamente compilabile per diverse piattaforme è possibile in C attraverso varie strategie:</p>
 <ul>
 <li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
 <li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
