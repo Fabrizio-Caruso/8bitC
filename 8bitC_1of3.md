@@ -290,7 +290,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <td><code>+test</code> (generico), <code>+embedded</code> (generico con nuove librerie),  <code>+cpm</code> (solo per generico CP/M)</td>
 </tr>
 </tbody>
-</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari Intel 8080 generico ma non è semplice in quanto ACK usa una sequenze di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”:</p>
+</table><p>(*) ACK prevede solo il target CP/M-80 per l’architettura Intel 8080 ma è possibile almeno in principio usare ACK per produrre binari generici per Intel 8080 ma non è semplice in quanto ACK usa una sequenze di comandi per produrre il Intel 8080 partendo dal C e passando da vari stai intermedi compreso un byte-code “EM”:</p>
 <ol>
 <li><code>ccp.ansi</code>:  precompilatore</li>
 <li><code>em_cemcom.ansi</code>: compila C preprocompilato producendo bytecode</li>
