@@ -238,12 +238,12 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <p>Questo permette al precompilatore non solo di selezionare le parti di codice specifiche per una macchina, ma anche di selezionare opzioni specifiche per configurazione delle macchina (memoria aggiuntiva, modo grafico, debug, etc.).</p>
 <h4 id="cross-chase-e-crosslib"><em>Cross-Chase</em> e <em>CrossLib</em></h4>
 <p>Il progetto <em>Cross-Chase</em> (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) propone il codice di un gioco compilabile su più di 100 sistemi 8-bit diversi con circa 200 configurazioni diverse usando sempre lo <strong>stesso codice</strong> del gioco grazie alla libreria universale <em>CrossLib</em>.</p>
-<p>Se guardiamo il codice pubblicato sulla sopracitata pagina GitHub vediamo come sia stato separato in:</p>
+<p>Se guardiamo il codice vediamo come sia stato separato in:</p>
 <ul>
 <li>codice del gioco (directory <code>src/chase</code>) totalmente indipendente dall’hardware,</li>
-<li>codice della libreria <em>CrossLib</em> (directory <code>src/cross_lib</code>) cheimplementa i dettagli di ogni hardware possibile.</li>
+<li>codice della libreria <em>CrossLib</em> (directory <code>src/cross_lib</code>) che implementa i dettagli di ogni hardware possibile.</li>
 </ul>
-<h3 id="codice-portabile-su-sistemi-non-supportati">Codice portabile su sistemi non supportati</h3>
+<h3 id="scrivere-codice-portabile-su-sistemi-non-supportati-dai-dev-kit">Scrivere codice portabile su sistemi non supportati dai dev-kit</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare un dato dev-kit per altri sistemi con la stessa architettura ma saremo dovremo implementare tutta la parte di codice specifica del target:</p>
 <ul>
 <li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
