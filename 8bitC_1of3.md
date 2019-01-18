@@ -216,7 +216,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>il codice che non dipende dall’hardware (per esempio la logica di un gioco) che usa l’interfaccia della libreria</li>
 <li>dal codice della libreria la cui implementazione dipende dall’hardware (per esempio le funzioni per l’input, output in un gioco) ma la cui interfaccia non dipende dall’hardware.</li>
 </ul>
-<p>Questo <em>pattern</em> è assai comune nella programmazione moderna e non è una esclusiva del C ma il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
+<p>Questo <em>pattern</em> è assai comune nella programmazione moderna. Il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
 <li><code>#define</code> -&gt; per definire una macro</li>
 <li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
