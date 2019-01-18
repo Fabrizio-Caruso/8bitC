@@ -147,8 +147,8 @@ Data la limitatezza delle risorse è spesso necessario ricorrere all’Assembly.
 </table><h3 id="portabilità-estrema">Portabilità estrema</h3>
 <p>Quindi la ragione principale per l’uso del C è la sua portabilità assoluta. In particolare se si usa un sottoinsieme dell’ANSI C che è uno standard.  In particolare l’ANSI C ci pemette di:</p>
 <ul>
-<li>fare porting semplificato tra una architettura all’altra</li>
-<li>scrivere codice “universale”, cioè valido per diversi target <strong>senza</strong> alcuna modifica</li>
+<li>fare porting semplificato tra una architettura all’altra,</li>
+<li>scrivere codice “universale”, cioè valido per diversi target <strong>senza</strong> alcuna modifica.</li>
 </ul>
 <h3 id="buone-performance">Buone performance</h3>
 <p>Qualcuno si spinge a dichiarare che il C sia una sorta di Assembly universale. Questa è una affermazione un po’ troppo ottimistica perché del C scritto molto bene non batterà mai dell’Assembly scritto bene. Ciò nonostante il C è probabilmente il linguaggio più vicino all’Assembly tra i linguaggi che permettono anche la programmazione ad alto livello.</p>
@@ -207,7 +207,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h4 id="librerie-c-standard">Librerie C standard</h4>
 <p>Se per l’input/output usassimo esclusivamente le librerie C standard (come <code>stdio.h</code>) potremmo avere codice compilabile con ACK, CMOC, CC65 e Z88DK ma saremmo limitati a input e output testaule  limitato a comandi come <code>printf</code> e <code>scanf</code>  senza controllo preciso della posizione del testo.</p>
 <h4 id="libreria-conio-comune-tra-cc65-e-z88dk">Libreria <em>CONIO</em> comune tra CC65 e Z88DK</h4>
-<p>Se per l’input/output, oltre alle librerie standard C, usassimo solo la libreria <em>CONIO</em> (che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile con <em>CC65</em> e <em>Z88DK</em> ma avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono il controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a></p>
+<p>Se per l’input/output, oltre alle librerie standard C, usassimo solo la libreria <em>CONIO</em> (che nasce per input/output testuale su <em>MS-DOS</em>) avremmo codice compilabile con <em>CC65</em> e <em>Z88DK</em> ma avremmo input e output testuale limitato a comandi come <code>cprintf</code>, <code>cgetc</code> , <code>gotoxy</code> che consentono il controllo della posizione del testo. Per maggiori dettagli facciamo riferimento a <a href="https://www.cc65.org/doc/funcref-14.html">https://www.cc65.org/doc/funcref-14.html</a> .</p>
 <h4 id="crearsi-una-libreria-multi-architettura">Crearsi una libreria multi-architettura</h4>
 <p>In tutti gli altri casi se vogliamo scrivere codice portabile su architetture diverse bisognerà crearsi una libreria multi-target e multi-architettura che quindi non avrà alcuna dipendenza da un dev-kit.</p>
 <h3 id="scrivere-una-libreria">Scrivere una libreria</h3>
@@ -218,8 +218,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </ul>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna. Il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
-<li><code>#define</code> -&gt; per definire una macro</li>
-<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> -&gt; per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
+<li><code>#define</code>  per definire una macro;</li>
+<li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
 </ul>
 <p>Inoltre tutti i compilatori prevedono l’opzione  <code>-D</code> per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
 <p>Nel codice avremo qualcosa come:</p>
