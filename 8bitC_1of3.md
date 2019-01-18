@@ -218,7 +218,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 </ul>
 <p>Questo <em>pattern</em> è assai comune nella programmazione moderna. Il C fornisce una serie di strumenti utili per implementare questo <em>pattern</em> in maniera che che si possano supportare hardware diversi da selezione al momento della compilazione. In particolare il C prevede un potente precompilatore con comandi come:</p>
 <ul>
-<li><code>#define</code>  per definire una macro;</li>
+<li><code>#define</code>  per definire una macro,</li>
 <li><code>#if</code> … <code>defined(...)</code> … <code>#elif</code> … <code>#else</code>…<code>#endif</code> per selezione porzioni di codice che dipendono dal valore o esistenza di una macro.</li>
 </ul>
 <p>Inoltre tutti i compilatori prevedono l’opzione  <code>-D</code> per passare una variabile al precompilatore con eventuale valore. Alcuni compilatori come CC65 implicitamente definiscono una variabile col nome del target (per esempio <em><strong>VIC20</strong></em>) per il quale si intende compilare.</p>
@@ -246,8 +246,8 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <h3 id="scrivere-codice-portabile-su-sistemi-non-supportati-dai-dev-kit">Scrivere codice portabile su sistemi non supportati dai dev-kit</h3>
 <p>I nostri dev-kit supportano una lista di target per ogni architettura attraverso la presenza di librerie specifiche per l’hardware. E’ comunque possibile sfruttare un dato dev-kit per altri sistemi con la stessa architettura ma saremo dovremo implementare tutta la parte di codice specifica del target:</p>
 <ul>
-<li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.)</li>
-<li>codice necessario per inizializzare il sistema</li>
+<li>codice necessario per gestire l’input/output (grafica, tastiera, joystick, suoni, etc.),</li>
+<li>codice necessario per inizializzare il sistema.</li>
 </ul>
 <p>Per fare ciò potremo in molti casi usare le routine già presenti nella ROM (nel terzo articolo di questa serie diamo un semplice esempio che è anche su <a href="https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md">https://github.com/Fabrizio-Caruso/8bitC/blob/master/8bitC.md</a>).</p>
 <p>Inoltre dovremo procurarci o scrivere un convertitore del binario in un formato accettabile per il nuovo sistema.</p>
