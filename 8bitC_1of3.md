@@ -161,7 +161,7 @@ Credo che la programmazione in C abbia però il grosso vantaggio di poterci fare
 <li>Scrivere codice <em>agnostico</em> dell’hardware e che quindi usi <em>interfacce astratte</em> (cioè delle API indipendenti dall’hardware).</li>
 <li>Usare implementazioni diverse per le <em>interfacce</em> comuni da selezionare al momento della compilazione (per esempio attraverso <em>direttive al precompilatore</em> o fornendo file diversi al momento del linking).</li>
 </ul>
-<h3 id="codice-portabile-tra-target-dello-stesso-compilatore-o-dev-kit">Codice portabile tra target dello stesso compilatore o dev-kit</h3>
+<h3 id="scrivere-codice-portabile-tra-sistemi-con-la-stessa-architettura-e-dev-kit">Scrivere codice portabile tra sistemi con la stessa architettura e dev-kit</h3>
 <p>Questo diventa banale se il nostro dev-kit multi-target mette a disposizione una libreria multi-target o se ci si limita a usare le librerie standard del C (stdio, stdlib, etc.). Se si è in queste condizioni, allora basterà ricompilare il codice per ogni target e la libreria multi-target del del dev-kit farà la “magia” per noi.</p>
 <p>Solo CC65 e Z88DK propongono interfacce multi-target per input e output oltre le librerie C standard:</p>
 
