@@ -93,17 +93,21 @@ Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo 
 <h4 id="usiamo-costanti">Usiamo costanti</h4>
 <p>Quindi se una data variabile ha un valore noto al momento della compilazione, è importante che sia rimpiazzata con una costante.<br>
 Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipende da una opzione di compilazione, allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
-<h4 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h4>
-<p>Inoltre, per compilatori <em>single pass</em> (come la maggioranza dei cross-compilatori 8-bit come per esempio CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
+<h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
+<p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruiti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
+<h3 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h3>
+<p>Per compilatori <em>single pass</em> (come la maggioranza dei cross-compilatori 8-bit come per esempio CC65), può essere importante aiutare il compilatore a capire che una data espressione sia una costante.</p>
 <p><strong><em>Esempio</em></strong> (preso da <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistra a destra non capendo che <code>OFFS+3</code> è una costante.</p>
 <pre><code>	#define OFFS   4
 	int  i;
 	i = i + OFFS + 3;
 </code></pre>
-<p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>.</p>
-<h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
-<p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruiti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
+<p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>:</p>
+<pre><code>	#define OFFS   4
+	int  i;
+	i = OFFS+3+i;
+</code></pre>
 <h3 id="implementare-peek-e-poke-in-c">Implementare <code>peek</code> e <code>poke</code> in C</h3>
 <p>Quasi sicuramente avremo bisogno di fare scrivere e leggere dei singoli byte su alcune specifiche locazioni di memoria.<br>
 Il modo per fare questo è in BASIC sarebbe attraverso i comando <code>peek</code> e <code>poke</code>.<br>
@@ -121,6 +125,8 @@ In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissim
 <li>le operazioni <code>signed</code> (cioè con segno) sono più lente di quelle <code>unsigned</code></li>
 <li>l’hardware non supporta operazioni in <em>virgola mobile</em></li>
 </ul>
+<h4 id="evitiamo-conversioni-inutili">Evitiamo conversioni inutili</h4>
+<p>Le conversioni tra tipi e soprattutto le conversioni tra tipi <code>signed</code> e <code>unsigned</code> sono costose.</p>
 <h4 id="tipi-interi-vs-tipi-a-virgola-mobile">Tipi interi vs tipi a virgola mobile</h4>
 <p>Il C prevede tipi numerici interi con segno (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code> e loro equivalenti in versione <code>unsigned</code>).<br>
 Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <em>virgola mobile</em>) che qui non tratteremo. Bisogna considerare che i <code>float</code> delle architetture 8-bit sono tutti <em>software float</em> ed hanno quindi un costo computazionale notevole. Sarebbero quindi da usare solo se strettamente necessari.</p>
@@ -223,25 +229,6 @@ In pratica i due scenari in cui è conveniente sono:</p>
 <p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
 <h4 id="evitare-lallocazione-dinamica-della-memoria">Evitare l’allocazione dinamica della memoria</h4>
 <p>I compilatori che stiamo considerando consentono di allocare e deallocare la memoria dinamicamente (con comandi come <code>malloc</code> e <code>free</code>) ma questo ha un ovvio costo computazionale. Se possibile è preferibile allocare tutta la memoria staticamente.</p>
-<h3 id="struttura-ottimale-del-binario">Struttura ottimale del binario</h3>
-<p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti.<br>
-Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
-<p>Spesso (ma non sempre) le architetture basate su MOS 6502 prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
-<p>Molte architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata. Quindi non potremo mettere la grafica direttamente in questa memoria.</p>
-<h4 id="cc65-istruiamo-il-linker">[CC65] Istruiamo il linker</h4>
-<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo.<br>
-In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre.<br>
-Il linker di CC65 non è semplicissimo da configurare ed una descrizione andrebbe oltre lo scopo di questo articolo.<br>
-Una descrizione dettagliata è presente su:<br>
-<a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
-Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
-<h5 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h5>
-<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
-<h4 id="z88dk-appmake-fa-quasi-tutto-per-noi">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h4>
-<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costuisce dei binari nel formato richiesto.<br>
-Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice.<br>
-Questo argomento è trattato in dettaglio in<br>
-<a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
 <p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
 Questa buona pratica può però avere degli effetti deleteri per gli ottimizzatori dei compilatori 8-bit perché in generale non eseguono <em>link-time optimization</em>, cioè non ottimizzeranno codice tra più file ma si limitano ad ottimizzare ogni file singolarmente.<br>
