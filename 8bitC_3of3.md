@@ -334,6 +334,26 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 </code></pre>
 <h4 id="le-librerie-spesso-lo-fanno-per-noi">Le librerie spesso lo fanno per noi</h4>
 <p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
+<h4 id="basck-scoviamo-le-librerie">BASCK: scoviamo le librerie</h4>
+<p>Se non riusciamo a trovare informazioni sulle routine della ROM come per esempio le loro <em>entry points</em> perché per esempio stiamo sviluppando per un sistema poco noto, possiamo usare il tool <em>BASCK</em> (<a href="https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c">https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c</a>) che viene distribuito con Z88DK. <em>BASCK</em> prende in input i file delle rom di sistemi basati su Z80 e 6502 e applicando vari pattern, trova le routine e i loro indirizzi. Usare queste routine non è sempre facile ma in alcuni casi è banale.</p>
+<p>Esempio:</p>
+<ol>
+<li>Dobbiamo lanciare BASCK passandogli la ROM e leggere il suo output. Per esempio se cerchiamo la routine PRINT nella ROM, filtriamo nell’output la stringa “PRS” (in Unix useremo il comando “grep”)</li>
+</ol>
+<pre><code>&gt; basck -map romfile.rom |grep PRS  
+PRS = $AAAA ; Create string entry and print it
+</code></pre>
+<p>Otterremo in questo modo l’indirizzo della routine del BASIC per stampare dei carateri.</p>
+<ol start="2">
+<li>A questo punto potremo scrivere del codice in Assembly o C per usarla:</li>
+</ol>
+<pre><code>extern void rom_prs(char * str) __z88dk_fastcall @0xAAAA;
+
+main() {  
+	rom_prs ("Hello WORLD !");  
+	while (1){};  
+}
+</code></pre>
 <h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
 In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
