@@ -41,26 +41,22 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
 {
         return val*val;
 }
-
 </code></pre>
 <pre><code>unsigned short next(unsigned char val)
 {
     return ++val;
 }
-
 </code></pre>
 <p>potremo usare <code>sumOfSomething</code> con l’una o l’altra funzione evitando di dovere scrivere il codice che fa la somma due volte:</p>
 <pre><code>printf("%d\n",sumOfSomething(4,square));
-
 </code></pre>
 <p>mostrerà 14, cioè la somma dei quadrati di 0,1,2,3.</p>
 <pre><code>printf("%d\n",sumOfSomething(4,next));
-
 </code></pre>
 <p>mostrerà 10, cioè la somma di 1,2,3,4.</p>
 <h5 id="passiamo-degli-offset-di-struct">Passiamo degli offset di <code>struct</code></h5>
 <p>In altri casi possiamo avere due funzioni quasi identiche la cui unica differenza è il campo di uno <code>struct</code> che si modifica. In questo caso possiamo scrivere un’unica funzione a cui passiamo l’<em>offset</em> dello <code>struct</code>.</p>
-<p>Un esempio avanzato si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>, vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
+<p>Un esempio avanzato si trova in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> dove, dato uno <code>struct</code> con due campi <code>_x</code> e <code>_y</code>,  vogliamo potere agire sul valore di uno o dell’altro in situazioni diverse:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
@@ -68,7 +64,6 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
 		...
 	};
 	typedef struct CharacterStruct Character;
-
 </code></pre>
 <p>Possiamo evitare di scrivere due diverse funzioni per agire su <code>_x</code> e su <code>_y</code> creando una unica funzione a cui si passa un <em>offset</em> che faccia da selettore:</p>
 <pre><code>	unsigned char moveCharacter(Character* hunterPtr, unsigned char offset)
@@ -83,7 +78,6 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
 		}
 	...
 	}
-
 </code></pre>
 <p>Nel caso sopra stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>. I vari <em>cast</em> a <code>unsigned char *</code> servono per accedere a byte in posizioni diverse all’interno dello <code>struct</code>.</p>
 <p><strong>Avvertenze</strong>: Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
@@ -108,13 +102,11 @@ Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistr
 <pre><code>	#define OFFS   4
 	int  i;
 	i = i + OFFS + 3;
-
 </code></pre>
 <p>Quindi sarebbe meglio riscrivere <code>i = i + OFFS+3</code> come <code>i = OFFS+3+i</code> oppure <code>i = i + (OFFS+3)</code>:</p>
 <pre><code>	#define OFFS   4
 	int  i;
 	i = OFFS+3+i;
-
 </code></pre>
 <h3 id="implementare-peek-e-poke-in-c">Implementare <code>peek</code> e <code>poke</code> in C</h3>
 <p>Quasi sicuramente avremo bisogno di fare scrivere e leggere dei singoli byte su alcune specifiche locazioni di memoria.<br>
@@ -122,11 +114,10 @@ Il modo per fare questo è in BASIC sarebbe attraverso i comando <code>peek</cod
 In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissima. Potremo però costruirci delle utili macro che useremo nel nostro codice:</p>
 <pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
     #define PEEK(addr)      (*(unsigned char*) (addr))
-
 </code></pre>
 <p>Nota: I compilatori scriveranno codice ottimale nel caso in cui si passino delle costanti come parametri.</p>
 <p>Per maggiori dettagli facciamo riferimento a: <a href="https://github.com/cc65/wiki/wiki/PEEK-and-POKE">https://github.com/cc65/wiki/wiki/PEEK-and-POKE</a></p>
-<h3 id="i-“tipi-migliori”-per-gli-8-bit">I “tipi migliori” per gli 8-bit</h3>
+<h3 id="i-tipi-migliori-per-gli-8-bit">I “tipi migliori” per gli 8-bit</h3>
 <p>Una premessa importante per la scelta dei tipi da preferire per architettura è data dal fatto che in generale abbiamo questa situazione:</p>
 <ul>
 <li>tutte le operazioni aritmetiche sono solo a 8 bit</li>
@@ -141,12 +132,11 @@ In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissim
 Molti compilatori (ma non CC65) prevedono il tipo <code>float</code> (numeri a <em>virgola mobile</em>) che qui non tratteremo. Bisogna considerare che i <code>float</code> delle architetture 8-bit sono tutti <em>software float</em> ed hanno quindi un costo computazionale notevole. Sarebbero quindi da usare solo se strettamente necessari.</p>
 <h4 id="il-nostro-amico-unsigned">Il nostro amico <em>unsigned</em></h4>
 <p>Siccome le architetture 8-bit che stiamo considerandno <strong>NON</strong> gestiscono ottimalmente tipi <code>signed</code>, dobbiamo evitare il più possibile l’uso di tipi numerici <code>signed</code>.</p>
-<h4 id="“size-matters”">“Size matters!”</h4>
+<h4 id="size-matters">“Size matters!”</h4>
 <p>La dimensione dei tipi numeri standard dipende dal compilatore e dall’architettura e non dal linguaggio.<br>
 Più recentemente sono stati introdotti dei tipi che fissano la dimensione in modo univoco (come per esempio <code>uint8_t</code> per l’intero <code>unsigend</code> a 8 bit).<br>
 Il modo standard per includere questi tipi a taglia fissa</p>
 <pre><code>	#include &lt;stdint.h&gt;
-
 </code></pre>
 <p>Non tutti i compilatori 8-bit dispongono di questi tipi.</p>
 <p>Fortunatamente per la stragrande maggioranza dei compilatori 8-bit abbiamo la seguente situazione:</p>
@@ -156,8 +146,8 @@ Il modo standard per includere questi tipi a taglia fissa</p>
 <tr>
 <th>tipo</th>
 <th>numero bit</th>
-<th>stdint</th>
-<th>alternativo</th>
+<th>nome in <code>stdint.h</code></th>
+<th>nome alternativo</th>
 </tr>
 </thead>
 <tbody>
@@ -165,25 +155,25 @@ Il modo standard per includere questi tipi a taglia fissa</p>
 <td><code>unsigned char</code></td>
 <td>8</td>
 <td><code>uint8_t</code></td>
-<td>byte</td>
+<td><code>byte</code></td>
 </tr>
 <tr>
 <td><code>unsigned short</code></td>
 <td>16</td>
 <td><code>uint16_t</code></td>
-<td>word</td>
+<td><code>word</code></td>
 </tr>
 <tr>
 <td><code>unsigned int</code></td>
 <td>16</td>
 <td><code>uint16_t</code></td>
-<td>word</td>
+<td><code>word</code></td>
 </tr>
 <tr>
 <td><code>unsigned long</code></td>
 <td>32</td>
 <td><code>uint32_t</code></td>
-<td>dword</td>
+<td><code>dword</code></td>
 </tr>
 </tbody>
 </table><p>Quindi dovremo:</p>
@@ -195,7 +185,6 @@ Il modo standard per includere questi tipi a taglia fissa</p>
 <pre><code>	typedef unsigned char uint8_t;
 	typedef unsigned short uint16_t;
 	typedef unsigned long uint32_t;
-
 </code></pre>
 <h3 id="scelta-delle-operazioni">Scelta delle operazioni</h3>
 <p>Quando scriviamo codice per una architettura 8-bit dobbiamo evitare se possibile codice con operazioni inefficienti o che ci obblighino a usare tipi non adatti (come i tipi <code>signed</code> o tipi a 16 o peggio 32 bit).</p>
@@ -208,7 +197,6 @@ Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, opp
 	...
 	foo &lt;&lt; 2; // moltiplicazione per 2^2=4
 	bar &gt;&gt; 1; // divisione per 2^1=2
-
 </code></pre>
 <h4 id="riscrivere-certe-operazioni">Riscrivere certe operazioni</h4>
 <p>Molte operazioni come il modulo possono essere riscritte in maniera più efficiente per gli 8 bit usando operatori bit a bit. Non sempre il compilatore ottimizza nel modo migliore. Quando il compilatore non ce la fa, dobbiamo dargli una mano noi:</p>
@@ -218,7 +206,6 @@ Quindi, se possibile dobbiamo evitare i prodotti adattando il nostro codice, opp
 	{
 		...
 	}
-
 </code></pre>
 <h3 id="variabili-e-parametri">Variabili e parametri</h3>
 <p>Uno dei più grossi limiti dell’architettura MOS 6502 non è la penuria di registri come si potrebbe pensare ma è la dimensione limitata del suo <em>stack hardware</em> (in <em>pagina uno</em>: <code>$0100-01FF</code>) che lo rende inutilizzabile in C per la gestioni dello <em>scope</em> delle variabili e i parametri delle funzioni.<br>
@@ -245,7 +232,7 @@ In pratica i due scenari in cui è conveniente sono:</p>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
 <p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
-<h4 id="evitare-l’allocazione-dinamica-della-memoria">Evitare l’allocazione dinamica della memoria</h4>
+<h4 id="evitare-lallocazione-dinamica-della-memoria">Evitare l’allocazione dinamica della memoria</h4>
 <p>I compilatori che stiamo considerando consentono di allocare e deallocare la memoria dinamicamente (con comandi come <code>malloc</code> e <code>free</code>) ma questo ha un ovvio costo computazionale. Se possibile è preferibile allocare tutta la memoria staticamente.</p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
 <p>In generale è bene separare in più file il proprio codice se il progetto è di grosse dimensioni.<br>
