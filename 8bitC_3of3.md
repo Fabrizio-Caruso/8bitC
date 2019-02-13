@@ -156,8 +156,8 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>(*): Multiple buffer and auxiliary ram for ROM routiens. For more details please refer to:<br>
-<a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> and <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
+</table><p>(*): Vari buffer e locazioni ausiliarie usate dalle routine in ROM. Per maggiori dettagli facciamo riferimento a:<br>
+<a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> e <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
 <p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
 <p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
