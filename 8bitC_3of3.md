@@ -355,16 +355,13 @@ main() {
 }
 </code></pre>
 <h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
-<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice.<br>
-In alcuni casi conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
-<h3 id="usare-le-estensioni-ascii-specifiche">Usare le estensioni ASCII specifiche</h3>
-<p>Per esempio, è inutile ridefinire dei caratteri per fare della grafica se il sistema dispone già di caratteri utili al nostro scopo sfruttando l’estensione specifica dei caratteri ASCII (ATASCII, PETSCII, SHARPSCII, etc.).</p>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice. Conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
 <h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
-<p>Conoscere il chip grafico può aiutarci a risparmiare tanta ram.</p>
+<p>Al fine di ottimizzare il nostro codice, la conoscenza del chip grafico può aiutarci a risparmiare tanta ram.</p>
 <p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
 I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
 <p>Esempio (Commodore Vic 20)<br>
-Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
+Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
 <ul>
 <li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
 <li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
