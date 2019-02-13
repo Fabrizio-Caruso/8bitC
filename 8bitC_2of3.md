@@ -11,16 +11,16 @@ L’articolo completo è disponibile on-line su <a href="https://github.com/Fabr
 <p>Consigliamo la lettura del primo articolo in cui abbiamo presentato i vari cross compilatori C per architetture 8 bit e abbiamo dato alcune indicazioni su come scrivere codice C portabile su tutte le architetture 8 bit.</p>
 <h2 id="ottimizzare-il-codice-in-generale">Ottimizzare il codice in generale</h2>
 <p>Ci sono alcune regole generali per scrivere codice migliore indipendentemente dal fatto che l’architettura sia 8-bit o meno.<br>
-Non tutte le buone pratiche di programmazione saranno ottimali per gli 8 bit. In questa sezione diamo esempi di pratiche generali che rimangono efficienti anche su architetture 8 bit.</p>
+Non tutte le buone pratiche di programmazione saranno ottimali per gli 8 bit. In questa sezione diamo esempi di pratiche generali che rimangono valide anche su architetture 8 bit vintage.</p>
 <h3 id="riutilizziamo-le-stesse-funzioni">Riutilizziamo le stesse funzioni</h3>
 <p>In generale, in qualunque linguaggio di programmazione si voglia programmare, è importante evitare la duplicazione del codice o la scrittura di codice superfluo.</p>
 <h4 id="programmazione-strutturata">Programmazione strutturata</h4>
-<p>Spesso guardando bene le funzioni che abbiamo scritto scopriremo che condividono delle parti comuni e che quindi potremo <em>fattorizzare</em> costruendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
+<p>Spesso guardando bene le funzioni che abbiamo scritto scopriremo che condividono delle parti comuni e che quindi potremo <em>re-fattorizzare</em> il nostro codice introducendo delle <em>sotto-funzioni</em> che le nostre funzioni chiameranno.<br>
 Dobbiamo però tenere conto che, oltre un certo limite, una eccessiva granularità del codice ha effetti deleteri perché una chiamata ad una funzione ha un costo computazionale e di memoria.</p>
 <h4 id="generalizzare-il-codice-parametrizzandolo">Generalizzare il codice parametrizzandolo</h4>
 <p>In alcuni casi è possibile generalizzare il codice passando un parametro per evitare di scrivere due funzioni diverse molto simili.</p>
 <h5 id="passiamo-delle-variabili">Passiamo delle variabili</h5>
-<p>Se due funzioni fanno la stessa cosa su oggetti diversi, sarebbe meglio avere una unica funziona che faccia la stessa cosa a cui si passi l’oggetto.</p>
+<p>Se due funzioni fanno la stessa cosa su oggetti diversi, sarebbe meglio avere una unica funziona a cui si passi l’oggetto su cui agire.</p>
 <h5 id="passiamo-delle-funzioni">Passiamo delle funzioni</h5>
 <p>In altri casi avremo due funzioni simili la cui unica differenza è l’applicazione di una funzione diversa. In questo caso possiamo scrivere un’unica funzione a cui si passa un puntatore a funzione.<br>
 Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne diamo un esempio in cui definiamo la funzione <code>sumOfSomething(range, something)</code> che somma il valore di <code>something(i)</code> per i che va da zero a <code>i-1</code>:</p>
@@ -47,7 +47,7 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
     return ++val;
 }
 </code></pre>
-<p>potremo usare <code>sumOfSomething</code> con l’una o l’altra funzione evitando di dovere scrivere il codice che fa la somma due volte:</p>
+<p>potremo usare <code>sumOfSomething</code> con l’una o l’altra funzione evitando di scrivere il codice che fa la somma due volte:</p>
 <pre><code>printf("%d\n",sumOfSomething(4,square));
 </code></pre>
 <p>mostrerà 14, cioè la somma dei quadrati di 0,1,2,3.</p>
@@ -79,7 +79,7 @@ Non tutti sono familiari con la sintassi dei puntatori a funzione e quindi ne di
 	...
 	}
 </code></pre>
-<p>Nel caso sopra stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>. I vari <em>cast</em> a <code>unsigned char *</code> servono per accedere a byte in posizioni diverse all’interno dello <code>struct</code>.</p>
+<p>Stiamo sfruttando il fatto che il secondo campo <code>_y</code> si trova esattamente un byte dopo il primo campo <code>_x</code>. Quindi con <code>offset=0</code> accediamo al campo <code>_x</code> e con <code>offset=1</code> accediamo al campo <code>_y</code>. I vari <em>cast</em> a <code>unsigned char *</code> servono per accedere a byte in posizioni diverse all’interno dello <code>struct</code>.</p>
 <p><strong>Avvertenze</strong>: Dobbiamo però considerare sempre che aggiungere un parametro ha un costo e quindi dovremo verificare (anche guardando la taglia del binario ottenuto) se nel nostro caso ha un costo inferiore al costo di una funzione aggiuntiva.</p>
 <h4 id="stesso-codice-su-oggetti-simili">Stesso codice su <em>oggetti</em> simili</h4>
 <p>Si può anche fare di più e usare lo stesso codice su <em>oggetti</em> che non sono esattamente dello stesso tipo ma che condividono solo alcuni aspetti comuni per esempio sfruttando gli <code>offset</code> dei campi negli <code>struct</code>, <em>puntatori a funzioni</em>, etc.<br>
@@ -92,7 +92,7 @@ Nota: E’ totalmente inutile usare un operatore di post-incremento in un ciclo 
 <p>Una qualunque architettura potrà ottimizzare meglio del codici in cui delle variabili sono sostituite con delle costanti.</p>
 <h4 id="usiamo-costanti">Usiamo costanti</h4>
 <p>Quindi se una data variabile ha un valore noto al momento della compilazione, è importante che sia rimpiazzata con una costante.<br>
-Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipende da una opzione di compilazione, allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
+Se il suo valore, pur essendo noto al momento della compilazione, dovesse dipendere da una opzione di compilazione (per esempio il tipo di target), allora la sostituiremo con una <em>macro</em> da settare attraverso una opzione di compilazione, in maniera tale che sia trattata come una costante dal compilatore.</p>
 <h2 id="ottimizzare-il-codice-per-gli-8-bit">Ottimizzare il codice per gli 8-bit</h2>
 <p>Il C è un linguaggio che presenta sia costrutti ad alto livello (come <code>struct</code>, le funzioni come parametri, etc.) sia costruiti a basso livello (come i puntatori e la loro manipolazione). Questo non basta per farne un linguaggio direttamente adatto alla programmazione su macchine 8-bit.</p>
 <h3 id="aiutiamo-il-compilatore-a-ottimizzare-le-costanti">Aiutiamo il compilatore a ottimizzare le costanti</h3>
@@ -109,8 +109,8 @@ Un compilatore <em>single pass</em> valuterà la seguente espressione da sinistr
 	i = OFFS+3+i;
 </code></pre>
 <h3 id="implementare-peek-e-poke-in-c">Implementare <code>peek</code> e <code>poke</code> in C</h3>
-<p>Quasi sicuramente avremo bisogno di fare scrivere e leggere dei singoli byte su alcune specifiche locazioni di memoria.<br>
-Il modo per fare questo è in BASIC sarebbe attraverso i comando <code>peek</code> e <code>poke</code>.<br>
+<p>Quasi sicuramente su una architettura 8-bit  avremo bisogno di fare scrivere e leggere dei singoli byte su alcune specifiche locazioni di memoria.<br>
+Il modo per fare questo è in BASIC sarebbe stato attraverso i comando <code>peek</code> e <code>poke</code>.<br>
 In C dobbiamo farlo attraverso dei puntatori la cui sintassi non è legibilissima. Potremo però costruirci delle utili macro che useremo nel nostro codice:</p>
 <pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
     #define PEEK(addr)      (*(unsigned char*) (addr))
@@ -138,7 +138,7 @@ Più recentemente sono stati introdotti dei tipi che fissano la dimensione in mo
 Il modo standard per includere questi tipi a taglia fissa</p>
 <pre><code>	#include &lt;stdint.h&gt;
 </code></pre>
-<p>Non tutti i compilatori 8-bit dispongono di questi tipi.</p>
+<p>Non tutti i compilatori 8-bit dispongono di questo header.</p>
 <p>Fortunatamente per la stragrande maggioranza dei compilatori 8-bit abbiamo la seguente situazione:</p>
 
 <table>
@@ -216,12 +216,12 @@ Quindi un compilatore ANSI C per 6502 sarà quasi sicuramente costretto a usare 
 </ul>
 <p>Le altre architetture 8-bit che stiamo considerando soffrono meno di questo problema ma la gestione delle scope delle variabili e dei parametri ha un costo anche quando si usa uno <em>stack hardware</em>.</p>
 <h4 id="un-antipattern-può-aiutarci">Un <em>antipattern</em> può aiutarci</h4>
-<p>Un modo per ridurre il problema è limitare l’uso delle variabili locali e dei parametri passati alle funzioni. Questo è chiaramente un <em>antipattern</em> e se lo applicassimo a tutto il nostro codice otterremo il classico <em>spaghetti code</em>. Dobbiamo quindi scegliere sapientemente quali variabili sono assolutamente locali e quali possono essere usate come globali. Avremo codice meno generico di quello che avremmo voluto ma sarà più efficiente. <strong>NON</strong> sto suggerendo di rendere tutte le variabili globali e di non passare mai parametri alle funzioni.</p>
+<p>Un modo per ridurre il problema è limitare l’uso delle variabili locali e dei parametri passati alle funzioni. Questo è chiaramente un <em>antipattern</em> e se lo applicassimo a tutto il nostro codice otterremo il classico <em>spaghetti code</em>. Dobbiamo quindi scegliere sapientemente quali variabili sono necessariamente locali e quali possono essere usate come globali. Avremo codice meno generico di quello che avremmo voluto ma sarà più efficiente. <strong>NON</strong> sto suggerendo di rendere tutte le variabili globali e di non passare mai parametri alle funzioni.</p>
 <h4 id="usare-funzioni-non-re-entrant">[6502] Usare funzioni non re-entrant</h4>
-<p>Il compilatore CC65 per l’architettura MOS 6502 mette a disposizione l’opzione <code>-Cl</code> che rende tutte le variabili locali come <code>static</code>, quindi globali. Questo ha l’effetto di evitare l’uso dello <em>stack software</em> per il loro scope. Ha però l’effetto di rendere tutte le nostre funzioni non re-entrant. In pratica questo ci impedisce di usare funzioni recursive. Questa non è un grave perdita perché la ricorsione sarebbe comunque una operazione troppo costosa per una architettura 8-bit.</p>
+<p>Il compilatore CC65 per l’architettura MOS 6502 mette a disposizione l’opzione <code>-Cl</code> che rende tutte le variabili locali come <code>static</code>, quindi globali. Questo ha l’effetto di evitare l’uso dello <em>stack software</em> per il loro scope. Ha però l’effetto di rendere tutte le nostre funzioni non re-entrant. In pratica questo ci impedisce di usare funzioni ricorsive. Questa non è un grave perdita perché la ricorsione sarebbe comunque una operazione troppo costosa per una architettura 8-bit.</p>
 <h4 id="usare-la-pagina-zero">[6502] Usare la pagina zero</h4>
 <p>Il C standard prevede la keyword <code>register</code> per suggerire al compilatore di mettere una variabile in un registro.<br>
-In genere i compilatori moderni ignorano questa keyword perché lasciano questa scelta ai loro ottimizzatori. Questo è vero per i compilatori in questione ad eccezione di quello presenti in CC65 che la usa come suggerimento al compilatore per mettere una variabile in <em>pagina zero</em>. Il MOS 6502 accede in maniera più efficiente a tale pagina di memoria. Si può guadagnare memoria e velocità.<br>
+In genere i compilatori moderni ignorano questa keyword perché lasciano questa scelta ai loro ottimizzatori. Questo è vero per i compilatori in questione ad eccezione di CC65 che la usa come suggerimento al compilatore per mettere una variabile in <em>pagina zero</em>. Il MOS 6502 accede in maniera più efficiente a tale pagina di memoria. Si può guadagnare memoria e velocità.<br>
 Per quanto riguarda l’architettura MOS 6502, il sistema operativo di queste macchine usa una parte della pagina zero. Resta comunque una manciata di byte a disposizione del programmatore.<br>
 CC65 per default lascia 6 byte della pagina zero a disposizione delle variabili dichiarate con keyword <code>register</code>.<br>
 Potrebbe sembrare quindi ovvio dichiarare molte variabili come <code>register</code> ma <strong>NON</strong> è così semplice perché tutto ha un costo. Per mettere una variabile sulla <em>pagina zero</em> sono necessarie diverse operazioni. Quindi se ne avrà un vantaggio quando le variabili sono molto usate.<br>
@@ -231,7 +231,7 @@ In pratica i due scenari in cui è conveniente sono:</p>
 <li>variabile in un loop che si ripete almeno un centinaio di volte</li>
 </ol>
 <p>Un riferimento più preciso è dato da: <a href="https://www.cc65.org/doc/cc65-8.html">https://www.cc65.org/doc/cc65-8.html</a></p>
-<p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve.</p>
+<p>Il mio consiglio è quello di compilare e vedere se il binario è divenuto più breve o addirittura ispezionare il codice Assembly generato.</p>
 <h4 id="evitare-lallocazione-dinamica-della-memoria">Evitare l’allocazione dinamica della memoria</h4>
 <p>I compilatori che stiamo considerando consentono di allocare e deallocare la memoria dinamicamente (con comandi come <code>malloc</code> e <code>free</code>) ma questo ha un ovvio costo computazionale. Se possibile è preferibile allocare tutta la memoria staticamente.</p>
 <h3 id="codice-su-file-diversi">Codice su file diversi?</h3>
