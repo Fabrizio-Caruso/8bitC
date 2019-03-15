@@ -232,7 +232,7 @@ This also allows to select specific options for the configuration of the target 
 <p>In many cases, we can use the ROM routines to do this (see the section on the ROM routines)</p>
 <p>Moreover we may have to convert the binary to a format that can be acccepted by the system.</p>
 <p>Therefore, we can indeed write portable code for even these unsupported systems.</p>
-<p>For example CC&amp;% does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use the dev-kit to produce binaries for these targets:</p>
+<p>For example CC65 does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use the dev-kit to produce binaries for these targets:</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supports (theoretically) any architecture even the unsupported ones such as for example the l’Olivetti Prodest PC128.</li>
 <li>The game Robotsfindskitten is been compiled for thr Atari 7800 with CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
