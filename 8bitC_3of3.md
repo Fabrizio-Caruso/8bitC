@@ -47,8 +47,7 @@ Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui
 Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
 <p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
-<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche. Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.<br>
-Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche. Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.  Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
 <p>In particolare consiglio di cercare:</p>
 <ul>
 <li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
