@@ -341,8 +341,9 @@ A <em>single pass</em> compiler may evaluate the following expression from left 
 This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
 <h3 id="implement-peek-and-poke-in-c">Implement <code>peek</code> and <code>poke</code> in C</h3>
 <p>Mosr probably we will need to read and write single bytes from and to specific memory locations.<br>
-In old BASIC this was done through <code>peek</code> and <code>poke</code> commands.<br>
-In C we must do this through poniters whose syntax is not very readable. In order to make our code more readable we can create the following macros:</p>
+In old BASIC this was done through<br>
+<code>peek</code> and <code>poke</code> commands.<br>
+In c we must do this through poniters whose syntax is not very readable. In order to make our code more readable we can create the following macros:</p>
 <pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
     #define PEEK(addr)      (*(unsigned char*) (addr))
 </code></pre>
@@ -674,7 +675,7 @@ Let us dfine <code>Item</code> as a sub-class of<code>Character</code> to which 
 </code></pre>
 <p>Why can we save memory by doing this?<br>
 Because we may treat different, yet similar, objects with the same code and so avoid code duplication.</p>
-<h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
+<h2 id="optimized-compilation">Optimized compilation</h2>
 <p>We won’t cover exaustively all compilation options of the cross-compilers under our consideration. We refer to their respective manuals for the derails.<br>
 Here we give a list of options to produced optimized code on our compilers.</p>
 <h3 id="aggressive-compilation">“Aggressive” compilation</h3>
