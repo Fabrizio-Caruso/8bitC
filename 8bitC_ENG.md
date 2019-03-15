@@ -717,9 +717,7 @@ Here we give a list of options to produced optimized code on our compilers.</p>
 </tr>
 </tbody>
 </table><h4 id="speed-vs-memory">Speed vs Memory</h4>
-<p>The most common problem for many 8-bit systems is the presence of little memory for code and data. Usually optimizing for speed also improves memory usage but this is not always the case.<br>
-In some other cases, our goal is speed even at the cost of extra memory.<br>
-Some compilers provide options to specify our preference with respect to speed and memory:</p>
+<p>The most common problem for many 8-bit systems is the presence of little memory for code and data. Usually optimizing for speed also improves memory usage but this is not always the case. In some other cases, our goal is speed even at the cost of extra memory. Some compilers provide options to specify our preference with respect to speed and memory:</p>
 
 <table>
 <thead>
@@ -753,38 +751,10 @@ Some compilers provide options to specify our preference with respect to speed a
 </table><p><strong>Known problems</strong></p>
 <ul>
 <li>CC65: <code>-Cl</code> prevents recursive functions</li>
-<li>CMOC: <code>-O2</code> has bugs</li>
 <li>ZSDCC: has bugs that do not depend on the options and has specific bugs that are triggered by <code>-SO3</code> when no <code>--max-alloc-node20000</code> option is provided.</li>
 </ul>
-<h3 id="safer-optimization">Safer optimization</h3>
-<p>In order to avoid these problems and reduce compilation time (above all for the Z80 architecture) we suggest:</p>
-
-<table>
-<thead>
-<tr>
-<th>Architecture</th>
-<th>Compiler</th>
-<th>Options</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Zilog Z80</td>
-<td>SCCZ80 (Z88DK)</td>
-<td><code>-O3</code></td>
-</tr>
-<tr>
-<td>MOS 6502</td>
-<td>CC65</td>
-<td><code>-O</code></td>
-</tr>
-<tr>
-<td>Motorola 6809</td>
-<td>CMOC</td>
-<td><code>-O1</code></td>
-</tr>
-</tbody>
-</table><h2 id="avoid-linking-useless-code">Avoid linking useless code</h2>
+<p>In order to avoid these problems and reduce compilation time we recommend the use of just SCCZ80 for Z80 during development and debugging and resort to ZSDCC only for the final optimization and tests.</p>
+<h2 id="avoid-linking-useless-code">Avoid linking useless code</h2>
 <p>Our compilers will not always be able to detect and remove unused and useless code from the binary. Therefore we must avoid to include it in the first place.</p>
 <p>We can do even better with some of the compilers by instructing them to not include some standard libraries or even portions of the libraries that we are sure not to use.</p>
 <h3 id="avoid-the-standard-library">Avoid the standard library</h3>
@@ -796,21 +766,20 @@ Some compilers provide options to specify our preference with respect to speed a
 <p>For example:</p>
 <pre><code>#pragma printf = "%c %u"
 </code></pre>
-<p>includes only <code>%c</code> and <code>%u</code> converts and excludes all the others.</p>
+<p>includes only <code>%c</code> and <code>%u</code> converts and excludes all the others;</p>
 <pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
 </code></pre>
-<p>does not generate code to inizialize the BSS memory area.</p>
+<p>does not generate code to inizialize the BSS memory area;</p>
 <pre><code>#pragma output CRT_ON_EXIT = 0x10001
 </code></pre>
-<p>the program does not when it exists (e.g., to BASIC).</p>
+<p>the program does not when it exists (e.g., to BASIC);</p>
 <pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
 </code></pre>
-<p>no <code>heap</code> memory (i.e., no <code>malloc</code> are possible).</p>
+<p>no <code>heap</code> memory (i.e., no <code>malloc</code> are possible);</p>
 <pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
 </code></pre>
 <p>removes <code>stdio heap</code> (no file can be opened).</p>
-<p>More examples are in:<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
+<p>More examples are in: <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="use-rom-routines">Use ROM routines</h2>
 <p>Most of the 8-bit systems (almost all computers), have plenty of routines in ROM. It is important to know about them and use them when they are need. In order to use them explicitly in our code, we may have to write some <em>in line</em> Assembly in our C code (or use separate Assembly routines). How to do this is different in every dev-kit and we refer to their respective manuals for more details.</p>
 <p>This is very important for systems that are not natively supported by the compilers and for which all input/output routines have to be written.</p>
