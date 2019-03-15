@@ -354,20 +354,11 @@ main() {
 	while (1){};  
 }
 </code></pre>
-<h2 id="sfruttare-lhardware-specifico">Sfruttare l’hardware specifico</h2>
-<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice. Conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce.</p>
-<h3 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h3>
-<p>Al fine di ottimizzare il nostro codice, la conoscenza del chip grafico può aiutarci a risparmiare tanta ram.</p>
+<h2 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h2>
+<p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice. Conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce. In particolare la conoscenza del chip grafico può aiutarci a risparmiare tanta ram.</p>
 <p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
 I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
 <p>Esempio (Commodore Vic 20)<br>
-Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte:</p>
-<ul>
-<li>In realtà dispone anche di 1024 nibble di RAM aggiuntiva speciale per gli attributi colore</li>
-<li>Pur avendo soltanto 3,5k di memoria RAM contigua per il codice, molta altra RAM è facilmente sfruttabile per dati (buffer cassetta, buffer comando INPUT del BASIC)</li>
-<li>La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM</li>
-</ul>
-<p>Quindi, sfruttiamo implicitamente la prima caratteristica accedendo ai colori senza usare la RAM comune.<br>
-Possiamo mappare le nostre variabili nei vari buffer non utilizzati.<br>
-Se ci bastano n (n&lt;=64) caratteri ridefiniti possiamo mapparne solo 64 con <code>POKE(0x9005,0xFF);</code> Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
+Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte.<br>
+La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM. Se ci bastano n (&lt;=64) caratteri ridefiniti possiamo mapparne in RAM solo 64 con <code>POKE(0x9005,0xFF);</code> (per esempio usato in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/init_graphics/cc65/vic20/vic20_init_graphics.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/init_graphics/cc65/vic20/vic20_init_graphics.c</a>). Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
 
