@@ -291,21 +291,20 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>Per esempio:</p>
 <pre><code>#pragma printf = "%c %u"
 </code></pre>
-<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri.</p>
+<p>includerà solo i convertitori per <code>%c</code> e <code>%u</code> escludendo tutto il codice per gli altri;</p>
 <pre><code>#pragma-define:CRT_INITIALIZE_BSS=0
 </code></pre>
-<p>non genera codice per l’inizializzazione dell’area di memoria BSS.</p>
+<p>non genera codice per l’inizializzazione dell’area di memoria BSS;</p>
 <pre><code>#pragma output CRT_ON_EXIT = 0x10001
 </code></pre>
-<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC)</p>
+<p>il programma non fa nulla alla sua uscita (non gestisce il ritorno al BASIC);</p>
 <pre><code>#pragma output CLIB_MALLOC_HEAP_SIZE = 0
 </code></pre>
-<p>elimina lo heap della memoria dinamica (nessuna malloc possibile)</p>
+<p>elimina lo heap della memoria dinamica (nessuna malloc possibile);</p>
 <pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
 </code></pre>
-<p>elimina lo heap di stdio (non gestisce l’apertura di file)</p>
-<p>Alcuni esempi sono in<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
+<p>elimina lo heap di stdio (non gestisce l’apertura di file).</p>
+<p>Alcuni esempi sono in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
 <h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
 <p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
 <p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
