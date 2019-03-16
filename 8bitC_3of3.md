@@ -43,11 +43,9 @@ Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui
 	...
 	foo((Character *)myItem);
 </code></pre>
-<p>Perché ci guadagniamo in termine di memoria?<br>
-Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
+<p>Perché ci guadagniamo in termine di memoria? Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risparmiamo memoria.</p>
 <h2 id="uso-avanzato-della-memoria">Uso avanzato della memoria</h2>
-<p>Il compilatore C in genere produrrà un unico binario che conterrà codice e dati che verranno caricati in una specifica zona di memoria (è comunque possibile avere porzioni di codice non contigue).</p>
-<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche. Il mio consiglio è quindi di studiare le mappa della memoria di ogni hardware per trovare queste preziose aree.  Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
+<p>In molte architetture alcune aree della memoria RAM sono usate come <em>buffer</em> oppure sono dedicate a usi specifici come alcune modalità grafiche. Il mio consiglio è quindi di studiare le mappa della memoria di ogni sistema per trovare queste preziose aree.  Per esempio per il Vic 20: <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
 <p>In particolare consiglio di cercare:</p>
 <ul>
 <li>buffer della cassetta, della tastiera, della stampante, del disco, etc.</li>
@@ -57,7 +55,7 @@ Perché sarà possibile trattare più oggetti con lo stesso codice e quindi risp
 </ul>
 <p>Queste aree di memoria potrebbero essere sfruttate dal nostro codice se nel nostro use-case non servono per il loro scopo originario (esempio: se non intendiamo caricare da cassetta dopo l’avvio del programma, possiamo usare il buffer della cassetta per metterci delle variabili da usare dopo l’avvio potendolo comunque usare prima dell’avvio per caricare il nostro stesso programma da cassetta).</p>
 <p><em>Esempi utili</em><br>
-In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria disponibile:</p>
+In questa tabella diamo alcuni esempi utili per vari sistemi tra cui molti con poca memoria disponibile:</p>
 
 <table>
 <thead>
@@ -154,10 +152,9 @@ In questa tabella diamo alcuni esempi utili per sistemi che hanno poca memoria d
 <td>$79E8-7A28</td>
 </tr>
 </tbody>
-</table><p>(*): Vari buffer e locazioni ausiliarie usate dalle routine in ROM. Per maggiori dettagli facciamo riferimento a:<br>
+</table><p>(*): Vari buffer e locazioni ausiliarie usate dalle routine in ROM. Per maggiori dettagli facciamo riferimento rispettivamente a:<br>
 <a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> e <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a></p>
-<p>In C standard potremmo solo definire le variabili puntatore e gli array come locazioni in queste aree di memoria.</p>
-<p>Di seguito diamo un esempio di mappatura delle variabili a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+<p>In C standard potremmo solo mappare il contenuto delle variabili puntatore e gli array su specifiche locazioni di memoria. Di seguito diamo un esempio di mappatura a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
 <li><code>player</code> di tipo <code>Character</code>,</li>
 <li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
@@ -190,15 +187,14 @@ I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di f
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
 <h2 id="struttura-ottimale-del-binario">Struttura ottimale del binario</h2>
 <p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti. Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
-<p>Spesso (ma non sempre) le architetture basate su MOS 6502 prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
-<p>Molte architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata. Quindi non potremo mettere la grafica direttamente in questa memoria.</p>
+<p>Molte architetture basate su MOS 6502 (ma non tutte) prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
+<p>Invece diverse architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata.</p>
 <h3 id="cc65-istruiamo-il-linker">[CC65] Istruiamo il linker</h3>
-<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo. In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre. Il linker di CC65 non è semplicissimo da configurare ed una sua descrizione andrebbe oltre lo scopo di questo articolo. Una descrizione dettagliata è presente su:<br>
-<a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a> . Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
+<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo. In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre. Il linker di CC65 non è semplicissimo da configurare ed una sua descrizione andrebbe oltre lo scopo di questo articolo. Una descrizione dettagliata è presente su: <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a> . Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
-<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
+<p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a> .</p>
 <h3 id="z88dk-appmake-fa-quasi-tutto-per-noi">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h3>
-<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costuisce dei binari nel formato richiesto. Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice. Questo argomento è trattato in dettaglio in <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
+<p>Z88DK fa molto di più e il suo potente tool <em>appmake</em> costruisce dei binari nel formato richiesto. Z88DK consente comunque all’utente di definire sezioni di memoria e di definire il “packaging” del binario ma non è semplice. Questo argomento è trattato in dettaglio in <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a> .</p>
 <h2 id="compilazione-ottimizzata">Compilazione ottimizzata</h2>
 <p>Non tratteremo in modo esaustivo le opzioni di compilazione dei cross-compilatori e consigliamo di fare riferimento ai loro rispettivi manuali per dettagli avanzati. Qui daremo una lista delle opzioni per compilare codice ottimizzato su ognuno dei compilatori che stiamo trattando.</p>
 <h3 id="ottimizzazione-aggressiva">Ottimizzazione “aggressiva”</h3>
@@ -280,12 +276,9 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 </ul>
 <p>Per ridurre i tempi di compilazione di ZSDCC  (a volte lunghissimi) e i suoi bug, consigliamo di usare SCCZ80 con opzione <code>-O3</code> durante la fase di sviluppo.  ZSDCC andrebbe provato alla fine.</p>
 <h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
-<p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto.</p>
-<p>Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
+<p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto. Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
-<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.</p>
-<h4 id="cpm-80-solo-getchar-e-putcharc">[cp/m-80] Solo <em>getchar()</em> e <em>putchar(c)</em></h4>
-<p>Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> e implementare tutto il resto.</p>
+<p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.  Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> quando è possibile.</p>
 <h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
 <p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
 <p>Per esempio:</p>
@@ -304,9 +297,9 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <pre><code>#pragma output CLIB_STDIO_HEAP_SIZE = 0
 </code></pre>
 <p>elimina lo heap di stdio (non gestisce l’apertura di file).</p>
-<p>Alcuni esempi sono in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a></p>
+<p>Alcuni esempi sono in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/cfg/z88dk</a> .</p>
 <h2 id="usare-le-routine-presenti-in-rom">Usare le routine presenti in ROM</h2>
-<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per usarle. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
+<p>La stragrande maggioranza dei sistemi 8-bit (quasi tutti i computer) prevede svariate routine nelle ROM. E’ quindi importante conoscerle per poterne usufruire. Per usarle esplicitamente dovremo scrivere del codice Assembly da richiamare da C. Il modo d’uso dell’Assembly assieme al C può avvenire in modo <em>in line</em> (codice Assembly integrato all’interno di funzioni C) oppure con file separati da linkare al C ed è diverso in ogni dev-kit. Per i dettagli consigliamo di leggere i manuali dei vari dev-kit.</p>
 <p>Questo è molto importante per i sistemi che non sono (ancora) supportati dai compilatori e per i quali bisogna scrivere da zero tutte le routine per l’input/output.</p>
 <p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/display_macros.c</a>)</p>
 <p>Per il display di caratteri sullo schermo per i Thomson Mo5, Mo6 e Olivetti Prodest PC128 (sistemi non supportati da nessun compilatore) piuttosto che scrivere una routine da zero possiamo affidarci ad una routine Assembly presente nella ROM:</p>
@@ -320,10 +313,10 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 		}
 	}
 </code></pre>
-<h4 id="le-librerie-spesso-lo-fanno-per-noi">Le librerie spesso lo fanno per noi</h4>
-<p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit, lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
-<h4 id="basck-scoviamo-le-librerie">BASCK: scoviamo le librerie</h4>
-<p>Se non riusciamo a trovare informazioni sulle routine della ROM come per esempio le loro <em>entry points</em> perché per esempio stiamo sviluppando per un sistema poco noto, possiamo usare il tool <em>BASCK</em> (<a href="https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c">https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c</a>) che viene distribuito con Z88DK. <em>BASCK</em> prende in input i file delle rom di sistemi basati su Z80 e 6502 e applicando vari pattern, trova le routine e i loro indirizzi. Usare queste routine non è sempre facile ma in alcuni casi è banale.</p>
+<h4 id="le-librerie-spesso-lo-già-fanno-per-noi">Le librerie spesso lo già fanno per noi</h4>
+<p>Fortunatamente spesso potremo usare le routine della ROM implicitamente senza fare alcuna fatica perché le librerie di supporto ai target dei nostri dev-kit lo fanno già per noi. Usare una routine della ROM ci fa risparmiare codice ma può imporci dei vincoli perché per esempio potrebbero non fare esattamente quello che vogliamo oppure usano alcune aree della RAM (buffer) che noi potremmo volere usare in modo diverso.</p>
+<h4 id="basck-scoviamo-le-librerie-della-rom">BASCK: scoviamo le librerie della ROM</h4>
+<p>Se non riusciamo a trovare informazioni sulle routine della ROM come per esempio le loro <em>entry points</em> perché, per esempio stiamo sviluppando per un sistema poco documentato, possiamo usare il tool <em>BASCK</em> (<a href="https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c">https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c</a>, sviluppato da Stefano Bodrato) che viene distribuito con Z88DK. <em>BASCK</em> prende in input i file delle ROM di sistemi basati su Z80 e 6502 e cercando vari pattern, trova le routine e i loro indirizzi. Usare queste routine non è sempre facile ma in alcuni casi è banale.</p>
 <p>Esempio:</p>
 <ol>
 <li>Dobbiamo lanciare BASCK passandogli la ROM e leggere il suo output. Per esempio se cerchiamo la routine PRINT nella ROM, filtriamo nell’output la stringa “PRS” (in Unix useremo il comando “grep”)</li>
@@ -344,9 +337,10 @@ main() {
 </code></pre>
 <h2 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h2>
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice. Conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce. In particolare la conoscenza del chip grafico può aiutarci a risparmiare tanta ram.</p>
-<p>Esempio (Chip della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
-I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria.</p>
+<p>Esempio (Chip Texas Instruments della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria. I computer Atari 8-bit prevedono un modo grafico testuale analogo (graphics mode 1+16, Antic mode 6).</p>
 <p>Esempio (Commodore Vic 20)<br>
 Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte.<br>
 La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM. Se ci bastano n (&lt;=64) caratteri ridefiniti possiamo mapparne in RAM solo 64 con <code>POKE(0x9005,0xFF);</code> (per esempio usato in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/init_graphics/cc65/vic20/vic20_init_graphics.c">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/cross_lib/display/init_graphics/cc65/vic20/vic20_init_graphics.c</a>). Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard senza alcun dispendio di memoria per i caratteri standard.</p>
+<p>Inoltre è possibile in alcuni casi fare uso della memoria video dedicata a cui accede il chip grafico (come il TI VDP, MOS VDC, etc.) ma ha solo senso al fine di ottenere memoria aggiuntiva ad un costo computazionale genericamente notevole perché la lettura e scrittura su questa memoria sarebbe indiretta.</p>
 
