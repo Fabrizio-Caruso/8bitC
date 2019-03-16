@@ -337,7 +337,7 @@ main() {
 </code></pre>
 <h2 id="sfruttare-i-chip-grafici">Sfruttare i chip grafici</h2>
 <p>Come visto nelle sezioni precedenti, anche se programmiamo in C non dobbiamo dimenticare l’hardware specifico per il quale stiamo scrivendo del codice. Conoscere l’hardware può aiutarci a scrivere codice molto più compatto e/o più veloce. In particolare la conoscenza del chip grafico può aiutarci a risparmiare tanta ram.</p>
-<p>Esempio (Chip Texas Instruments della serie VDP tra cui il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+<p>Esempio (Chip TI VDP come il TMS9918A presente su MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
 I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode 1</em>)  in cui il colore del carattere è implicitamente dato dal codice del carattere. Se usiamo questo speciale modo video, sarà quindi sufficiente un singolo byte per definire il carattere ed il suo colore con un notevole risparmio in termini di memoria. I computer Atari 8-bit prevedono un modo grafico testuale analogo (graphics mode 1+16, Antic mode 6).</p>
 <p>Esempio (Chip VIC del Commodore Vic 20)<br>
 Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte.<br>
