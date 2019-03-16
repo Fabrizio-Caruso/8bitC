@@ -12,10 +12,10 @@
 <h2 id="programmazione-ad-oggetti">Programmazione ad oggetti</h2>
 <p>Contrariamente a quello che si possa credere, la programmazione ad oggetti è possibile in ANSI C e può aiutarci a produrre codice più compatto in alcune situazioni. Esistono interi framework ad oggetti che usano ANSI C (es. Gnome è scritto usando <em>GObject</em> che è uno di questi framework).</p>
 <p>Nel caso delle macchine 8-bit con vincoli di memoria molto forti, possiamo comunque implementare <em>classi</em>, <em>polimorfismo</em> ed <em>ereditarietà</em> in maniera molto efficiente.<br>
-Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare i due strumenti fondamentali:</p>
+Una trattazione dettagliata non è possibile in questo articolo e qui ci limitiamo a citare due strumenti fondamentali:</p>
 <ul>
-<li>usare <em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
-<li>usare <em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
+<li><em>puntatori a funzioni</em> per ottenere metodi <em>polimorfici</em>, cioè il cui <em>binding</em> (e quindi comportamento) è dinamicamente definito a <em>run-time</em>. Si può evitare l’implementazione di una <em>vtable</em> se ci si limita a classi con un solo metodo polimorfico.</li>
+<li><em>puntatori a</em> <code>struct</code> e <em>composizione</em> per implementare sotto-classi: dato uno <code>struct</code> A, si implementa una sua sotto-classe con uno <code>struct</code> B definito come uno <code>struct</code> il cui <strong>primo</strong> campo è A. Usando puntatori a tali <code>struct</code>, il C garantisce che gli <em>offset</em> di B siano gli stessi degli offset di A.</li>
 </ul>
 <p>Esempio (preso da <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
 Definiamo <code>Item</code> come un sotto-classe di <code>Character</code> a cui aggiungiamo delle variabili ed il metodo polimorfico <code>_effect()</code>:</p>
@@ -154,7 +154,7 @@ In questa tabella diamo alcuni esempi utili per vari sistemi tra cui molti con p
 </tbody>
 </table><p>(*): Vari buffer e locazioni ausiliarie usate dalle routine in ROM. Per maggiori dettagli facciamo riferimento rispettivamente a:<br>
 <a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> e <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a>.</p>
-<p>In C standard potremmo solo mappare il contenuto delle variabili puntatore e gli array su specifiche locazioni di memoria. Di seguito diamo un esempio di mappatura a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+<p>In C standard potremmo solo assagnere le variabili puntatore e gli array su specifiche locazioni di memoria. Di seguito diamo un esempio di mappatura a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
 <li><code>player</code> di tipo <code>Character</code>,</li>
 <li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
@@ -186,9 +186,7 @@ I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di f
 <p>CMOC mette a disposizione l’opzione <code>--data=&lt;indirizzo&gt;</code> che permette di allocare tutte le variabili globali scrivibili a partire da un indirizzo dato.</p>
 <p>La documentazione di ACK non dice nulla a riguardo. Potremo comunque definire i tipi puntatore e gli array nelle zone di memoria libera.</p>
 <h2 id="struttura-ottimale-del-binario">Struttura ottimale del binario</h2>
-<p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti. Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti.</p>
-<p>Molte architetture basate su MOS 6502 (ma non tutte) prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
-<p>Invece diverse architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata.</p>
+<p>Se il nostro programma prevede dei dati in una definita area di memoria, sarebbe meglio metterli direttamente nel binario che verrà copiato in memoria durante il caricamento. Se questi dati sono invece nel codice, saremo costretti a scrivere del codice che li copia nell’area di memoria in cui sono previsti. Il caso più comune è forse quello degli sprites e dei caratteri/tiles ridefiniti. Questo sarà possibile solo in sistemi in cui i dati stanno nella stessa memoria RAM a cui accede direttamente il processore come per esempio molti sistemi che prevedono video <em>memory mapped</em>.</p>
 <h3 id="cc65-istruiamo-il-linker">[CC65] Istruiamo il linker</h3>
 <p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo. In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre. Il linker di CC65 non è semplicissimo da configurare ed una sua descrizione andrebbe oltre lo scopo di questo articolo. Una descrizione dettagliata è presente su: <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a>. Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
@@ -274,7 +272,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <li>CC65: <code>-Cl</code> impedisce la ricorsione</li>
 <li>ZSDCC: ha dei bug a prescindere dalle opzioni e ne ha altri presenti con <code>-SO3</code> in assenza di <code>--max-alloc-node20000</code>.</li>
 </ul>
-<p>Per ridurre i tempi di compilazione di ZSDCC  (a volte lunghissimi) e i suoi bug, consigliamo di usare SCCZ80 con opzione <code>-O3</code> durante la fase di sviluppo.  ZSDCC andrebbe provato alla fine.</p>
+<p>Per ridurre i tempi di compilazione di ZSDCC  (a volte lunghissimi) e i suoi bug, consigliamo di usare SCCZ80 (eventualmente con opzione <code>-O3</code>) durante la fase di sviluppo.  ZSDCC andrebbe provato solo alla fine.</p>
 <h2 id="evitare-il-linking-di-codice-inutile">Evitare il linking di codice inutile</h2>
 <p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto. Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
