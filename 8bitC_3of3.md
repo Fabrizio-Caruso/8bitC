@@ -188,7 +188,7 @@ I compilatori di CC65 e Z88DK invece prevedono una sintassi per permetterci di f
 <p>Molte architetture basate su MOS 6502 (ma non tutte) prevedono video <em>memory mapped</em> in cui i dati della grafica si trovano nella stessa RAM a cui accede la CPU.</p>
 <p>Invece diverse architetture basate su Z80 (MSX, Spectravideo, Memotech, Tatung Einstein, etc.) usano il chip Texas VDP che invece ha una memoria video dedicata.</p>
 <h3 id="cc65-istruiamo-il-linker">[CC65] Istruiamo il linker</h3>
-<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo. In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre. Il linker di CC65 non è semplicissimo da configurare ed una sua descrizione andrebbe oltre lo scopo di questo articolo. Una descrizione dettagliata è presente su: <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a> . Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
+<p>Ogni compilatore mette a disposizioni strumenti diversi per definire la struttura del binario e quindi permetterci di costruirlo in maniera che i dati siano caricati in una determinata zona di memoria durante il load del programma senza uso di codice aggiuntivo. In particolare su CC65 si può usare il file .cfg di configurazione del linker che descrive la struttura del binario che vogliamo produrre. Il linker di CC65 non è semplicissimo da configurare ed una sua descrizione andrebbe oltre lo scopo di questo articolo. Una descrizione dettagliata è presente su: <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a>. Il mio consiglio è di leggere il manuale e di modificare i file di default .cfg già presenti in CC65 al fine di adattarli al proprio use-case.</p>
 <h4 id="exomizer-ci-aiuta-anche-in-questo-caso">Exomizer ci aiuta (anche) in questo caso</h4>
 <p>In alcuni casi se la nostra grafica deve trovarsi in un’area molto lontana dal codice, e vogliamo creare un unico binario, avremo un binario enorme e con un “buco”. Questo è il caso per esempio del C64 in cui la grafica per caratteri e sprites può trovarsi lontana dal codice. In questo caso io suggerisco di usare <em>exomizer</em> sul risultato finale: <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a>.</p>
 <h3 id="z88dk-appmake-fa-quasi-tutto-per-noi">[Z88DK] <em>Appmake</em> fa (quasi) tutto per noi</h3>
@@ -322,7 +322,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <pre><code>&gt; basck -map romfile.rom |grep PRS  
 PRS = $AAAA ; Create string entry and print it
 </code></pre>
-<p>Otterremo in questo modo l’indirizzo della routine del BASIC per stampare dei carateri.</p>
+<p>Otterremo in questo modo l’indirizzo della routine del BASIC per stampare dei caratteri.</p>
 <ol start="2">
 <li>A questo punto potremo scrivere del codice in Assembly o C per usarla:</li>
 </ol>
@@ -340,5 +340,5 @@ I sistemi basati su questo chip prevedono una modalità video testuale (<em>Mode
 <p>Esempio (Chip VIC del Commodore Vic 20)<br>
 Il Commodore Vic 20 è un caso veramente speciale perché prevede dei limiti hardware considerevoli (RAM totale: 5k, RAM disponibile per il codice: 3,5K) ma anche dei trucchi per superarli almeno in parte.<br>
 La caratteristica più sorprendente è che il chip grafico VIC può mappare una parte dei caratteri in RAM lasciandone metà definiti dalla ROM. Se bastano n (&lt;=64) caratteri ridefiniti possiamo mapparne in RAM solo 64 con <code>POKE(0x9005,0xFF);</code>. Ne potremo usare anche meno di 64 lasciando il resto per il codice ma mantenendo in aggiunta 64 caratteri standard.</p>
-<p>Inoltre è possibile in alcuni casi fare uso della memoria video dedicata a cui accedeno alcuni chip grafici (come il TI VDP, MOS VDC del C128, etc.) per altri scopi. Il costo computazionale sarebbe comunque notevole perché l’accesso su questa memoria sarebbe indiretto.</p>
+<p>Inoltre è possibile in alcuni casi fare uso della memoria video dedicata a cui accedono alcuni chip grafici (come il TI VDP, MOS VDC del C128, etc.) per altri scopi. Il costo computazionale sarebbe comunque notevole perché l’accesso su questa memoria sarebbe indiretto.</p>
 
