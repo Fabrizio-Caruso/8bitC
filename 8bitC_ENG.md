@@ -500,8 +500,6 @@ In practice the two most common scenarios where this is the case are:</p>
 <p>If our program uses data in a specific memory area, it would be better to have the data already stored in the binary and have the load process of the binary copy the data at the expected locations without any code to do actual copying of the data.<br>
 If the data is in the source code instead, we will have to copy them and we will also end up having them twice in memory.<br>
 The most common case is the data for sprites and redefined characters or tiles.</p>
-<p>Often but not always many MOS 6502 architectures use <em>memory mapped</em> graphics memory and so use common RAM for graphics data.<br>
-On the other hand many Z80-based systems such as (MSZ, Specravideo, Memotech MTX, Sord M5, Tatung Einstein, etc.) use the Texas VDP graphics chip that has its own video memory.</p>
 <p>Different compilers provide different tools to define the final binary structure.</p>
 <h4 id="cc65-let-us-instruct-the-linker">[CC65] Let us instruct the linker</h4>
 <p>It is possible to configure CC65’s linker through a .cfg file that describes the structure of the binary that we want to produce.<br>
@@ -518,12 +516,12 @@ Z88DK also allows the user to define <em>memory sections</em> and to redefine th
 This topic is treated in detail in:<br>
 <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
 <h3 id="code-on-multiple-files">Code on multiple files</h3>
-<p>Usually separating a large code into multiple files is a good practice but it may produce poorer code for 8-bit optimizer because they do not perform <em>link-time optimization</em>, i.e., they cannot optimize code between two or more files but also optimize each file separately.<br>
-For example we have a function that is called only once and the function is defined in the same file where it is invoked, then the optimizer may be able to <em>inline</em> it but this would never be possible if the functions were defined in a separate file.<br>
+<p>Usually separating the source code into multiple files is a good practice but it may produce poorer code because 8-bit optimizers do not perform <em>link-time optimization</em>, i.e., they cannot optimize code between two or more files and only optimize each file separately.<br>
+For example if we have a function that is called only once and the function is defined in the same file where it is invoked, then the optimizer may be able to <em>inline</em> it but this would never be possible if the function were defined and invoked in different files.<br>
 My advice is <strong>not</strong> to create one or few huge files but to take into account how separating the code into multiple files can affect the optimization.</p>
 <h2 id="advanced-memory-use">Advanced memory use</h2>
 <p>The C compiler usually produces a unique binary that contains both code and data, which will be loaded in specific memory locations (even with non contiguous memory areas).</p>
-<p>In many architectures some RAM areas are use as <em>buffers</em> for the ROM routines or are used only in some special cases (e.g., some graphics modes).<br>
+<p>In many architectures some RAM areas are used as <em>buffers</em> for the ROM routines or are used only in some special cases (e.g., some graphics modes).<br>
 My advice is to study the memory map. For example for the Vic 20 we would have to look at:<br>
 <a href="http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt">http://www.zimmers.net/cbmpics/cbm/vic/memorymap.txt</a></p>
 <p>In particular we should look for:</p>
@@ -533,9 +531,9 @@ My advice is to study the memory map. For example for the Vic 20 we would have t
 <li>memory areas used by special graphics modes</li>
 <li>free small portions of free memory that are not usually used by code because they are not contiguous with the main code memory area.</li>
 </ul>
-<p>There memory areas could be used by our code if they do not serve their standard purpose in our use-case, e.g., if we do not intend to use the tape after the program has been loaded (including from the tape), then we can use the tape buffer in our code to store some variables.</p>
+<p>These memory areas could be used by our code if they do not serve their standard purpose in our use-case, e.g., if we do not intend to use the tape after the program has been loaded (including from the tape), then we can use the tape buffer in our code to store some variables.</p>
 <p><em>Useful cases</em><br>
-We list some useful memory areas for the Commodore 64 and a few memory-limited systems:</p>
+We list some of these useful memory areas for some systems including many with very limited RAM:</p>
 
 <table>
 <thead>
@@ -646,9 +644,9 @@ We list some useful memory areas for the Commodore 64 and a few memory-limited s
 	Character *player = 0xC000+$28+$14;
 </code></pre>
 <p>This generic solution with pointers does not always produce optimal code because it forces us to <em>dereference</em> our pointers and creates pointer variables (usually 2 bytes per pointer) that the compiler has to allocate in memory.</p>
-<p>No standard solution exist to store any other type of variables in a specific memory area but the CC65 and Z88DK linkers provide a special syntax to do this and let us save hundreds or even thousands of precious bytes. Some examples are in<br>
+<p>No standard solution exists to store any other type of variables in a specific memory area but the CC65 and Z88DK linkers provide a special syntax to do this and let us save hundreds or even thousands of precious bytes. Some examples are in<br>
 <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/cross_lib/memory</a></p>
-<p>In particolar we will have to create an Assembly file: a .s file (underCC65) or .asm file (under Z88DK) that we will link to our binary. In this file we will be able to assign each variable to a specific memory area.<br>
+<p>In particular we will have to create an Assembly file: a .s file (underCC65) or .asm file (under Z88DK) that we will link to our binary. In this file we will be able to assign each variable to a specific memory area.<br>
 Remark: We need to <strong>add</strong> an <em>underscore</em> prefix to each variable.</p>
 <p>CC65 syntax (Commodore Vic 20 example)</p>
 <pre><code>	.export _ghosts;
@@ -672,12 +670,11 @@ Remark: We need to <strong>add</strong> an <em>underscore</em> prefix to each va
 <p>A detailed description of object-oriented programming goes beyond the purpose of this articile.<br>
 Here we decribe how to implement its main features:</p>
 <ul>
-<li>Use<em>pointers to functions</em> to implement *polymorphic" methods, i.e., methods with <em>dynamic binding</em>, whose behavior is defined at <em>run-time</em>. It is possible to avoid the implementation of a <em>vtable</em> if we limit ourselves to classes with just one polymorphic method.</li>
+<li>Use <em>pointers to functions</em> to implement *polymorphic" methods, i.e., methods with <em>dynamic binding</em>, whose behavior is defined at <em>run-time</em>. It is possible to avoid the implementation of a <em>vtable</em> if we limit ourselves to classes with just one polymorphic method.</li>
 <li>Use <em>pointers to <code>struct</code></em> and <em>composition</em> to implelent <em>sub-classes</em>: given a  <code>struct</code> A, we implement a sub-class with a <code>struct</code> B defined as a  <code>struct</code> whose <strong>first</strong> field is of type A. When passing pointers to such new <code>struct</code>, the C language guarantees that the <em>offset</em> of B are the same as the ones of A and therefore a pointer to B can be <em>cast</em> into a pointer to A.</li>
 </ul>
-<p>Example (taken from<br>
-<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
-Let us dfine <code>Item</code> as a sub-class of<code>Character</code> to which we add some variables and a polymorphic method <code>_effect()</code>:</p>
+<p>Example (taken from <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase">https://github.com/Fabrizio-Caruso/CROSS-CHASE/tree/master/src/chase</a>)<br>
+Let us define <code>Item</code> as a sub-class of<code>Character</code> to which we add some variables and a polymorphic method <code>_effect()</code>:</p>
 <pre><code>	struct CharacterStruct
 	{
 		unsigned char _x;
@@ -705,7 +702,7 @@ Let us dfine <code>Item</code> as a sub-class of<code>Character</code> to which 
 <p>Why can we save memory by doing this?<br>
 Because we may treat different, yet similar, objects with the same code and so avoid code duplication.</p>
 <h2 id="optimized-compilation">Optimized compilation</h2>
-<p>We won’t cover exaustively all compilation options of the cross-compilers under our consideration. We refer to their respective manuals for the derails.<br>
+<p>We won’t cover exhaustively all compilation options of the cross-compilers under our consideration. We refer to their respective manuals for the derails.<br>
 Here we give a list of options to produced optimized code on our compilers.</p>
 <h3 id="aggressive-compilation">“Aggressive” compilation</h3>
 <p>The following options will apply the highest optimizations to produce faster and above all more compact code:</p>
@@ -779,7 +776,7 @@ Here we give a list of options to produced optimized code on our compilers.</p>
 </tbody>
 </table><p><strong>Known problems</strong></p>
 <ul>
-<li>CC65: <code>-Cl</code> prevents recursive functions</li>
+<li>CC65: <code>-Cl</code> prevents the use of recursive functions</li>
 <li>ZSDCC: has bugs that do not depend on the options and has specific bugs that are triggered by <code>-SO3</code> when no <code>--max-alloc-node20000</code> option is provided.</li>
 </ul>
 <p>In order to avoid these problems and reduce compilation time we recommend the use of just SCCZ80 for Z80 during development and debugging and resort to ZSDCC only for the final optimization and tests.</p>
@@ -787,10 +784,8 @@ Here we give a list of options to produced optimized code on our compilers.</p>
 <p>Our compilers will not always be able to detect and remove unused and useless code from the binary. Therefore we must avoid to include it in the first place.</p>
 <p>We can do even better with some of the compilers by instructing them to not include some standard libraries or even portions of the libraries that we are sure not to use.</p>
 <h3 id="avoid-the-standard-library">Avoid the standard library</h3>
-<p>In some meaningful cases, we could avoid using the standard library in order to reduce significantly the size of the produced binary.</p>
-<h4 id="cpm-80-use-only-getchar-and-putcharc">[cp/m-80] Use only <code>getchar()</code> and <code>putchar(c)</code></h4>
-<p>Replacing functions such as <code>printf</code> and <code>scanf</code> with just <code>getchar()</code> and <code>putchar(c)</code> is very useful when using ACK to produce <code>CP/M-80</code> binaries because otherwise ACK links a huge implementation of the standard C library.</p>
-<h4 id="z88dk-special-pragmas-to-remove-code">[z88dk] Special <code>pragma</code>'s to remove code</h4>
+<p>Avoiding the standard library can save some generated code. This has a significant impact when using ACK to produce <code>CP/M-80</code> binaries. When compiling with ACK, whenever possible, we shoud try to replace functions such as <code>printf</code> and <code>scanf</code> with just <code>getchar()</code> and <code>putchar(c)</code>.</p>
+<h3 id="z88dk-special-pragmas-to-remove-code">[z88dk] Special <code>pragma</code>'s to remove code</h3>
 <p>Z88DK provides several <em>pragma</em> commands to instruct the compiler and linker to not include some useless code.</p>
 <p>For example:</p>
 <pre><code>#pragma printf = "%c %u"
