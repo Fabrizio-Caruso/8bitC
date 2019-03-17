@@ -35,16 +35,15 @@
 <h2 id="definitions">Definitions</h2>
 <p>In this article we will refer to <em>system</em>, <em>target</em> and <em>architecture</em> with the following meanings:</p>
 <ul>
-<li>A <em>system</em> is any kind of processor-equipped machine such as computers, consoles, hand-helds, scientigic calculators, embedded systems, etc.</li>
-<li>A <em>target</em> of a compiler is any kind of <em>system</em> supported by the compiler, i.e., a system for which the compiler provides specific support with libraries and the generator of a binary in the specific format.</li>
-<li>An <em>architecture</em> is a processor family (e.g., Intel 8080, MOS 6502, etc.). Therefore a <em>target</em> has an <em>architecture</em> that corresponds to its processor. So it has only one architecture unless if it has more than two or more processors belonging to two different families (such as the Commodore 128, which has both a Z80 and a 6502-derived processor)</li>
+<li>A <em>system</em> is any kind of processor-equipped machine such as computers, consoles, hand-helds, scientific calculators, embedded systems, etc.</li>
+<li>A <em>target</em> of a compiler is any kind of <em>system</em> supported by the compiler, i.e., a system for which the compiler provides specific support with libraries and the generator of a binary in a format that is usable by an emulator and/or real hardware.</li>
+<li>An <em>architecture</em> is a processor family (e.g., Intel 8080, MOS 6502, etc.). Therefore a <em>target</em> has an <em>architecture</em> that corresponds to its processor. So it has only one architecture unless if it has two or more processors belonging to different families (such as the Commodore 128, which has both a Z80 and a 6502-derived processor)</li>
 </ul>
 <h2 id="multi-target-cross-compilers">Multi-target cross-compilers</h2>
 <p>In order to produce binaries from source code we recommend <em>multi-target</em> <em>cross-compilers</em> (i.e., compilers that are run on a modern PC and that produce binaries for multiple <em>targets</em>).</p>
 <h3 id="cross-compilers-vs-native-compilers">Cross-compilers vs native compilers</h3>
 <p>We do not recommend the use of <em>native</em> compilers because they would be inconvenient (even if used inside an accellerated emulator) and would never produce the same kind of optimized code due to the limitated resources of the 8-bit system.</p>
 <p>In particular we will refer to the following <em>multi-targer</em> <em>cross-compilers</em>:</p>
-<p>We will refer in particular to the following <em>multi-target</em> <em>cross-compilers</em>:</p>
 
 <table>
 <thead>
@@ -90,7 +89,7 @@
 <li>the more reliable SCCZ80 that also offers fast compilation,</li>
 <li>the experimental ZSDCC (Z80-only optimized SDCC version) that can produce faster and more compact code than SCCZ80 at the cost of much slower compilation and the risk introducing erratic behavior.</li>
 </ul>
-<p>Almost of considered compilers generate code for just one architecture (they are <em>mono-architecture</em>) even though they are <em>multi-target</em>. ACK is an exception because it is <em>multi-architecture</em> (Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
+<p>Almost all of considered compilers generate code for just one architecture (they are <em>mono-architecture</em>) even though they are <em>multi-target</em>. ACK is an exception because it is <em>multi-architecture</em> (Intel 8080, Intel 8088/8086, I386, 68K, MIPS, PDP11, etc.).</p>
 <p>This article is <em>not</em> an introduction nor a manual for these compilers and it will <em>not</em> cover the following topics:</p>
 <ul>
 <li>compiler installation</li>
@@ -103,7 +102,7 @@ We will not consider previous versions such as C in <em>K&amp;R</em> syntax.</p>
 <h2 id="motivation">Motivation</h2>
 <p>Why should we use C to code for vintage 8-bit systems?<br>
 Traditionally these systems were coded in either Assembly or interpreted BASIC or a mix of the two.<br>
-Given the limited resources, Assembly was ofter necessary. BASIC was convenient for its simplicity and because an interpreter was often present on the system.</p>
+Given the limited resources, Assembly was often necessary. BASIC was convenient for its simplicity and because an interpreter was often present on the system’s ROM.</p>
 <p>If we limit our comparison to just Assembly, BASIC and C, the following tables summarizes the reasons of using C:</p>
 
 <table>
@@ -136,23 +135,22 @@ Given the limited resources, Assembly was ofter necessary. BASIC was convenient 
 </tr>
 </tbody>
 </table><h3 id="very-high-portability">Very high portability</h3>
-<p>Therefore the main reason for using ANSI C is its portability.<br>
-In particolar ANSI C allows us:</p>
+<p>In particolar ANSI C allows us:</p>
 <ul>
 <li>to ease porting from different architectures</li>
 <li>to write “universal” code, that is valid code for different targets <em>without</em> any necessary modification</li>
 </ul>
 <h3 id="good-performance">Good performance</h3>
-<p>Someone declares C as a sort of universal Assembly language. I do not fully agree with this statement because optimally-written C will never beat optimally-written Assembly.<br>
+<p>Someone sees C as a sort of universal Assembly language. I do not fully agree with this statement because optimally-written C will never beat optimally-written Assembly.<br>
 Nevertheless, C is the closest language to Assembly among the languages that allow high level programming.</p>
 <h3 id="sentimental-drawbacks">“Sentimental drawbacks”</h3>
-<p>One not fully rational reason for not using C in this context is the fact coding in C provides a less <em>vintage</em> experience compared to BASIC and Assembly because it was less common on the home computers from the 80s (but it was common on 8-bit business computers such as on computers that used the CP/M operating system).<br>
-A good reason for coding in C is that C allows us to code any 8-bit system.</p>
+<p>One not fully rational reason for not using C in this context is the fact that coding in C provides a less <em>vintage</em> experience compared to BASIC and Assembly because it was less common on the home computers from the 80s (but it was common on 8-bit business computers such as on computers that used the CP/M operating system).<br>
+On the other hand, I believe that a good reason for coding in C is that C allows us to code for any 8-bit system.</p>
 <h2 id="writing-portable-code">Writing portable code</h2>
-<p>Writing easily portable code or even directly compilable for different architectures is possible is C through different strategies:</p>
+<p>Writing easily portable code or even directly compilable code for different architectures is possible in C through different strategies:</p>
 <ul>
-<li>Write code that is <em>hardware-agnostic</em> through <em>abstract interfaces</em> (that is hardware-independent APIs)</li>
-<li>Use different implementations of the *interfaces" and select them at compilation-time (by using <em>precompiler-directives</em> or by providing different files at linking-time)</li>
+<li>Write code that is <em>hardware-agnostic</em> through <em>abstract interfaces</em> (i.e., is hardware-independent APIs)</li>
+<li>Use different implementations of the <em>interfaces</em> and select them at compilation-time (by using <em>precompiler-directives</em> or by providing different files at linking-time)</li>
 </ul>
 <h3 id="writing-portable-code-for-targets-of-a-dev-kit">Writing portable code for targets of a dev-kit</h3>
 <p>This is trivial if our multi-target dev-kit provides a multi-target library or if we just use standard C libraries (e.g., stdio, stdlib, etc.). Under these conditions we just need to recompile our code. The multi-target library will do the “magic” for us.</p>
@@ -190,13 +188,13 @@ A good reason for coding in C is that C allows us to code any 8-bit system.</p>
 </tbody>
 </table><p>In particular Z88DK has very powerful libraries for multi-target graphics and even provides APIs for software sprites (<a href="https://github.com/z88dk/z88dk/wiki/monographics">https://github.com/z88dk/z88dk/wiki/monographics</a>) and redefined characters for most of its 80 targets.<br>
 <strong>Example</strong>: The code of the game H-Tron (<a href="https://sourceforge.net/projects/h-tron/">https://sourceforge.net/projects/h-tron/</a>) uses Z88DK’s APIs for low resolution bitmap graphics for a multitude of Z80-based targets.</p>
-<p>Therefore if we were to use exclusively the standard C libraries we could compile our code with ACK, CMOC, CC65 and Z88DK. If we used <em>conio</em> we could compile the code with CC65 and Z88DK.</p>
+<p>Therefore if we were to use exclusively the standard C libraries we could compile our code with ACK, CMOC, CC65 and Z88DK. If we used <em>conio</em> we could compile the code with CC65 and Z88DK (maybe with minor adaptations).</p>
 <p>In all other cases, if we want to write portable code on different architectures and systems, we would need to write a “hardware abstraction layer” that allows us to <strong>separate</strong>:</p>
 <ul>
 <li>the code that does not depend on the hardware (e.g., the logic part)</li>
 <li>the code that depends on the harware (e.g., input/output in a videogame)</li>
 </ul>
-<p>This <em>patterm</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> in a way to select the different portions of code required by each hardware at compilation-time.<br>
+<p>This <em>patterm</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> to select the different portions of code required by each hardware at compilation-time.<br>
 In particular C provides a powerful pre-compiler with commands such as:</p>
 <ul>
 <li><code>#define</code> -&gt; to define a <em>macro</em></li>
@@ -222,7 +220,7 @@ This also allows to select specific options for the configuration of the target 
 <li>the code of the game (<em>src/chase</em> directory) is hardware-independent</li>
 <li>the code of the <em>crossLib</em> library  (<em>src/cross_lib</em> directory) implements all the hardware-sepcific details</li>
 </ul>
-<h3 id="writing-portable-code-even-for-non-supported-systems">Writing portable code even for non-supported systems</h3>
+<h3 id="writing-portable-code-even-for-unsupported-systems">Writing portable code even for unsupported systems</h3>
 <p>The dev-kits under our consideration support a list of targets for each architecture by providing specific libraries. Nevertheless it is possible to exploit these dev-kits for other systems with the same architecture but we will have to implement all the hardware-specific code:</p>
 <ul>
 <li>the necessary code for input/output (e.g., graphics, sounds, keyboard, joystick, etc.)</li>
@@ -232,7 +230,7 @@ This also allows to select specific options for the configuration of the target 
 <p>In many cases, we can use the ROM routines to do this (see the section on the ROM routines)</p>
 <p>Moreover we may have to convert the binary to a format that can be acccepted by the system.</p>
 <p>Therefore, we can indeed write portable code for even these unsupported systems.</p>
-<p>For example CC65 does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use the dev-kit to produce binaries for these targets:</p>
+<p>For example CC65 does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use these dev-kits to produce binaries for such targets:</p>
 <ul>
 <li>Cross Chase (<a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE">https://github.com/Fabrizio-Caruso/CROSS-CHASE</a>) supports (theoretically) any architecture even the unsupported ones such as for example the l’Olivetti Prodest PC128.</li>
 <li>The game Robotsfindskitten is been compiled for thr Atari 7800 with CC65 (<a href="https://sourceforge.net/projects/rfk7800/files/rfk7800/">https://sourceforge.net/projects/rfk7800/files/rfk7800/</a>).</li>
