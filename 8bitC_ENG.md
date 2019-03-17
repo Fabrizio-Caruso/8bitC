@@ -822,22 +822,32 @@ Here we give a list of options to produced optimized code on our compilers.</p>
 <h4 id="libraries-may-already-use-rom-routines">Libraries may already use ROM routines</h4>
 <p>Luckily we use ROM routines implicitly by just using the libraries that are provided by the dev-kit. This saves us a lot of RAM memory because the code is already stored in ROM.<br>
 Nevertheless we must take into consideration that when we use a ROM routine may add some constraints in our code because we cannot modify them and they may use some auxiliary RAM locations (e.g., buffers) that we won’t be allowed to use.</p>
-<h2 id="use-the-specific-hardware">Use the specific hardware</h2>
-<p>As seen in the previous section, even if we could in C we should not forget the specific hardware. In some cases the hardware can help us write more compact and faster code.</p>
-<h3 id="redefine-characters-only-when-needed">Redefine characters only when needed</h3>
-<p>When we need very simple low level graphics, we could avoid redefining all our characters. For example we could exploit the extended ASCII character set  (ATASCII, PETSCII, SHARPSCII, etc.). Even if some redefined characters are necessary we could just redefine the needed ones and in same cases, we could use characters in ROM and in RAM at the same time  (see the Vic 20 example in the next section).</p>
-<h3 id="exploit-the-graphics-chips">Exploit the graphics chips</h3>
-<p>In some cases we can save some significant amount of memory if we know the graphics chips.</p>
-<p>Example (Texas VDP TMS9918A chip such as the one on MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
-Systems that use this chip have a special text color mode (<em>Mode 1</em>) where each character has as preassigned color. When using this text mode setting a character and its color is done by a single byte.</p>
-<p>Example (Commodore Vic 20)<br>
-The Commodore Vic 20 is a very special case because of its very limited RAM memory (total RAM: 5k, RAM available for the code: 3,5K) but it also comes with tricky ways to mitigate these limits:</p>
-<ul>
-<li>It also has color ram (1024 nibbles).</li>
-<li>A large part of the non-code RAM can be used by the code (buffers, auxiliary locations, etc.)</li>
-<li>The most surprising feature is that each chip can map some characters in RAM and some in ROM.</li>
-</ul>
-<p>Therefore, we do not use RAM for colors. We can map some variables in some non-code RAM areas.<br>
-If we need n (n&lt;=64) redefined characters, we can just map 64 onto RAM by <code>POKE(0x9005,0xFF);</code>.<br>
-We can then redefine up to 64 characters and keep 64 standard characters (defined in ROM).</p>
+<h4 id="basck-let-us-find-the-rom-routines">BASCK: let us find the ROM routines</h4>
+<p>When information on the ROM routines of a lesser known system is scant or we do not know the <em>entry points</em> (start addresses) of such routines we may resort <em>BASCK</em> (<a href="https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c">https://github.com/z88dk/z88dk/blob/master/support/basck/basck.c</a>, developed by Stefano Bodrato), which is distributed as part of Z88DK. <em>BASCK</em> takes as input ROM files of Z80 and 6502-based systems and searches for known patterns of ROM routines. Once the routines and the their <em>entry points</em> are found, using them is not always simple but in some cases it is trivial.</p>
+<p>Example</p>
+<ol>
+<li>Let us say we are looking for the PRINT routine in the ROM, then we run BASCK and we filter its output with the “PRS” string  (e.g., with the Unix “grep” command )</li>
+</ol>
+<pre><code>&gt; basck -map romfile.rom |grep PRS  
+PRS = $AAAA ; Create string entry and print it
+</code></pre>
+<p>This gives us the address of the PRINT routine.</p>
+<ol start="2">
+<li>Now we can write C or Assembly code to use it:</li>
+</ol>
+<pre><code>extern void rom_prs(char * str) __z88dk_fastcall @0xAAAA;
+
+main() {  
+	rom_prs ("Hello WORLD !");  
+	while (1){};  
+}
+</code></pre>
+<h2 id="exploit-the-graphics-chips">Exploit the graphics chips</h2>
+<p>As seen in the previous section, even if we could in C we should not forget the specific hardware. In some cases the hardware can help us write more compact and faster code. In particular the graphics chip can help us save lots of RAM.</p>
+<p>Example (TI VDP chip such as the TMS9918A used in the MSX, Spectravideo, Memotech MTX, Sord M5, etc.)<br>
+In some cases we could exploit a special text mode (<em>Mode 1</em>) where the color of a character is implicitfor each group of characters. In such case, a single byte is sufficient to define a character and its color. The 8-bit Atari computer have a similar text mode (graphics mode 1+16, Antic mode 6).</p>
+<p>Example (VIC chip used in the Commodore Vic 20)<br>
+The Commodore Vic 20 is a special case because of its hardware limits (RAM totale: 5k, RAM disponibile per il codice: 3,5K) but also for some of the tricks it provides to reduce the impact of these limits.<br>
+One surprising feature of this chip, is its ability to map just a subset of its characters to RAM while mapping the rest to ROM. If we only need n (&lt;=64) redefined characters we can map onto RAM just 64 of them with <code>POKE(0x9005,0xFF);</code>. In such a way we may also use less than 64.</p>
+<p>Moreover, in some cases we can use the separate video ram to which some graphics chips have access (e.g., the TI VDP, MOS VDC of the C128, etc.) for different purposes than doing graphics, such as storing data. This is possible but it has a very high computational cost because the CPU has an indirect access to this separate RAM.</p>
 
