@@ -372,13 +372,10 @@ A <em>single pass</em> compiler may evaluate the following expression from left 
 	i = OFFS + 3 + i;
 </code></pre>
 <h2 id="bit-specific-code-optimization">8-bit specific code optimization</h2>
-<p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.).<br>
+<p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitwise operators, etc.).<br>
 This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
 <h3 id="implement-peek-and-poke-in-c">Implement <code>peek</code> and <code>poke</code> in C</h3>
-<p>Mosr probably we will need to read and write single bytes from and to specific memory locations.<br>
-In old BASIC this was done through<br>
-<code>peek</code> and <code>poke</code> commands.<br>
-In c we must do this through poniters whose syntax is not very readable. In order to make our code more readable we can create the following macros:</p>
+<p>Most probably we will need to read and write single bytes from and to specific memory locations. In old BASIC this was done through <code>peek</code> and <code>poke</code> commands. In C we must do this through pointers whose syntax is not very readable. In order to make our code more readable we can create the following macros:</p>
 <pre><code>    #define POKE(addr,val)  (*(unsigned char*) (addr) = (val))
     #define PEEK(addr)      (*(unsigned char*) (addr))
 </code></pre>
@@ -394,9 +391,7 @@ In c we must do this through poniters whose syntax is not very readable. In orde
 </ul>
 <h4 id="integer-vs-floating-point-types">Integer vs floating point types</h4>
 <p>The C languages provides <code>signed</code> integer types (<code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>, <code>long long</code>, etc.) and their <code>unsigned</code> counterparts.<br>
-Most cross compiler (but not CC65) support the <code>float</code> type (for <em>floating point</em> numbers), which we do not cover here.<br>
-We only remark that <code>float</code> numbers in 8-bit architecture are always <em>software float</em> and therefore have a high computational cost.<br>
-Hence we should only use them when strictly necessary.</p>
+Most cross compilers (but not CC65) support the <code>float</code> type (for <em>floating point</em> numbers), which we do not cover here. We only remark that <code>float</code> numbers in 8-bit architecture are always <em>software float</em> and therefore have a high computational cost. Hence we should only use them when strictly necessary.</p>
 <h4 id="our-friend-unsigned">Our friend <em>unsigned</em></h4>
 <p>Since the 8-bit architectures under consideration do <strong>NOT</strong> handle <code>signed</code> types well, we must avoid them whenever possible.</p>
 <h4 id="size-matters">“Size matters!”</h4>
@@ -413,7 +408,8 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 <tr>
 <th>type</th>
 <th>number of bits</th>
-<th>equivalent type</th>
+<th>equivalent type in <code>stdint.h</code></th>
+<th>alternative name</th>
 </tr>
 </thead>
 <tbody>
@@ -421,26 +417,30 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 <td><code>unsigned char</code></td>
 <td>8</td>
 <td><code>uint8_t</code></td>
+<td><code>byte</code></td>
 </tr>
 <tr>
 <td><code>unsigned short</code></td>
 <td>16</td>
 <td><code>uint16_t</code></td>
+<td><code>word</code></td>
 </tr>
 <tr>
 <td><code>unsigned int</code></td>
 <td>16</td>
 <td><code>uint16_t</code></td>
+<td><code>word</code></td>
 </tr>
 <tr>
 <td><code>unsigned long</code></td>
 <td>32</td>
 <td><code>uint32_t</code></td>
+<td><code>dword</code></td>
 </tr>
 </tbody>
 </table><p>Therefore we must:</p>
 <ul>
-<li>whenever possible use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operatoins;</li>
+<li>use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operatoins whenever possible;</li>
 <li>use <code>unsigned char</code> (or <code>uint8_t</code>) and <code>unsigned short</code> (or <code>uint16_t</code>) for all other operations and avoid all 32-bit operations.</li>
 </ul>
 <p>Remark: When the fixed-size types are not available we can introduce them by using <code>typedef</code>:</p>
@@ -453,8 +453,7 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 <h4 id="avoid-signed">Avoid <em>signed</em></h4>
 <p>In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.</p>
 <h4 id="avoid-explicit-products">Avoid explicit products</h4>
-<p>All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values.<br>
-Therefore, if possible, we should avoid the products or limit ourselves to products and divisions by power of 2 that we can implement with the <em>&lt;&lt;</em> e <em>&gt;&gt;</em> operators:</p>
+<p>All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values. Therefore, if possible, we should avoid products or limit ourselves to products and divisions by power of 2 that we can implement with the <em>&lt;&lt;</em> e <em>&gt;&gt;</em> operators:</p>
 <pre><code>	unsigned char foo, bar;
 	...
 	foo &lt;&lt; 2; // multiply by 2^2=4
@@ -470,9 +469,8 @@ Therefore, if possible, we should avoid the products or limit ourselves to produ
 	}
 </code></pre>
 <h3 id="variables-and-parameters">Variables and parameters</h3>
-<p>One of the greatest limitations of the MOS 6502-architecture is not the lack of registers as someone may think but it is the small size of its <em>hardware stack</em> (in <em>page one</em>: <code>$0100-01FF</code>),<br>
-which makes unusable in C for managing the <em>scope</em> of variables and parameter passing.<br>
-Therefore a C compiler for the MOS 6502 will most probably be forced to implement a <em>software stack</em>:</p>
+<p>One of the greatest limitations of the MOS 6502-architecture is not the lack of registers as someone may think but it is the small size of its <em>hardware stack</em> (in <em>page one</em>: <code>$0100-01FF</code>), which is unusable in C for managing the <em>scope</em> of variables and parameter passing.<br>
+Therefore a C compiler for the MOS 6502 may have to use a <em>software stack</em>:</p>
 <ul>
 <li>to manage the scope of local variables,</li>
 <li>to manage parameter passing.</li>
@@ -483,18 +481,14 @@ Therefore a C compiler for the MOS 6502 will most probably be forced to implemen
 We must therefore wisely choose which variables deserve to be local and which variables can be declared as global.<br>
 We would then have less re-usable code but we will gain in efficiency. I am <strong>NOT</strong> suggesting the use of just global variables and to renounce to all parameters in functions.</p>
 <h4 id="do-no-use-re-entrant-function">[6502] Do no use re-entrant function</h4>
-<p>The CC65 compiler for the MOS 6502 architecture provides the <code>-Cl</code> that interprets all local variables as <code>static</code>, i.e., global.<br>
-This has the effect of avoiding the <em>software stack</em> for their scope. This also has the effect of making all the functions <em>non-reentrant</em>.<br>
-In practice this prevents us from using recursive function. This is not a serious loss because recursion would be a costly operation, which we should avoid on 8-bit systems.</p>
+<p>The CC65 compiler for the MOS 6502 architecture provides the <code>-Cl</code> option that tells the compiler to interpret all local variables as <code>static</code>, i.e., global.<br>
+This has the effect of avoiding the use of the <em>software stack</em> for their scope. This also has the effect of making all the functions <em>non-reentrant</em>.<br>
+In practice this prevents us from using recursive functions. This is not a serious loss because recursion would be a costly operation, which we should avoid on 8-bit systems.</p>
 <h4 id="use-page-zero">[6502] Use page zero</h4>
 <p>Standard C provides the <code>register</code> keyword to give a hint to the compiler to use a register for a given variable.<br>
 Most modern compiler simply ignore this keyword because their optimizers can choose better than the programmer.<br>
-This is also true for the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>pagina zero</em> for a given variable.<br>
-The MOS 6502 can access this page more efficiently than any other memory area.<br>
-The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer.<br>
-By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
-One may think that all variables should be declared as <code>register</code> but things are <strong>NOT</strong> so simple because everything has a cost.<br>
-In order to store a variable in page zero, some extra operations are required. Hence, page zero provides an advantage only for variables that are heavily used.<br>
+This is also true for most of the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>pagina zero</em> for a given variable.  The MOS 6502 can access this page more efficiently than any other memory area. The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer. By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
+One may think that all variables should be declared as <code>register</code> but things are <strong>NOT</strong> so simple because everything has a cost. In order to store a variable in page zero, some extra operations are required. Hence, page zero provides an advantage only for variables that are heavily used.<br>
 In practice the two most common scenarios where this is the case are:</p>
 <ol>
 <li>parameters of type pointer to <code>struct</code> that are used at least 3 times within the function scope;</li>
