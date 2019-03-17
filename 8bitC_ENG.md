@@ -42,8 +42,8 @@
 <h2 id="multi-target-cross-compilers">Multi-target cross-compilers</h2>
 <p>In order to produce binaries from source code we recommend <em>multi-target</em> <em>cross-compilers</em> (i.e., compilers that are run on a modern PC and that produce binaries for multiple <em>targets</em>).</p>
 <h3 id="cross-compilers-vs-native-compilers">Cross-compilers vs native compilers</h3>
-<p>We do not recommend the use of <em>native</em> compilers because they would be inconvenient (even if used inside an accellerated emulator) and would never produce the same kind of optimized code due to the limitated resources of the 8-bit system.</p>
-<p>In particular we will refer to the following <em>multi-targer</em> <em>cross-compilers</em>:</p>
+<p>We do not recommend the use of <em>native</em> compilers because they would be inconvenient (even if used inside an accelerated emulator) and would never produce the same kind of optimized code due to the limited resources of the 8-bit system.</p>
+<p>In particular we will refer to the following <em>multi-target</em> <em>cross-compilers</em>:</p>
 
 <table>
 <thead>
@@ -135,7 +135,7 @@ Given the limited resources, Assembly was often necessary. BASIC was convenient 
 </tr>
 </tbody>
 </table><h3 id="very-high-portability">Very high portability</h3>
-<p>In particolar ANSI C allows us:</p>
+<p>In particular ANSI C allows us:</p>
 <ul>
 <li>to ease porting from different architectures</li>
 <li>to write “universal” code, that is valid code for different targets <em>without</em> any necessary modification</li>
@@ -218,7 +218,7 @@ This also allows to select specific options for the configuration of the target 
 <p>The code of <em>Cross-Chase</em> provides an example of how to write <em>universal</em> code for any system and architecture:</p>
 <ul>
 <li>the code of the game (<em>src/chase</em> directory) is hardware-independent</li>
-<li>the code of the <em>crossLib</em> library  (<em>src/cross_lib</em> directory) implements all the hardware-sepcific details</li>
+<li>the code of the <em>crossLib</em> library  (<em>src/cross_lib</em> directory) implements all the hardware-specific details</li>
 </ul>
 <h3 id="writing-portable-code-even-for-unsupported-systems">Writing portable code even for unsupported systems</h3>
 <p>The dev-kits under our consideration support a list of targets for each architecture by providing specific libraries. Nevertheless it is possible to exploit these dev-kits for other systems with the same architecture but we will have to implement all the hardware-specific code:</p>
@@ -228,7 +228,7 @@ This also allows to select specific options for the configuration of the target 
 </ul>
 <p>Alternatively, it is possible to extend a dev-kit to support to new targets.</p>
 <p>In many cases, we can use the ROM routines to do this (see the section on the ROM routines)</p>
-<p>Moreover we may have to convert the binary to a format that can be acccepted by the system.</p>
+<p>Moreover we may have to convert the binary to a format that can be accepted by the system.</p>
 <p>Therefore, we can indeed write portable code for even these unsupported systems.</p>
 <p>For example CC65 does not support the <em>BBC Micro</em>, nor the <em>Atari 7800</em> and CMOC does not support the <em>Olivetti Prodest PC128</em>. Yet, it is possible to use these dev-kits to produce binaries for such targets:</p>
 <ul>
@@ -353,7 +353,7 @@ we want to be able to change the value of one field or the other in different si
 <h3 id="pre-incrementdecrement--vs-post-incrementdecrement">Pre-increment/decrement  vs Post-increment/decrement</h3>
 <p>We must avoid post-increment/decrement operators (<code>i++</code>, <code>i--</code>) when they are not needed, i.e.,  when we do not need the original value and replace them with (<code>++i</code>, <code>--i</code>). The reason is that the post-increment operator requires at least an extra operation to save the original value.<br>
 Remark: It is totally useless to use a post-increment in a <code>for</code> loop.</p>
-<h3 id="costant-vs-variables">Costant vs Variables</h3>
+<h3 id="constant-vs-variables">Constant vs Variables</h3>
 <p>Any architecture will perform better if variables are replaced by constants.</p>
 <h4 id="use-constants">Use constants</h4>
 <p>Therefore if a variable has a known value at compilation-time, it is important to replace it with a constant.<br>
@@ -440,7 +440,7 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 </tbody>
 </table><p>Therefore we must:</p>
 <ul>
-<li>use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operatoins whenever possible;</li>
+<li>use <code>unsigned char</code> (or <code>uint8_t</code>) for arithmetic operations whenever possible;</li>
 <li>use <code>unsigned char</code> (or <code>uint8_t</code>) and <code>unsigned short</code> (or <code>uint16_t</code>) for all other operations and avoid all 32-bit operations.</li>
 </ul>
 <p>Remark: When the fixed-size types are not available we can introduce them by using <code>typedef</code>:</p>
@@ -477,7 +477,7 @@ Therefore a C compiler for the MOS 6502 may have to use a <em>software stack</em
 </ul>
 <p>The other 8-bit architectures under our consideration may suffer less from this problem but the scope of local variables and parameter passing also have a cost when a <em>hardware stack</em> can be used.</p>
 <h4 id="an-antipattern-may-help-us">An <em>antipattern</em> may help us</h4>
-<p>One way to mitigate this problem is to reduce the use of local variables and passed paramters. This is clearly an <em>antipattern</em> and if we were to apply it to all our code we would get some <em>spaghetti code</em>.<br>
+<p>One way to mitigate this problem is to reduce the use of local variables and passed parameters. This is clearly an <em>antipattern</em> and if we were to apply it to all our code we would get some <em>spaghetti code</em>.<br>
 We must therefore wisely choose which variables deserve to be local and which variables can be declared as global.<br>
 We would then have less re-usable code but we will gain in efficiency. I am <strong>NOT</strong> suggesting the use of just global variables and to renounce to all parameters in functions.</p>
 <h4 id="do-no-use-re-entrant-function">[6502] Do no use re-entrant function</h4>
@@ -487,7 +487,7 @@ In practice this prevents us from using recursive functions. This is not a serio
 <h4 id="use-page-zero">[6502] Use page zero</h4>
 <p>Standard C provides the <code>register</code> keyword to give a hint to the compiler to use a register for a given variable.<br>
 Most modern compiler simply ignore this keyword because their optimizers can choose better than the programmer.<br>
-This is also true for most of the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>pagina zero</em> for a given variable.  The MOS 6502 can access this page more efficiently than any other memory area. The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer. By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
+This is also true for most of the compilers under consideration but not for CC65 that uses this keyword to tell the compiler to use <em>page zero</em> for a given variable.  The MOS 6502 can access this page more efficiently than any other memory area. The operating system already uses this page but the CC65 compilers leaves a few available bytes for the programmer. By default CC65 reserves 6 bytes in page zero for variables declared as <code>register</code>.<br>
 One may think that all variables should be declared as <code>register</code> but things are <strong>NOT</strong> so simple because everything has a cost. In order to store a variable in page zero, some extra operations are required. Hence, page zero provides an advantage only for variables that are heavily used.<br>
 In practice the two most common scenarios where this is the case are:</p>
 <ol>
@@ -505,14 +505,14 @@ The most common case is the data for sprites and redefined characters or tiles.<
 <p>It is possible to configure CC65’s linker through a .cfg file that describes the structure of the binary that we want to produce.<br>
 This is not very simple and a description of the linker would go beyond the scope of this article. For details we refer to<br>
 <a href="https://cc65.github.io/doc/ld65.html">https://cc65.github.io/doc/ld65.html</a><br>
-We advice to read the manual and start by modyfing the default .cfg file in order to adapt it to one’s use-case.</p>
+We advice to read the manual and start by modifying the default .cfg file in order to adapt it to one’s use-case.</p>
 <h5 id="exomizer-can-help-us-also-on-this">Exomizer can help us (also) on this</h5>
 <p>In some cases we may have graphics data in a memory area far from the code and have them both on the same binary. If we do this, we may end up with a “hole” between the two areas.<br>
 A common example is provided by the C64 where graphics data may be in higher memory than the code.<br>
 In this case I recommend the <em>exomizer</em> tool to compress the binary:  <a href="https://bitbucket.org/magli143/exomizer/wiki/Home">https://bitbucket.org/magli143/exomizer/wiki/Home</a></p>
 <h4 id="z88dk-appmake-does-almost-everything-for-us">[Z88DK] <em>Appmake</em> does almost everything for us</h4>
 <p>Z88DK makes our life easier and its power <em>appmake</em> tool automatically builds binaries in the correct format for most scenarios.<br>
-Z88DK also allows the user to define <em>memory sections</em> and to redefine the binary “packagging” but doing this is quite complicated.<br>
+Z88DK also allows the user to define <em>memory sections</em> and to redefine the binary “packaging” but doing this is quite complicated.<br>
 This topic is treated in detail in:<br>
 <a href="https://github.com/z88dk/z88dk/issues/860">https://github.com/z88dk/z88dk/issues/860</a></p>
 <h3 id="code-on-multiple-files">Code on multiple files</h3>
