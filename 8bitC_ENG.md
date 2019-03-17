@@ -408,7 +408,7 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 <tr>
 <th>type</th>
 <th>number of bits</th>
-<th>equivalent type in <code>stdint.h</code></th>
+<th><code>stdint.h</code></th>
 <th>alternative name</th>
 </tr>
 </thead>
