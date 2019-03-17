@@ -285,7 +285,42 @@ This also allows to select specific options for the configuration of the target 
 <h4 id="structured-programming">Structured programming</h4>
 <p>We have to examine each function in order to find common portions that we can <em>factor</em> by introducing <em>sub-functions</em> that are original function can call.<br>
 However we must take into account that, beyond a certain limit, excessive code granularity has negative effects because each function call has a computational and memory cost.</p>
-<h4 id="parametrized-code">Parametrized code</h4>
+<h5 id="passing-variables">Passing variables</h5>
+<p>If two functions do the same thing on different objects then just simply use the same function and pass to it the specific object as a parameter.</p>
+<h5 id="passing-pointers-to-functions">Passing pointers to functions</h5>
+<p>In other cases, some portions of the code differ only by an applied function. In such cases, we should write one function to which we pass a pointer to the specific function we want to apply.</p>
+<p>Not everyone is familiar with the C syntax for pointer to functions. Therefore we give here a simple example in which we define <code>sumOfSomething(range, something)</code> that sums  <code>something(i)</code> on values of <code>i</code> from 0 to <code>i-1</code>:</p>
+<pre><code>unsigned short sumOfSomething(unsigned char range, unsigned short (* something) (unsigned char))
+{
+    unsigned char i;
+    unsigned short res =0;
+    for(i=0;i&lt;range;++i)
+    {
+        res+=something(i);
+    }
+    return res;
+}
+
+</code></pre>
+<p>Hence given the two functions:</p>
+<pre><code>unsigned short square(unsigned char val)
+{
+        return val*val;
+}
+</code></pre>
+<pre><code>unsigned short next(unsigned char val)
+{
+    return ++val;
+}
+</code></pre>
+<p>we can use <code>sumOfSomething</code> on either of the two:</p>
+<pre><code>printf("%d\n",sumOfSomething(4,square));
+</code></pre>
+<p>prints 14, i.e., the sum of squares of 0,1,2,3.</p>
+<pre><code>printf("%d\n",sumOfSomething(4,next));
+</code></pre>
+<p>prints 10, i.e., the sum of 0+1,1+1,2+1,3+1.</p>
+<h5 id="passing-offsets-to-struct">Passing offsets to struct</h5>
 <p>In some cases it is possible to generalize the code by passing a parameter to avoid writing very similar functions.<br>
 An advanced example is in <a href="https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h">https://github.com/Fabrizio-Caruso/CROSS-CHASE/blob/master/src/chase/character.h</a> where, given a <code>struct</code> with two fields <code>_x</code> and <code>_y</code>,<br>
 we want to be able to change the value of one field or the other in different situations:</p>
@@ -314,26 +349,28 @@ we want to be able to change the value of one field or the other in different si
 <p>In this case, we use the fact that the field <code>_y</code> is exactly one byte after the field <code>_x</code>. Therefore with <code>offset=0</code> we access <code>_x</code> and with <code>offset=1</code> we access <code>_y</code>.</p>
 <p><strong>Warning</strong>: We must always remember that adding a parameter has a cost and we must verify that the cost of the parameter is lower than the cost of an extra function (e.g., by looking at the size of the obtained binary).</p>
 <h4 id="same-code-on-similar-objects">Same code on similar <em>objects</em></h4>
-<p>We can do even better and use the same code on <em>objects</em> that are not identical but shares some common features by using <code>offset</code> in <code>struct</code>, <em>pointers to functions</em>, etc.<br>
-In general this is possible through <em>object-oriented programming</em> whose light-weight implementation for 8-bit systems is described in a subsequent section in this article.</p>
+<p>We can do even better and use the same code on <em>objects</em> that are not identical but shares some common features by using <code>offset</code> in <code>struct</code>, <em>pointers to functions</em>, etc. In general this is possible through <em>object-oriented programming</em> whose light-weight implementation for 8-bit systems is described in a subsequent section in this article.</p>
 <h3 id="pre-incrementdecrement--vs-post-incrementdecrement">Pre-increment/decrement  vs Post-increment/decrement</h3>
-<p>We must avoid post-increment/decrement operators (<code>i++</code>, <code>i--</code>) when they are not needed, i.e.,  when we do not need the original value and replace them with (<code>++i</code>, <code>--i</code>).<br>
-The reason is that the post-increment operator requires at least an extra operation to save the original value.<br>
+<p>We must avoid post-increment/decrement operators (<code>i++</code>, <code>i--</code>) when they are not needed, i.e.,  when we do not need the original value and replace them with (<code>++i</code>, <code>--i</code>). The reason is that the post-increment operator requires at least an extra operation to save the original value.<br>
 Remark: It is totally useless to use a post-increment in a <code>for</code> loop.</p>
 <h3 id="costant-vs-variables">Costant vs Variables</h3>
-<p>Any architecture will perform better if variables are replace with constants.</p>
+<p>Any architecture will perform better if variables are replaced by constants.</p>
 <h4 id="use-constants">Use constants</h4>
 <p>Therefore if a variable has a known value at compilation-time, it is important to replace it with a constant.<br>
 If its value depends on some compilation option, then we should use a <em>macro</em> to set its value.</p>
-<h4 id="help-the-compiler-to-recognize-constants">Help the compiler to recognize constants</h4>
-<p>Besides, for <em>single pass</em> compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler whether a given expression is a constant.</p>
+<h4 id="help-the-compiler-recognize-constants">Help the compiler recognize constants</h4>
+<p>For <em>single pass</em> compilers (the majority of 8-bit cross-compilers, e.g., CC65), it is important to help the compiler decide whether a given expression is a constant.</p>
 <p><strong><em>Example</em></strong> (from <a href="https://www.cc65.org/doc/coding.html">https://www.cc65.org/doc/coding.html</a>):<br>
 A <em>single pass</em> compiler may evaluate the following expression from left to right and miss the fact that <code>OFFS+3</code> is a constant:</p>
 <pre><code>	#define OFFS   4
 	int  i;
 	i = i + OFFS + 3;
 </code></pre>
-<p>In this case it would be better to re-write <code>i = i + OFFS+3</code> as <code>i = OFFS+3+i</code> or <code>i = i + (OFFS+3)</code>.</p>
+<p>In this case it would be better to re-write <code>i = i + OFFS+3</code> as <code>i = OFFS+3+i</code> or <code>i = i + (OFFS+3)</code>:</p>
+<pre><code>	#define OFFS   4
+	int  i;
+	i = OFFS + 3 + i;
+</code></pre>
 <h2 id="bit-specific-code-optimization">8-bit specific code optimization</h2>
 <p>The C language has both high level constructs (such as <code>struct</code>, functions as parameters, etc.) and low level constructs (such as pointers, bitsise operators, etc.).<br>
 This is not enough to make C a programming language well-suited for programming 8-bit systems.</p>
