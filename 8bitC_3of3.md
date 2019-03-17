@@ -154,7 +154,7 @@ In questa tabella diamo alcuni esempi utili per vari sistemi tra cui molti con p
 </tbody>
 </table><p>(*): Vari buffer e locazioni ausiliarie usate dalle routine in ROM. Per maggiori dettagli facciamo riferimento rispettivamente a:<br>
 <a href="http://m5.arigato.cz/m5sysvar.html">http://m5.arigato.cz/m5sysvar.html</a> e <a href="http://www.trs-80.com/trs80-zaps-internals.htm">http://www.trs-80.com/trs80-zaps-internals.htm</a>.</p>
-<p>In C standard potremmo solo assagnere le variabili puntatore e gli array su specifiche locazioni di memoria. Di seguito diamo un esempio di mappatura a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
+<p>In C standard potremmo solo assegnare le variabili puntatore e gli array su specifiche locazioni di memoria. Di seguito diamo un esempio di mappatura a partire da <code>0xC000</code> in cui abbiamo definito uno <code>struct</code> di tipo <code>Character</code> che occupa 5 byte, e abbiamo le seguenti variabili:</p>
 <ul>
 <li><code>player</code> di tipo <code>Character</code>,</li>
 <li><code>ghosts</code> di tipo <code>array</code> di 8 <code>Character</code> (40=$28 byte)</li>
@@ -277,7 +277,7 @@ Alcuni compilatori mettono a disposizioni delle opzioni per specificare la propr
 <p>I compilatori che trattiamo non sempre saranno capaci di eliminare il codice non usato. Dobbiamo quindi evitare di includere codice non utile per essere sicuri che non finisca nel binario prodotto. Possiamo fare ancora meglio con alcuni dei nostri compilatori, istruendoli a non includere alcune librerie standard o persino alcune loro parti se siamo sicuri di non doverle usare.</p>
 <h3 id="evitare-la-standard-lib">Evitare la standard lib</h3>
 <p>Evitare nel proprio codice la libraria standard nei casi in cui avrebbe senso, può ridurre la taglia del codice in maniera considerevole.  Questa regola è generale ma è particolarmente valida quando si usa ACK per produrre un binario per CP/M-80. In questo caso consiglio di usare esclusivamente <code>getchar()</code> e <code>putchar(c)</code> quando è possibile.</p>
-<h4 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h4>
+<h3 id="z88dk-pragmas-per-non-generare-codice">[z88dk] Pragmas per non generare codice</h3>
 <p>Z88DK mette a disposizione una serie di <em>pragma</em> per istruire il compilatore a non generare codice inutile.</p>
 <p>Per esempio:</p>
 <pre><code>#pragma printf = "%c %u"
