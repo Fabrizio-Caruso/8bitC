@@ -237,7 +237,7 @@ This also allows to select specific options for the configuration of the target 
 <li>BBC has already been added unofficially as an experimental new target in CC65 (<a href="https://github.com/dominicbeesley/cc65">https://github.com/dominicbeesley/cc65</a>).</li>
 </ul>
 <h4 id="compilation-for-unsupported-targets">Compilation for unsupported targets</h4>
-<p>We give a list of compilation options for generic target for each dev-kit so that the compiler is instructued to compile without any dependence on a specific target. For more details we refer to the manual of the dev-kits.</p>
+<p>We give a list of compilation options for generic targets for each dev-kit. These options tell to compile without any dependence on a specific target. For more details we refer to the manual of the dev-kits.</p>
 
 <table>
 <thead>
