@@ -194,7 +194,7 @@ On the other hand, I believe that a good reason for coding in C is that C allows
 <li>the code that does not depend on the hardware (e.g., the logic part)</li>
 <li>the code that depends on the harware (e.g., input/output in a videogame)</li>
 </ul>
-<p>This <em>patterm</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> to select the different portions of code required by each hardware at compilation-time.<br>
+<p>This <em>pattern</em> is very common in modern programming and it is not exclusive to C. For this purpose C provides a set of tools to implement this <em>pattern</em> to select the different portions of code required by each hardware at compilation-time.<br>
 In particular C provides a powerful pre-compiler with commands such as:</p>
 <ul>
 <li><code>#define</code> -&gt; to define a <em>macro</em></li>
