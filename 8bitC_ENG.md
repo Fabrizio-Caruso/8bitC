@@ -451,7 +451,7 @@ Recently the C99 standard has introduced some types that have an unambiguous siz
 <h3 id="choice-of-the-operations">Choice of the operations</h3>
 <p>When writing code for an 8-bit architecture we must avoid inefficient operations or operations that force us to use inefficient types (such as <code>signed</code> or 32-bit types).</p>
 <h4 id="avoid-signed">Avoid <em>signed</em></h4>
-<p>In particolar, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.</p>
+<p>In particular, it is often possible to rewrite the code in a way to avoid subtractions or when this is not possible, we can at least have a code that does not produce negative results.</p>
 <h4 id="avoid-explicit-products">Avoid explicit products</h4>
 <p>All the architectures under consideration, with the only exception of the Motorola 6809, do not have a product operation between two 8-bit values. Therefore, if possible, we should avoid products or limit ourselves to products and divisions by power of 2 that we can implement with the <em>&lt;&lt;</em> e <em>&gt;&gt;</em> operators:</p>
 <pre><code>	unsigned char foo, bar;
