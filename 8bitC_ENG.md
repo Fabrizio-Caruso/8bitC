@@ -612,7 +612,7 @@ We list some of these useful memory areas for some systems including many with v
 <tr>
 <td>Sord M5</td>
 <td>RAM for ROM routines (*)</td>
-<td>$7000-$73FF</td>
+<td>$7000-73FF</td>
 </tr>
 <tr>
 <td>TRS-80 Model I/III/IV</td>
