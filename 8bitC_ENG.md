@@ -480,7 +480,7 @@ Therefore a C compiler for the MOS 6502 may have to use a <em>software stack</em
 <p>One way to mitigate this problem is to reduce the use of local variables and passed parameters. This is clearly an <em>antipattern</em> and if we were to apply it to all our code we would get some <em>spaghetti code</em>.<br>
 We must therefore wisely choose which variables deserve to be local and which variables can be declared as global.<br>
 We would then have less re-usable code but we will gain in efficiency. I am <strong>NOT</strong> suggesting the use of just global variables and to renounce to all parameters in functions.</p>
-<h4 id="do-no-use-re-entrant-functions">[6502] Do no use re-entrant functions</h4>
+<h4 id="do-not-use-re-entrant-functions">[6502] Do not use re-entrant functions</h4>
 <p>The CC65 compiler for the MOS 6502 architecture provides the <code>-Cl</code> option that tells the compiler to interpret all local variables as <code>static</code>, i.e., global.<br>
 This has the effect of avoiding the use of the <em>software stack</em> for their scope. This also has the effect of making all the functions <em>non-reentrant</em>.<br>
 In practice this prevents us from using recursive functions. This is not a serious loss because recursion would be a costly operation, which we should avoid on 8-bit systems.</p>
